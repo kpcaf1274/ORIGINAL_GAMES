@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Space Shooters</title>
+    <style>
+        body {
+            margin: 0; padding: 0;
+            background-color: #1a1a1a;
+            display: flex; flex-direction: column; align-items: center;
+            height: 100vh; color: white;
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden; touch-action: none;
+        }
+        #gameContainer { position: relative; margin-top: 10px; }
+        canvas {
+            background-color: black; display: block;
+            border: 3px solid #33ff00;
+            max-width: 95vw; max-height: 65vh;
+        }
+        #ui-layer {
+            position: absolute; top: 5px; left: 10px; right: 10px;
+            display: flex; justify-content: space-between;
+            font-size: 16px; pointer-events: none;
+        }
+        #controls {
+            display: flex; justify-content: space-around;
+            width: 100%; padding: 15px 0; background: #111;
+            position: fixed; bottom: 0; left: 0;
+        }
+        .btn {
+            width: 70px; height: 70px;
+            background: #333; border: 2px solid #33ff00; border-radius: 50%;
+            color: #33ff00; font-weight: bold;
+            display: flex; justify-content: center; align-items: center;
+            user-select: none;
+        }
+        #btn-shoot { background: #ff3333; color: white; border-color: white; width: 90px; height: 90px; border-radius: 10px; }
+
+        #gameOverScreen, #startScreen {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center; background: rgba(0, 0, 0, 0.95);
+            padding: 30px; border: 3px solid #33ff00; z-index: 10; width: 80%;
+        }
+    </style>
+</head>
+<body>
+
+<div id="gameContainer">
+    <canvas id="gameCanvas" width="600" height="480"></canvas>
+    <div id="ui-layer">
+        <div>SCORE: <span id="score">0</span></div>
+    </div>
+    
+    <div id="startScreen">
+        <h1 style="color: #33ff00;">SPACE SHOOTERS</h1>
+        <button onclick="startGame()" style="padding: 15px 30px; font-size: 20px; background: #33ff00; border: none; font-family: inherit; font-weight: bold; cursor: pointer; border-radius: 5px;">START</button>
+    </div>
+
+    <div id="gameOverScreen" style="display: none;">
+        <h1 id="statusText" style="color: #ff3333;">GAME OVER</h1>
+        <p>Score: <span id="finalScore">0</span></p>
+        <button onclick="restartGame()" style="padding: 10px 20px; background: #33ff00; border: none; font-family: inherit; font-weight: bold; cursor: pointer;">RETRY</button>
+    </div>
+</div>
+
+<div id="controls">
+    <div class="btn" id="btn-left">◀</div>
+    <div class="btn" id="btn-shoot">FIRE</div>
+    <div class="btn" id="btn-right">▶</div>
+</div>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('score');
+    
+    let audioCtx = null;
+    function initAudio() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    function playSound(freq, type, duration, vol = 0.2) {
+        if (!audioCtx || audioCtx.state === 'suspended') return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+    }
+
+    const sfx = {
+        shoot: () => playSound(600, 'square', 0.1, 0.1),
+        hit: () => playSound(150, 'sawtooth', 0.2, 0.2),
+        ufo: () => playSound(1000, 'sine', 0.05, 0.05),
+        over: () => playSound(100, 'sawtooth', 0.5, 0.2)
+    };
+
+    let gameRunning = false;
+    let score = 0;
+    let player = { x: 280, y: 430, width: 34, height: 20, speed: 6, color: '#33ff00' };
+    let bullets = [], enemyBullets = [], enemies = [], barriers = [];
+    let enemyDir = 1, enemySpeed = 1, enemyShootChance = 0.01;
+    let ufo = { x: -50, y: 40, width: 50, height: 20, active: false, speed: 2.5, points: 100 };
+
+    const keys = { Left: false, Right: false };
+    const keyState = {};
+
+    function initGame() {
+        enemies = [];
+        for (let r = 0; r < 4; r++) {
+            for (let c = 0; c < 8; c++) {
+                enemies.push({ x: 60 + c * 45, y: 80 + r * 35, status: 'alive' });
+            }
+        }
+        barriers = [];
+        for (let i = 0; i < 4; i++) {
+            for (let row = 0; row < 3; row++) {
+                for (let col = 0; col < 5; col++) {
+                    barriers.push({ x: 80 + i * 130 + col * 12, y: 370 + row * 10, width: 12, height: 10 });
+                }
+            }
+        }
+        ufo.active = false;
+        bullets = []; enemyBullets = [];
+    }
+
+    function shoot() {
+        if (bullets.length < 3) {
+            bullets.push({ x: player.x + 15, y: player.y, width: 4, height: 12 });
+            sfx.shoot();
+        }
+    }
+
+    function update() {
+        if (!gameRunning) return;
+
+        if (keys.Left || keyState['ArrowLeft']) player.x = Math.max(0, player.x - player.speed);
+        if (keys.Right || keyState['ArrowRight']) player.x = Math.min(canvas.width - player.width, player.x + player.speed);
+
+        bullets.forEach((b, i) => {
+            b.y -= 7;
+            if (b.y < 0) bullets.splice(i, 1);
+        });
+
+        enemyBullets.forEach((eb, i) => {
+            eb.y += 4;
+            if (rectIntersect(eb, player)) endGame("MISSION FAILED");
+            if (eb.y > canvas.height) enemyBullets.splice(i, 1);
+        });
+
+        let hitEdge = false;
+        enemies.filter(e => e.status === 'alive').forEach(e => {
+            e.x += enemySpeed * enemyDir;
+            if (e.x > canvas.width - 35 || e.x < 5) hitEdge = true;
+            if (e.y + 20 >= player.y) endGame("INVASION!");
+            if (Math.random() < enemyShootChance / 30) {
+                enemyBullets.push({ x: e.x + 15, y: e.y + 20, width: 3, height: 10 });
+            }
+        });
+
+        if (hitEdge) {
+            enemyDir *= -1;
+            enemies.forEach(e => e.y += 15);
+        }
+
+        // UFOロジック
+        if (!ufo.active && Math.random() < 0.003) {
+            ufo.active = true; ufo.x = -50;
+        }
+        if (ufo.active) {
+            ufo.x += ufo.speed;
+            if (Math.floor(ufo.x) % 30 === 0) sfx.ufo(); // 音の頻度を下げて軽くした
+            if (ufo.x > canvas.width) ufo.active = false;
+        }
+
+        // 判定
+        bullets.forEach((b, bi) => {
+            enemies.forEach(e => {
+                if (e.status === 'alive' && rectIntersect(b, e)) {
+                    e.status = 'dead'; bullets.splice(bi, 1); score += 10; sfx.hit();
+                }
+            });
+            if (ufo.active && rectIntersect(b, ufo, ufo.width, ufo.height)) {
+                ufo.active = false; bullets.splice(bi, 1); score += ufo.points; sfx.hit();
+            }
+            barriers.forEach((bar, bari) => {
+                if (rectIntersect(b, bar)) { bullets.splice(bi, 1); barriers.splice(bari, 1); }
+            });
+        });
+
+        enemyBullets.forEach((eb, ei) => {
+            barriers.forEach((bar, bari) => {
+                if (rectIntersect(eb, bar)) { enemyBullets.splice(ei, 1); barriers.splice(bari, 1); }
+            });
+        });
+
+        scoreEl.innerText = score;
+        if (enemies.every(e => e.status === 'dead')) { enemySpeed += 0.5; initGame(); }
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 壁
+        ctx.fillStyle = '#33ff00';
+        barriers.forEach(b => ctx.fillRect(b.x, b.y, b.width, b.height));
+        
+        // プレイヤー
+        ctx.fillRect(player.x, player.y + 8, player.width, 12);
+        ctx.fillRect(player.x + 12, player.y, 10, 8);
+
+        // エイリアン
+        enemies.filter(e => e.status === 'alive').forEach(e => {
+            ctx.fillStyle = '#ff3333';
+            const x = e.x, y = e.y;
+            ctx.fillRect(x + 6, y, 18, 16);
+            ctx.fillRect(x, y + 4, 30, 8);
+            ctx.fillRect(x + 4, y + 16, 6, 4);
+            ctx.fillRect(x + 20, y + 16, 6, 4);
+            ctx.fillStyle = 'black';
+            ctx.fillRect(x + 8, y + 6, 4, 4);
+            ctx.fillRect(x + 18, y + 6, 4, 4);
+        });
+
+        // UFO (ここがフリーズの原因だった所)
+        if (ufo.active) {
+            ctx.fillStyle = '#ff33ff';
+            ctx.beginPath();
+            ctx.ellipse(ufo.x + ufo.width/2, ufo.y + ufo.height/2, ufo.width/2, ufo.height/2, 0, 0, Math.PI * 2);
+            ctx.fill();
+            // 窓パーツ
+            ctx.fillStyle = 'black';
+            ctx.fillRect(ufo.x + 12, ufo.y + 4, 6, 6);
+            ctx.fillRect(ufo.x + 32, ufo.y + 4, 6, 6);
+        }
+
+        ctx.fillStyle = '#ffff00';
+        bullets.forEach(b => ctx.fillRect(b.x, b.y, b.width, b.height));
+        ctx.fillStyle = 'white';
+        enemyBullets.forEach(eb => ctx.fillRect(eb.x, eb.y, eb.width, eb.height));
+    }
+
+    function rectIntersect(r1, r2, w2 = 30, h2 = 20) {
+        return r1.x < r2.x + w2 && r1.x + r1.width > r2.x && r1.y < r2.y + h2 && r1.y + r1.height > r2.y;
+    }
+
+    function gameLoop() {
+        if (!gameRunning) return;
+        update(); draw();
+        requestAnimationFrame(gameLoop);
+    }
+
+    window.startGame = () => {
+        initAudio();
+        if (audioCtx) audioCtx.resume();
+        document.getElementById('startScreen').style.display = 'none';
+        restartGame();
+    };
+
+    window.restartGame = () => {
+        if (audioCtx) audioCtx.resume();
+        score = 0; enemySpeed = 1; gameRunning = true;
+        document.getElementById('gameOverScreen').style.display = 'none';
+        initGame(); gameLoop();
+    };
+
+    function endGame(msg) {
+        gameRunning = false; sfx.over();
+        document.getElementById('statusText').innerText = msg;
+        document.getElementById('finalScore').innerText = score;
+        document.getElementById('gameOverScreen').style.display = 'block';
+    }
+
+    // スマホイベント
+    const setupMobile = () => {
+        const handle = (id, key, val) => {
+            const el = document.getElementById(id);
+            el.addEventListener('touchstart', (e) => { e.preventDefault(); keys[key] = val; if(audioCtx) audioCtx.resume(); });
+            el.addEventListener('touchend', (e) => { e.preventDefault(); keys[key] = !val; });
+        };
+        handle('btn-left', 'Left', true);
+        handle('btn-right', 'Right', true);
+        document.getElementById('btn-shoot').addEventListener('touchstart', (e) => {
+            e.preventDefault(); if(audioCtx) audioCtx.resume(); shoot();
+        });
+    };
+
+    document.addEventListener('keydown', e => { 
+        keyState[e.code] = true; 
+        if (e.code === 'Space' && gameRunning) shoot();
+    });
+    document.addEventListener('keyup', e => keyState[e.code] = false);
+
+    setupMobile();
+</script>
+</body>
+</html>
