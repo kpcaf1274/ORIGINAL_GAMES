@@ -52,16 +52,18 @@
     <canvas id="gameCanvas" width="600" height="480"></canvas>
     <div id="ui-layer">
         <div>SCORE: <span id="score">0</span></div>
+        <div style="color: #ff3333;">LEVEL: <span id="levelDisplay">1</span></div>
     </div>
     
     <div id="startScreen">
         <h1 style="color: #33ff00;">SPACE SHOOTERS</h1>
-        <button onclick="startGame()" style="padding: 15px 30px; font-size: 20px; background: #33ff00; border: none; font-family: inherit; font-weight: bold; cursor: pointer; border-radius: 5px;">START</button>
+        <p>CONTINUOUS BARRIER MODE</p>
+        <button onclick="startGame()" style="padding: 15px 30px; font-size: 20px; background: #33ff00; border: none; font-family: inherit; font-weight: bold; cursor: pointer; border-radius: 5px;">START MISSION</button>
     </div>
 
     <div id="gameOverScreen" style="display: none;">
         <h1 id="statusText" style="color: #ff3333;">GAME OVER</h1>
-        <p>Score: <span id="finalScore">0</span></p>
+        <p>Final Score: <span id="finalScore">0</span></p>
         <button onclick="restartGame()" style="padding: 10px 20px; background: #33ff00; border: none; font-family: inherit; font-weight: bold; cursor: pointer;">RETRY</button>
     </div>
 </div>
@@ -70,12 +72,14 @@
     <div class="btn" id="btn-left">◀</div>
     <div class="btn" id="btn-right">▶</div>
     <div class="btn" id="btn-shoot">FIRE</div>
+   
 </div>
 
 <script>
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const scoreEl = document.getElementById('score');
+    const levelEl = document.getElementById('levelDisplay');
     
     let audioCtx = null;
     function initAudio() {
@@ -105,21 +109,27 @@
 
     let gameRunning = false;
     let score = 0;
+    let level = 1;
     let player = { x: 280, y: 430, width: 34, height: 20, speed: 6, color: '#33ff00' };
     let bullets = [], enemyBullets = [], enemies = [], barriers = [];
-    let enemyDir = 1, enemySpeed = 1, enemyShootChance = 0.01;
+    let enemyDir = 1, enemySpeed = 1, enemyShootChance = 0.012; // 初期攻撃頻度
     let ufo = { x: -50, y: 40, width: 50, height: 20, active: false, speed: 2.5, points: 100 };
 
     const keys = { Left: false, Right: false };
     const keyState = {};
 
-    function initGame() {
+    // 敵の生成
+    function initEnemies() {
         enemies = [];
         for (let r = 0; r < 4; r++) {
             for (let c = 0; c < 8; c++) {
                 enemies.push({ x: 60 + c * 45, y: 80 + r * 35, status: 'alive' });
             }
         }
+    }
+
+    // 防御壁の生成（ゲーム開始時のみ呼ぶ）
+    function initBarriers() {
         barriers = [];
         for (let i = 0; i < 4; i++) {
             for (let row = 0; row < 3; row++) {
@@ -128,8 +138,6 @@
                 }
             }
         }
-        ufo.active = false;
-        bullets = []; enemyBullets = [];
     }
 
     function shoot() {
@@ -157,10 +165,14 @@
         });
 
         let hitEdge = false;
-        enemies.filter(e => e.status === 'alive').forEach(e => {
+        const activeEnemies = enemies.filter(e => e.status === 'alive');
+        
+        activeEnemies.forEach(e => {
             e.x += enemySpeed * enemyDir;
             if (e.x > canvas.width - 35 || e.x < 5) hitEdge = true;
             if (e.y + 20 >= player.y) endGame("INVASION!");
+            
+            // 攻撃頻度の上昇。レベルに応じて確率アップ
             if (Math.random() < enemyShootChance / 30) {
                 enemyBullets.push({ x: e.x + 15, y: e.y + 20, width: 3, height: 10 });
             }
@@ -171,17 +183,15 @@
             enemies.forEach(e => e.y += 15);
         }
 
-        // UFOロジック
-        if (!ufo.active && Math.random() < 0.003) {
-            ufo.active = true; ufo.x = -50;
-        }
         if (ufo.active) {
             ufo.x += ufo.speed;
-            if (Math.floor(ufo.x) % 30 === 0) sfx.ufo(); // 音の頻度を下げて軽くした
+            if (Math.floor(ufo.x) % 35 === 0) sfx.ufo();
             if (ufo.x > canvas.width) ufo.active = false;
+        } else if (Math.random() < 0.003) {
+            ufo.active = true; ufo.x = -50;
         }
 
-        // 判定
+        // 衝突判定
         bullets.forEach((b, bi) => {
             enemies.forEach(e => {
                 if (e.status === 'alive' && rectIntersect(b, e)) {
@@ -203,21 +213,28 @@
         });
 
         scoreEl.innerText = score;
-        if (enemies.every(e => e.status === 'dead')) { enemySpeed += 0.5; initGame(); }
+
+        // 全滅時の処理
+        if (activeEnemies.length === 0) {
+            level++;
+            levelEl.innerText = level;
+            enemySpeed += 0.4;         // 速度アップ
+            enemyShootChance += 0.005; // 攻撃頻度アップ
+            initEnemies();             // 敵だけ復活（壁はそのまま）
+            bullets = []; enemyBullets = []; // 弾をリセットして再開を公平に
+        }
     }
 
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // 壁
+        // 壁（リセットされないので、ボロボロになったまま描画される）
         ctx.fillStyle = '#33ff00';
         barriers.forEach(b => ctx.fillRect(b.x, b.y, b.width, b.height));
         
-        // プレイヤー
         ctx.fillRect(player.x, player.y + 8, player.width, 12);
         ctx.fillRect(player.x + 12, player.y, 10, 8);
 
-        // エイリアン
         enemies.filter(e => e.status === 'alive').forEach(e => {
             ctx.fillStyle = '#ff3333';
             const x = e.x, y = e.y;
@@ -230,13 +247,11 @@
             ctx.fillRect(x + 18, y + 6, 4, 4);
         });
 
-        // UFO (ここがフリーズの原因だった所)
         if (ufo.active) {
             ctx.fillStyle = '#ff33ff';
             ctx.beginPath();
             ctx.ellipse(ufo.x + ufo.width/2, ufo.y + ufo.height/2, ufo.width/2, ufo.height/2, 0, 0, Math.PI * 2);
             ctx.fill();
-            // 窓パーツ
             ctx.fillStyle = 'black';
             ctx.fillRect(ufo.x + 12, ufo.y + 4, 6, 6);
             ctx.fillRect(ufo.x + 32, ufo.y + 4, 6, 6);
@@ -267,9 +282,13 @@
 
     window.restartGame = () => {
         if (audioCtx) audioCtx.resume();
-        score = 0; enemySpeed = 1; gameRunning = true;
+        score = 0; level = 1; enemySpeed = 1; enemyShootChance = 0.012;
+        levelEl.innerText = level;
+        gameRunning = true;
         document.getElementById('gameOverScreen').style.display = 'none';
-        initGame(); gameLoop();
+        initEnemies();
+        initBarriers(); // ゲーム開始時（またはリトライ時）のみ壁を作る
+        gameLoop();
     };
 
     function endGame(msg) {
@@ -279,7 +298,6 @@
         document.getElementById('gameOverScreen').style.display = 'block';
     }
 
-    // スマホイベント
     const setupMobile = () => {
         const handle = (id, key, val) => {
             const el = document.getElementById(id);
