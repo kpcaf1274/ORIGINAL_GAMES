@@ -4071,7 +4071,7 @@ let strwin  = [
      "は平安に遊び暮らした",
      "ということである…。",
 ];
-async function drawEpitaph(dead) {
+async function drawEpitaph(dead, deathFloor) {
 functionName=("await drawEpitaph(" +dead +")");
                                      ;
  offGraphics.setColor(0);
@@ -4084,7 +4084,9 @@ functionName=("await drawEpitaph(" +dead +")");
   if (await hasObjectType(0x0a0000)) {
    offGraphics.drawString("魔よけ" +"を手に", fontWidth*3, fontHeight*5, Graphics.BASELINE | Graphics.LEFT);
   }
-  offGraphics.drawString("地下"+curFloor+"階", fontWidth*5, fontHeight*6, Graphics.BASELINE | Graphics.LEFT);
+  // deathFloor is passed by gameover() — curFloor has already been zeroed
+  // and is kept at 0 to guarantee "run ended" for any concurrent snapshot.
+  offGraphics.drawString("地下"+deathFloor+"階", fontWidth*5, fontHeight*6, Graphics.BASELINE | Graphics.LEFT);
   offGraphics.drawString(await getKilledBy(pcKilledBy), fontWidth*4, fontHeight*7, Graphics.BASELINE | Graphics.LEFT);
  } else {let length  = strwin.length;let i;
   for (i=0; i<length; i++) {
@@ -4154,9 +4156,15 @@ functionName=("await drawScore()");
                                        ;
                  ;
 }
+// Flipped to true the moment gameover() starts. persistSnapshot checks this
+// in addition to mode===6 so that an in-flight visibilitychange/pagehide can
+// never re-save the run as "in progress" while the epitaph/score screens
+// wait for input.
+let gameOverLock = false;
 async function gameover(dead) {
 functionName=("await gameover(" +dead +")");
                                      ;
+ gameOverLock = true;
  mode = 6;
  score[0]++;
  if (dead) {
@@ -4185,16 +4193,25 @@ functionName=("await gameover(" +dead +")");
  }
  if (score[4] < pcGold) {
   score[4] = pcGold;
- }let tmp  = curFloor;
+ }
+ // Remember the floor only for display on the tombstone. Do NOT restore
+ // curFloor afterwards: if we did, a visibility/pagehide event during
+ // the epitaph or score keyWait would let persistSnapshot save the run
+ // as "still in progress" and the next launch would resume the dead
+ // player's state. Keep curFloor at 0 from here on out.
+ const deathFloor = curFloor;
  curFloor = 0;
  await saveScore();
- curFloor = tmp;
+ // Wipe any mid-run state so reload can't pick it up, and clear the
+ // snapshot-resume hint that persistSnapshot may have left behind.
+ try { RecordStore.deleteRecordStore('save'); } catch (e) {}
+ try { localStorage.removeItem('mirogue.snapshotResume'); } catch (e) {}
  if (dead) {
   await message(pcName+"はたおれた。");
   await message("さようなら、"+pcName+"！");
   await more();
  }
- await drawEpitaph(dead);
+ await drawEpitaph(dead, deathFloor);
  repaint();
  await keyWait();
  await drawScore();
@@ -4203,7 +4220,15 @@ functionName=("await gameover(" +dead +")");
  // After the score screen, return to the title by reloading. The original
  // MIDP `midlet.quit()` had no web equivalent and threw a TypeError because
  // `midlet` is never assigned, leaving the player stuck on the score screen.
- try { window.location.reload(); } catch (e) {}
+ // Use a cache-busted URL so mobile Safari / Chrome can't serve a stale
+ // copy of the HTML that would re-trigger the original bug.
+ try {
+  const u = new URL(window.location.href);
+  u.searchParams.set('v', Date.now().toString());
+  window.location.replace(u.toString());
+ } catch (e) {
+  try { window.location.reload(); } catch (e2) {}
+ }
                                        ;
                  ;
 }
@@ -6858,6 +6883,7 @@ window.onload = async function() {
     // loadScore() can restore the floor and loadGame() can restore inventory.
     const persistSnapshot = () => {
         try {
+            if (typeof gameOverLock !== 'undefined' && gameOverLock) return; // run has ended
             if (typeof curFloor === 'undefined') return;
             if (curFloor <= 0) return;          // no active run
             if (typeof mode !== 'undefined' && mode === 6) return; // gameover
