@@ -1436,6 +1436,16 @@ functionName=("await loadGame()");
  trapDoor = false;
  await trueNameInit();
  await loadSave();let d,type;let i;
+ // In the original Java source these fields are `int`/array slots that are
+ // auto-initialized to 0. When the converter emits `let pcWeapon;` in JS they
+ // default to `undefined` instead, which then silently bypasses `== 0` guards
+ // (e.g. fire() → "bug itemを投げた"). Restore Java's default-zero semantics
+ // before deriving equipment from pcPack, mirroring gameInit().
+ pcWeapon = 0;
+ pcArmor = 0;
+ pcSubweapon = 0;
+ pcRing[0] = 0;
+ pcRing[1] = 0;
  for (i=0; i<pcPackCount; i++) {
   d = pcPack[i];
   if (( (d & 0x04000000) != 0 )) {
