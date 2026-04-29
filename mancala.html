@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pop Mancala</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(120deg, #ffecd2 0%, #fcb69f 100%);
+            color: #333; user-select: none; overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; width: 100vw;
+        }
+        .screen { width: 100%; max-width: 1000px; height: 100%; display: flex; flex-direction: column; padding: 15px; box-sizing: border-box; }
+        .hidden { display: none !important; }
+
+        #setup-screen { align-items: center; justify-content: center; text-align: center; }
+        h1 { font-size: 3.5rem; color: #ff6b6b; text-shadow: 3px 3px 0px #fff; margin-top: 0; margin-bottom: 30px; }
+        .options { background: rgba(255,255,255,0.85); padding: 30px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
+        .options h3 { margin-top: 0; font-size: 1.5rem; color: #4facfe; }
+        .btn-group { display: flex; gap: 10px; margin-bottom: 25px; justify-content: center; flex-wrap: wrap; }
+        .btn { padding: 12px 20px; font-size: 1.2rem; font-family: 'Nunito', sans-serif; font-weight: 700; border: none; border-radius: 50px; background: #e0e0e0; color: #555; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn.active { background: #4facfe; color: white; box-shadow: 0 4px 15px rgba(79,172,254,0.4); transform: scale(1.05); }
+        .start-btn { padding: 15px 40px; font-size: 1.8rem; font-family: 'Nunito', sans-serif; font-weight: 900; border: none; border-radius: 50px; background: #ff6b6b; color: white; cursor: pointer; box-shadow: 0 6px 20px rgba(255,107,107,0.4); transition: all 0.2s; margin-top: 10px; }
+        .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 10px rgba(255,107,107,0.4); }
+
+        .header { display: flex; justify-content: center; align-items: center; padding: 10px 20px; background: rgba(255,255,255,0.7); border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        #turn-indicator { margin: 0; font-size: 1.8rem; }
+        .player-label { text-align: center; font-weight: 900; font-size: 1.5rem; margin: 5px 0; text-transform: uppercase; letter-spacing: 2px; }
+        #p2-label { color: #ff595e; }
+        #p1-label { color: #1982c4; }
+        .board-container { flex: 1; display: flex; justify-content: center; align-items: center; width: 100%; }
+        .board { width: 95%; height: 55vh; max-height: 350px; display: grid; grid-template-columns: 1.2fr repeat(6,1fr) 1.2fr; grid-template-rows: 1fr 1fr; gap: 12px; background: #8B4513; padding: 15px; border-radius: 40px; box-shadow: inset 0 0 20px rgba(0,0,0,0.6), 0 10px 30px rgba(0,0,0,0.3); position: relative; }
+
+        @media (max-width: 768px) {
+            .board { gap: 8px; padding: 10px; border-radius: 30px; }
+            .header { padding: 10px; }
+            #turn-indicator { font-size: 1.2rem; }
+            .player-label { font-size: 1.2rem; }
+        }
+
+        .pit, .store { background: rgba(0,0,0,0.25); border-radius: 50px; display: flex; flex-wrap: wrap; justify-content: center; align-content: center; gap: 3px; padding: 8px; box-shadow: inset 0 5px 10px rgba(0,0,0,0.4); position: relative; cursor: pointer; transition: all 0.2s; }
+        .store { grid-row: 1 / span 2; border-radius: 30px; cursor: default; }
+        .store.player2-store { grid-column: 1; }
+        .store.player1-store { grid-column: 8; }
+        #pit-12 { grid-column: 2; grid-row: 1; } #pit-11 { grid-column: 3; grid-row: 1; }
+        #pit-10 { grid-column: 4; grid-row: 1; } #pit-9  { grid-column: 5; grid-row: 1; }
+        #pit-8  { grid-column: 6; grid-row: 1; } #pit-7  { grid-column: 7; grid-row: 1; }
+        #pit-0  { grid-column: 2; grid-row: 2; } #pit-1  { grid-column: 3; grid-row: 2; }
+        #pit-2  { grid-column: 4; grid-row: 2; } #pit-3  { grid-column: 5; grid-row: 2; }
+        #pit-4  { grid-column: 6; grid-row: 2; } #pit-5  { grid-column: 7; grid-row: 2; }
+
+        .pit:active { transform: scale(0.95); }
+        .pit.highlight, .store.highlight { background: rgba(255,255,100,0.4); box-shadow: 0 0 15px rgba(255,255,100,0.8), inset 0 5px 10px rgba(0,0,0,0.4); }
+        .pit.active-turn { box-shadow: 0 0 15px #4facfe, inset 0 5px 10px rgba(0,0,0,0.3); background: rgba(255,255,255,0.1); }
+        .pit.selected-pit { box-shadow: 0 0 20px #ffca3a, 0 0 40px #ffca3a; background: rgba(255,200,50,0.3); }
+
+        .stone { width: 16px; height: 16px; border-radius: 50%; box-shadow: inset -2px -2px 4px rgba(0,0,0,0.3), 2px 2px 4px rgba(0,0,0,0.2); }
+        .stone.just-dropped { animation: dropIn 0.35s cubic-bezier(0.175,0.885,0.32,1.275); }
+        @keyframes dropIn { 0% { transform: translateY(-20px) scale(0.5); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+
+        .flying-stone { position: fixed; width: 22px; height: 22px; border-radius: 50%; z-index: 500; pointer-events: none; box-shadow: 0 0 10px rgba(255,255,255,0.6), inset -2px -2px 4px rgba(0,0,0,0.3); transition: left 0.35s cubic-bezier(0.4,0,0.2,1), top 0.35s cubic-bezier(0.4,0,0.2,1); }
+
+        .count-badge { position: absolute; top: -5px; right: -5px; background: white; color: black; font-weight: 900; border-radius: 50%; width: 24px; height: 24px; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); font-size: 12px; pointer-events: none; z-index: 5; }
+
+        #notice { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) scale(0.5); background: rgba(0,0,0,0.85); color: #fff; padding: 20px 40px; border-radius: 50px; font-size: 2.5rem; font-weight: 900; pointer-events: none; opacity: 0; transition: all 0.3s cubic-bezier(0.175,0.885,0.32,1.275); z-index: 100; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        #notice.show { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+
+        .modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 200; }
+        .modal-content { background: white; padding: 50px; border-radius: 30px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); animation: popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275); }
+        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        #winner-text { color: #ff6b6b; font-size: 3rem; margin-top: 0; }
+
+        /* Direction chooser popup */
+        .dir-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); z-index: 300; display: flex; justify-content: center; align-items: center; }
+        .dir-popup { background: white; border-radius: 30px; padding: 30px 30px 25px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.4); animation: popIn 0.3s cubic-bezier(0.175,0.885,0.32,1.275); min-width: 260px; position: relative; }
+        .dir-popup h3 { margin: 0 0 18px 0; font-size: 1.4rem; color: #333; }
+        .dir-buttons { display: flex; gap: 20px; justify-content: center; }
+        .dir-btn { padding: 18px 35px; font-size: 2.8rem; font-family: 'Nunito', sans-serif; font-weight: 900; border: none; border-radius: 25px; cursor: pointer; transition: all 0.2s; color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.2); line-height: 1; }
+        .dir-btn:active { transform: scale(0.9); }
+        .dir-btn.left-dir { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .dir-btn.right-dir { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .dir-close { position: absolute; top: -12px; right: -12px; width: 36px; height: 36px; border-radius: 50%; border: none; background: #ff6b6b; color: white; font-size: 1.4rem; font-weight: 900; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.3); display: flex; justify-content: center; align-items: center; line-height: 1; transition: all 0.15s; }
+        .dir-close:active { transform: scale(0.85); }
+    </style>
+</head>
+<body>
+    <div id="setup-screen" class="screen">
+        <h1>Mancala!</h1>
+        <div class="options">
+            <h3>Game Mode</h3>
+            <div class="btn-group" id="mode-group">
+                <button class="btn active" data-val="pvp">👤 vs 👤</button>
+                <button class="btn" data-val="pvai">👤 vs 🤖</button>
+            </div>
+            <h3>Who Starts?</h3>
+            <div class="btn-group" id="start-group">
+                <button class="btn active" data-val="p1">Player 1</button>
+                <button class="btn" data-val="p2">Player 2</button>
+                <button class="btn" data-val="rnd">Random</button>
+            </div>
+            <button class="start-btn" onclick="startGame()">▶ PLAY!</button>
+        </div>
+    </div>
+
+    <div id="game-screen" class="screen hidden">
+        <div class="header">
+            <h2 id="turn-indicator">Player 1's Turn 👦</h2>
+        </div>
+        <div class="player-label" id="p2-label">Player 2</div>
+        <div class="board-container">
+            <div class="board" id="board">
+                <div class="store player2-store" id="pit-13"></div>
+                <div class="pit player2-pit" id="pit-12"></div>
+                <div class="pit player2-pit" id="pit-11"></div>
+                <div class="pit player2-pit" id="pit-10"></div>
+                <div class="pit player2-pit" id="pit-9"></div>
+                <div class="pit player2-pit" id="pit-8"></div>
+                <div class="pit player2-pit" id="pit-7"></div>
+                <div class="pit player1-pit" id="pit-0"></div>
+                <div class="pit player1-pit" id="pit-1"></div>
+                <div class="pit player1-pit" id="pit-2"></div>
+                <div class="pit player1-pit" id="pit-3"></div>
+                <div class="pit player1-pit" id="pit-4"></div>
+                <div class="pit player1-pit" id="pit-5"></div>
+                <div class="store player1-store" id="pit-6"></div>
+            </div>
+        </div>
+        <div class="player-label" id="p1-label">Player 1</div>
+        <div class="header" style="margin-top:5px;padding:5px 20px;">
+            <button class="btn" onclick="resetToMenu()" style="width:100%;">🏠 Main Menu</button>
+        </div>
+    </div>
+
+    <div id="notice">Extra Turn! 🎉</div>
+    <div id="dir-chooser" class="dir-overlay hidden">
+        <div class="dir-popup">
+            <button class="dir-close" onclick="cancelDir()">✕</button>
+            <h3>Pick Direction!</h3>
+            <div class="dir-buttons">
+                <button class="dir-btn left-dir" onclick="chooseDir(-1)">⬅</button>
+                <button class="dir-btn right-dir" onclick="chooseDir(1)">➡</button>
+            </div>
+        </div>
+    </div>
+    <div id="winner-modal" class="modal hidden">
+        <div class="modal-content">
+            <h1 id="winner-text">Player 1 Wins! 🎉</h1>
+            <button class="start-btn" onclick="resetToMenu()">Play Again 🔄</button>
+        </div>
+    </div>
+
+    <script>
+        // === Web Audio Sound Engine ===
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+        function ensureAudio() { if (!audioCtx) audioCtx = new AudioCtx(); }
+
+        function playTone(freq, dur, type, vol) {
+            ensureAudio();
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.type = type || 'sine';
+            o.frequency.value = freq;
+            g.gain.setValueAtTime(vol || 0.15, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+            o.connect(g); g.connect(audioCtx.destination);
+            o.start(); o.stop(audioCtx.currentTime + dur);
+        }
+
+        function sndDrop()    { playTone(600 + Math.random()*400, 0.12, 'sine', 0.18); }
+        function sndPickup()  { playTone(350, 0.08, 'triangle', 0.12); playTone(450, 0.08, 'triangle', 0.10); }
+        function sndTap()     { playTone(800, 0.06, 'sine', 0.08); }
+        function sndExtra()   { setTimeout(()=>playTone(523,0.15,'sine',0.2),0); setTimeout(()=>playTone(659,0.15,'sine',0.2),120); setTimeout(()=>playTone(784,0.25,'sine',0.2),240); }
+        function sndWin()     { [523,659,784,1047].forEach((f,i)=>setTimeout(()=>playTone(f,0.3,'sine',0.2),i*150)); }
+
+        let gameMode = 'pvp', startWho = 'p1';
+        document.querySelectorAll('#mode-group .btn').forEach(btn => {
+            btn.onclick = e => {
+                document.querySelectorAll('#mode-group .btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                gameMode = e.target.dataset.val;
+                document.querySelector('#start-group .btn[data-val="p2"]').innerText = gameMode === 'pvai' ? "AI 🤖" : "Player 2 👦";
+            };
+        });
+        document.querySelectorAll('#start-group .btn').forEach(btn => {
+            btn.onclick = e => {
+                document.querySelectorAll('#start-group .btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                startWho = e.target.dataset.val;
+            };
+        });
+
+        let state = [], currentPlayer = 0, isVsAI = false, isAnimating = false, gameEnded = false, stoneId = 0;
+        let pendingPit = -1, dirResolve = null;
+        const colors = ['#ff595e','#ffca3a','#8ac926','#1982c4','#6a4c93','#ff9f1c','#00f5d4','#f15bb5'];
+
+        function startGame() {
+            isVsAI = (gameMode === 'pvai');
+            if (startWho === 'p1') currentPlayer = 0;
+            else if (startWho === 'p2') currentPlayer = 1;
+            else currentPlayer = Math.random() < 0.5 ? 0 : 1;
+            gameEnded = false;
+            document.getElementById('p2-label').innerText = isVsAI ? "AI 🤖" : "Player 2 👦";
+            document.getElementById('p1-label').innerText = "Player 1 👦";
+            initGame();
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('winner-modal').classList.add('hidden');
+            updateTurnUI();
+            if (currentPlayer === 1 && isVsAI) setTimeout(playAITurn, 1000);
+        }
+
+        function initGame() {
+            state = Array(14).fill(0).map(() => []);
+            stoneId = 0;
+            for (let i = 0; i < 6; i++) for (let j = 0; j < 3; j++) state[i].push({id: stoneId++, color: colors[Math.floor(Math.random()*colors.length)]});
+            for (let i = 7; i < 13; i++) for (let j = 0; j < 3; j++) state[i].push({id: stoneId++, color: colors[Math.floor(Math.random()*colors.length)]});
+        }
+
+        function getPitCenter(idx) {
+            const el = document.getElementById('pit-' + idx);
+            const r = el.getBoundingClientRect();
+            return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+        }
+
+        function renderBoard(highlightIndex = -1) {
+            for (let i = 0; i < 14; i++) {
+                const pit = document.getElementById('pit-' + i);
+                pit.innerHTML = '';
+                state[i].forEach(stone => {
+                    const s = document.createElement('div');
+                    s.className = 'stone';
+                    s.style.backgroundColor = stone.color;
+                    pit.appendChild(s);
+                });
+                const badge = document.createElement('div');
+                badge.className = 'count-badge';
+                badge.innerText = state[i].length;
+                pit.appendChild(badge);
+
+                pit.classList.remove('highlight', 'active-turn', 'selected-pit');
+                if (i === highlightIndex) pit.classList.add('highlight');
+                pit.onclick = null;
+                if (!isAnimating && !gameEnded) {
+                    if (currentPlayer === 0 && i >= 0 && i <= 5 && state[i].length > 0) {
+                        pit.classList.add('active-turn');
+                        pit.onclick = () => onPitClick(i);
+                    } else if (currentPlayer === 1 && !isVsAI && i >= 7 && i <= 12 && state[i].length > 0) {
+                        pit.classList.add('active-turn');
+                        pit.onclick = () => onPitClick(i);
+                    }
+                }
+            }
+        }
+
+        function onPitClick(idx) {
+            if (isAnimating || pendingPit !== -1) return;
+            sndTap();
+            pendingPit = idx;
+            document.getElementById('pit-' + idx).classList.add('selected-pit');
+            document.getElementById('dir-chooser').classList.remove('hidden');
+        }
+
+        function chooseDir(dir) {
+            sndTap();
+            document.getElementById('dir-chooser').classList.add('hidden');
+            const pit = pendingPit;
+            pendingPit = -1;
+            // P2's pits are visually reversed on screen, so flip direction
+            const actualDir = (currentPlayer === 1) ? -dir : dir;
+            if (pit !== -1) playTurn(pit, actualDir);
+        }
+
+        function cancelDir() {
+            document.getElementById('dir-chooser').classList.add('hidden');
+            const pit = pendingPit;
+            pendingPit = -1;
+            if (pit !== -1) document.getElementById('pit-' + pit).classList.remove('selected-pit');
+        }
+
+        async function animateStone(color, fromIdx, toIdx) {
+            return new Promise(resolve => {
+                const from = getPitCenter(fromIdx);
+                const to = getPitCenter(toIdx);
+                const el = document.createElement('div');
+                el.className = 'flying-stone';
+                el.style.backgroundColor = color;
+                el.style.left = (from.x - 11) + 'px';
+                el.style.top = (from.y - 11) + 'px';
+                document.body.appendChild(el);
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        el.style.left = (to.x - 11) + 'px';
+                        el.style.top = (to.y - 11) + 'px';
+                    });
+                });
+                el.addEventListener('transitionend', () => { el.remove(); resolve(); }, {once: true});
+                setTimeout(() => { el.remove(); resolve(); }, 500);
+            });
+        }
+
+        async function playTurn(pitIndex, dir) {
+            if (isAnimating) return;
+            let hand = state[pitIndex].splice(0, state[pitIndex].length);
+            if (hand.length === 0) return;
+            isAnimating = true;
+            sndPickup();
+            renderBoard(pitIndex);
+
+            let curr = pitIndex;
+            while (hand.length > 0) {
+                let prev = curr;
+                curr = (curr + dir + 14) % 14;
+                let stone = hand.pop();
+                await animateStone(stone.color, prev, curr);
+                sndDrop();
+                state[curr].push(stone);
+                renderBoard(curr);
+                if (hand.length > 0) await new Promise(r => setTimeout(r, 120));
+            }
+
+            await new Promise(r => setTimeout(r, 400));
+            renderBoard();
+
+            if (curr === 6 || curr === 13) {
+                sndExtra();
+                showNotice("Extra Turn! 🎉");
+                await new Promise(r => setTimeout(r, 1200));
+            } else {
+                currentPlayer = 1 - currentPlayer;
+            }
+
+            checkWin();
+            isAnimating = false;
+            updateTurnUI();
+            if (!gameEnded && currentPlayer === 1 && isVsAI) setTimeout(playAITurn, 800);
+        }
+
+        async function playAITurn() {
+            if (gameEnded) return;
+            let bestMove = -1, bestDir = 1, found = false;
+            for (let pit = 7; pit <= 12; pit++) {
+                let s = state[pit].length;
+                if (s === 0) continue;
+                for (let d of [1, -1]) {
+                    let last = ((pit + d * s) % 14 + 14) % 14;
+                    if (last === 6 || last === 13) { bestMove = pit; bestDir = d; found = true; break; }
+                }
+                if (found) break;
+            }
+            if (!found) {
+                let valid = [];
+                for (let pit = 7; pit <= 12; pit++) if (state[pit].length > 0) valid.push(pit);
+                if (valid.length > 0) { bestMove = valid[Math.floor(Math.random()*valid.length)]; bestDir = Math.random() < 0.5 ? 1 : -1; }
+            }
+            if (bestMove !== -1) {
+                await new Promise(r => setTimeout(r, 600));
+                playTurn(bestMove, bestDir);
+            }
+        }
+
+        function updateTurnUI() {
+            if (gameEnded) return;
+            const t = document.getElementById('turn-indicator');
+            if (currentPlayer === 0) { t.innerText = "Player 1's Turn 👦"; t.style.color = "#1982c4"; }
+            else { t.innerText = isVsAI ? "AI's Turn 🤖" : "Player 2's Turn 👦"; t.style.color = "#ff595e"; }
+            renderBoard();
+        }
+
+        function showNotice(msg) {
+            const n = document.getElementById('notice');
+            n.innerText = msg; n.classList.add('show');
+            setTimeout(() => n.classList.remove('show'), 1200);
+        }
+
+        function checkWin() {
+            let p1E = true, p2E = true;
+            for (let i = 0; i <= 5; i++) if (state[i].length > 0) p1E = false;
+            for (let i = 7; i <= 12; i++) if (state[i].length > 0) p2E = false;
+            if (p1E || p2E) {
+                gameEnded = true;
+                sndWin();
+                let w = "";
+                if (p1E && p2E) w = "It's a Tie! 🤝";
+                else if (p1E) w = "Player 1 Wins! 🎉";
+                else w = isVsAI ? "AI Wins! 🤖" : "Player 2 Wins! 🎉";
+                document.getElementById('winner-text').innerText = w;
+                document.getElementById('winner-modal').classList.remove('hidden');
+            }
+        }
+
+        function resetToMenu() {
+            document.getElementById('setup-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('winner-modal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
