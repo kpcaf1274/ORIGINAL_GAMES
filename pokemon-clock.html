@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ポケモンとけいべんきょう</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Outfit:wght@600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Outfit:wght@600;800&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --primary-color: #ffcb05;
@@ -64,7 +66,7 @@
             font-size: 24px;
             font-weight: bold;
             letter-spacing: 2px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             z-index: 10;
             display: flex;
             justify-content: space-between;
@@ -146,21 +148,33 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
             transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
             position: relative;
             aspect-ratio: 1;
         }
 
-        .pokemon-card:hover, .pokemon-card:active {
+        .pokemon-card:hover,
+        .pokemon-card:active {
             transform: scale(1.05);
-            box-shadow: 0 10px 18px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 18px rgba(0, 0, 0, 0.1);
         }
 
-        .pokemon-card.grass { border-color: var(--grass-color); }
-        .pokemon-card.fire { border-color: var(--fire-color); }
-        .pokemon-card.water { border-color: var(--water-color); }
-        .pokemon-card.electric { border-color: var(--electric-color); }
+        .pokemon-card.grass {
+            border-color: var(--grass-color);
+        }
+
+        .pokemon-card.fire {
+            border-color: var(--fire-color);
+        }
+
+        .pokemon-card.water {
+            border-color: var(--water-color);
+        }
+
+        .pokemon-card.electric {
+            border-color: var(--electric-color);
+        }
 
         .pokemon-card img {
             width: 80%;
@@ -185,10 +199,23 @@
             font-size: 10px;
             font-weight: bold;
         }
-        .type-badge.grass { background-color: var(--grass-color); }
-        .type-badge.fire { background-color: var(--fire-color); }
-        .type-badge.water { background-color: var(--water-color); }
-        .type-badge.electric { background-color: var(--electric-color); color: black; }
+
+        .type-badge.grass {
+            background-color: var(--grass-color);
+        }
+
+        .type-badge.fire {
+            background-color: var(--fire-color);
+        }
+
+        .type-badge.water {
+            background-color: var(--water-color);
+        }
+
+        .type-badge.electric {
+            background-color: var(--electric-color);
+            color: black;
+        }
 
         /* 2. メインゲーム画面 */
         #game-screen {
@@ -219,7 +246,7 @@
             text-align: center;
             font-size: 22px;
             font-weight: bold;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
             margin-bottom: 10px;
             position: relative;
         }
@@ -238,7 +265,7 @@
             width: 220px;
             height: 220px;
             object-fit: contain;
-            filter: drop-shadow(0px 10px 10px rgba(0,0,0,0.15));
+            filter: drop-shadow(0px 10px 10px rgba(0, 0, 0, 0.15));
             transition: transform 0.3s;
         }
 
@@ -258,7 +285,7 @@
             color: white;
             padding: 5px 20px;
             border-radius: 20px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         /* 右側: 時計盤エリア */
@@ -277,7 +304,7 @@
             height: 380px;
             background: white;
             border-radius: 50%;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.15), inset 0 4px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15), inset 0 4px 10px rgba(0, 0, 0, 0.05);
             padding: 10px;
             display: flex;
             justify-content: center;
@@ -308,7 +335,7 @@
             cursor: pointer;
             font-family: 'Kosugi Maru', sans-serif;
             transition: all 0.1s;
-            box-shadow: 0 8px 0px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 0px rgba(0, 0, 0, 0.2);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -317,7 +344,7 @@
 
         .btn:active {
             transform: translateY(6px);
-            box-shadow: 0 2px 0px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 0px rgba(0, 0, 0, 0.2);
         }
 
         .btn-check {
@@ -341,7 +368,7 @@
             padding: 5px 15px;
             border-radius: 10px;
             margin-top: 15px;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
             display: none;
         }
 
@@ -364,30 +391,67 @@
             font-size: 80px;
             font-weight: 800;
             color: var(--accent-color);
-            text-shadow: 4px 4px 0px white, -4px -4px 0px white, 4px -4px 0px white, -4px 4px 0px white, 0px 8px 15px rgba(0,0,0,0.2);
+            text-shadow: 4px 4px 0px white, -4px -4px 0px white, 4px -4px 0px white, -4px 4px 0px white, 0px 8px 15px rgba(0, 0, 0, 0.2);
             animation: bounceIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
             display: none;
         }
 
         /* アニメーション定義 */
         @keyframes bounceIn {
-            0% { transform: scale(0.3); opacity: 0; }
-            50% { transform: scale(1.1); opacity: 0.9; }
-            70% { transform: scale(0.9); opacity: 0.95; }
-            100% { transform: scale(1); opacity: 1; }
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.9;
+            }
+
+            70% {
+                transform: scale(0.9);
+                opacity: 0.95;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
 
         /* 進化のキラキラアニメーション */
         @keyframes evolveSparkle {
-            0% { filter: drop-shadow(0 0 0px #fff) brightness(1); transform: scale(1); }
-            50% { filter: drop-shadow(0 0 50px #fff) brightness(3); transform: scale(1.2); }
-            100% { filter: drop-shadow(0 0 0px #fff) brightness(1); transform: scale(1); }
+            0% {
+                filter: drop-shadow(0 0 0px #fff) brightness(1);
+                transform: scale(1);
+            }
+
+            50% {
+                filter: drop-shadow(0 0 50px #fff) brightness(3);
+                transform: scale(1.2);
+            }
+
+            100% {
+                filter: drop-shadow(0 0 0px #fff) brightness(1);
+                transform: scale(1);
+            }
         }
 
         @keyframes devolveSparkle {
-            0% { filter: drop-shadow(0 0 0px #2196f3) brightness(1); transform: scale(1); }
-            50% { filter: drop-shadow(0 0 50px #2196f3) brightness(0.5) blur(5px); transform: scale(0.8); }
-            100% { filter: drop-shadow(0 0 0px #2196f3) brightness(1); transform: scale(1); }
+            0% {
+                filter: drop-shadow(0 0 0px #2196f3) brightness(1);
+                transform: scale(1);
+            }
+
+            50% {
+                filter: drop-shadow(0 0 50px #2196f3) brightness(0.5) blur(5px);
+                transform: scale(0.8);
+            }
+
+            100% {
+                filter: drop-shadow(0 0 0px #2196f3) brightness(1);
+                transform: scale(1);
+            }
         }
 
         /* 成功クラッカーエフェクト */
@@ -400,8 +464,15 @@
         }
 
         @keyframes fall {
-            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(700px) rotate(360deg); opacity: 0; }
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(700px) rotate(360deg);
+                opacity: 0;
+            }
         }
 
         /* ヒント時の電撃エフェクト */
@@ -415,13 +486,16 @@
         }
 
         @keyframes shock {
-            to { stroke-dashoffset: -40; }
+            to {
+                stroke-dashoffset: -40;
+            }
         }
 
         .level-select-container {
             margin-right: 5px;
             z-index: 20;
-            display: none; /* デフォルト非表示、ゲーム画面のみ */
+            display: none;
+            /* デフォルト非表示、ゲーム画面のみ */
         }
 
         #level-select {
@@ -438,7 +512,7 @@
             box-shadow: 0 3px 0px #cda200;
             transition: all 0.1s;
         }
-        
+
         #level-select:active {
             transform: translateY(2px);
             box-shadow: none;
@@ -497,14 +571,14 @@
             padding: 15px 40px;
             border: 5px solid var(--primary-color);
             margin-bottom: 30px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
         }
 
         #level-pokemon-img {
             width: 120px;
             height: 120px;
             object-fit: contain;
-            filter: drop-shadow(0px 8px 8px rgba(0,0,0,0.12));
+            filter: drop-shadow(0px 8px 8px rgba(0, 0, 0, 0.12));
         }
 
         #level-pokemon-name {
@@ -586,7 +660,7 @@
             border-radius: 20px;
             padding: 12px;
             border: 4px dashed var(--primary-color);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.06);
             width: 100%;
             box-sizing: border-box;
         }
@@ -641,1338 +715,1328 @@
 
         /* モンスターボールの揺れアニメーション */
         @keyframes pokeballShake {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            15% { transform: translate(-8px, 0) rotate(-15deg); }
-            30% { transform: translate(6px, 0) rotate(12deg); }
-            45% { transform: translate(-6px, 0) rotate(-10deg); }
-            60% { transform: translate(4px, 0) rotate(8deg); }
-            75% { transform: translate(-2px, 0) rotate(-4deg); }
-            90% { transform: translate(1px, 0) rotate(2deg); }
-            100% { transform: translate(0, 0) rotate(0deg); }
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            15% {
+                transform: translate(-8px, 0) rotate(-15deg);
+            }
+
+            30% {
+                transform: translate(6px, 0) rotate(12deg);
+            }
+
+            45% {
+                transform: translate(-6px, 0) rotate(-10deg);
+            }
+
+            60% {
+                transform: translate(4px, 0) rotate(8deg);
+            }
+
+            75% {
+                transform: translate(-2px, 0) rotate(-4deg);
+            }
+
+            90% {
+                transform: translate(1px, 0) rotate(2deg);
+            }
+
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
         }
 
         .pokeball-shake-anim {
-            animation: pokeballShake 0.9s cubic-bezier(.36,.07,.19,.97) both;
+            animation: pokeballShake 0.9s cubic-bezier(.36, .07, .19, .97) both;
             transform-origin: bottom center;
         }
     </style>
 </head>
+
 <body>
 
-<div id="app-container">
-    <header>
-        <button class="btn-home" id="btn-home" style="display: none;">◀ もどる</button>
-        <div class="header-title">ポケモンとけいべんきょう</div>
-        <div class="level-select-container">
-            <select id="level-select">
-                <option value="1">レベル1 (ちょうどのじかん)</option>
-                <option value="2">レベル2 (30ぷん・くりあがりなし)</option>
-                <option value="3">レベル3 (15ふん・くりあがりなし)</option>
-                <option value="4">レベル4 (5ふん・くりあがりなし)</option>
-                <option value="5">レベル5 (1ふん・くりあがりなし)</option>
-                <option value="6">レベル6 (15ふん・くりあがりあり!)</option>
-                <option value="7">レベル7 (5ふん・くりあがりあり!)</option>
-                <option value="8">レベル8 (1ふん・くりあがりあり!)</option>
-            </select>
-        </div>
-    </header>
-
-    <!-- 1. 相棒選択画面 (全員一覧) -->
-    <div id="select-screen" class="screen active">
-        <div class="select-instruction">いっしょに べんきょうする ポケモンを えらんでね！</div>
-        
-        <!-- ポケモン全員一覧 -->
-        <div class="pokemon-grid" id="pokemon-grid">
-            <!-- JSで動的にすべての御三家を追加します -->
-        </div>
-    </div>
-
-    <!-- 1.5. レベル選択画面 (新設) -->
-    <div id="level-screen" class="screen">
-        <button class="btn-home" id="btn-level-back">◀ えらびなおす</button>
-        <div class="level-instruction">べんきょうする レベルを えらんでね！</div>
-        
-        <div class="selected-pokemon-preview">
-            <img id="level-pokemon-img" src="" alt="Selected Pokemon">
-            <div id="level-pokemon-name"></div>
-        </div>
-
-        <div class="level-buttons-grid">
-            <button class="btn-level" data-level="1">
-                <span class="level-num">レベル 1</span>
-                <span class="level-desc">ちょうどの じかん</span>
-            </button>
-            <button class="btn-level" data-level="2">
-                <span class="level-num">レベル 2</span>
-                <span class="level-desc">30ぷん<br><small>(くりあがり なし)</small></span>
-            </button>
-            <button class="btn-level" data-level="3">
-                <span class="level-num">レベル 3</span>
-                <span class="level-desc">15ふん<br><small>(くりあがり なし)</small></span>
-            </button>
-            <button class="btn-level" data-level="4">
-                <span class="level-num">レベル 4</span>
-                <span class="level-desc">5ふん<br><small>(くりあがり なし)</small></span>
-            </button>
-            <button class="btn-level" data-level="5">
-                <span class="level-num">レベル 5</span>
-                <span class="level-desc">1ふん<br><small>(くりあがり なし)</small></span>
-            </button>
-            <button class="btn-level" data-level="6">
-                <span class="level-num">レベル 6</span>
-                <span class="level-desc">15ふん<br><span style="color:#ff4444; font-weight:bold;">(くりあがり あり!)</span></span>
-            </button>
-            <button class="btn-level" data-level="7">
-                <span class="level-num">レベル 7</span>
-                <span class="level-desc">5ふん<br><span style="color:#ff4444; font-weight:bold;">(くりあがり あり!)</span></span>
-            </button>
-            <button class="btn-level" data-level="8">
-                <span class="level-num">レベル 8</span>
-                <span class="level-desc">1ふん<br><span style="color:#ff4444; font-weight:bold;">(くりあがり あり!)</span></span>
-            </button>
-        </div>
-    </div>
-
-    <!-- 2. ゲーム画面 -->
-    <div id="game-screen" class="screen">
-        <!-- 左パネル (お題 ＆ ポケモン) -->
-        <div class="left-panel">
-            <div class="question-box" id="question-text">
-                ロード中...
+    <div id="app-container">
+        <header>
+            <button class="btn-home" id="btn-home" style="display: none;">◀ もどる</button>
+            <div class="header-title">ポケモンとけいべんきょう</div>
+            <div class="level-select-container">
+                <select id="level-select">
+                    <option value="1">レベル1 (じかんだけ)</option>
+                    <option value="2">レベル2 (5ふん・1じかんいない・くりあがりなし)</option>
+                    <option value="3">レベル3 (5ふん・1じかんいない・くりあがりあり)</option>
+                    <option value="4">レベル4 (5ふん・1じかんこえ・くりあがりなし)</option>
+                    <option value="5">レベル5 (5ふん・1じかんこえ・くりあがりあり)</option>
+                    <option value="6">レベル6 (1ふん・1じかんこえ・くりあがりあり)</option>
+                </select>
             </div>
-            
-            <!-- 4択選択肢エリア -->
-            <div class="choices-container" id="choices-container">
-                <div class="choices-title">この じかんは なにじなにぷんかな？ えらんでね！</div>
-                <div class="choices-grid">
-                    <button class="btn-choice" data-choice-idx="0"></button>
-                    <button class="btn-choice" data-choice-idx="1"></button>
-                    <button class="btn-choice" data-choice-idx="2"></button>
-                    <button class="btn-choice" data-choice-idx="3"></button>
+        </header>
+
+        <!-- 1. 相棒選択画面 (全員一覧) -->
+        <div id="select-screen" class="screen active">
+            <div class="select-instruction">いっしょに べんきょうする ポケモンを えらんでね！</div>
+
+            <!-- ポケモン全員一覧 -->
+            <div class="pokemon-grid" id="pokemon-grid">
+                <!-- JSで動的にすべての御三家を追加します -->
+            </div>
+        </div>
+
+        <!-- 1.5. レベル選択画面 (新設) -->
+        <div id="level-screen" class="screen">
+            <button class="btn-home" id="btn-level-back">◀ えらびなおす</button>
+            <div class="level-instruction">べんきょうする レベルを えらんでね！</div>
+
+            <div class="selected-pokemon-preview">
+                <img id="level-pokemon-img" src="" alt="Selected Pokemon">
+                <div id="level-pokemon-name"></div>
+            </div>
+
+            <div class="level-buttons-grid">
+                <button class="btn-level" data-level="1">
+                    <span class="level-num">レベル 1</span>
+                    <span class="level-desc">じかんだけ</span>
+                </button>
+                <button class="btn-level" data-level="2">
+                    <span class="level-num">レベル 2</span>
+                    <span class="level-desc">5ふん・1じかんいない<br><small>(くりあがり なし)</small></span>
+                </button>
+                <button class="btn-level" data-level="3">
+                    <span class="level-num">レベル 3</span>
+                    <span class="level-desc">5ふん・1じかんいない<br><span style="color:#ff4444; font-weight:bold;">(くりあがり
+                            あり!)</span></span>
+                </button>
+                <button class="btn-level" data-level="4">
+                    <span class="level-num">レベル 4</span>
+                    <span class="level-desc">5ふん・1じかんこえ<br><small>(くりあがり なし)</small></span>
+                </button>
+                <button class="btn-level" data-level="5">
+                    <span class="level-num">レベル 5</span>
+                    <span class="level-desc">5ふん・1じかんこえ<br><span style="color:#ff4444; font-weight:bold;">(くりあがり
+                            あり!)</span></span>
+                </button>
+                <button class="btn-level" data-level="6">
+                    <span class="level-num">レベル 6</span>
+                    <span class="level-desc">1ぷん・1じかんこえ<br><span style="color:#ff4444; font-weight:bold;">(くりあがり
+                            あり!)</span></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 2. ゲーム画面 -->
+        <div id="game-screen" class="screen">
+            <!-- 左パネル (お題 ＆ ポケモン) -->
+            <div class="left-panel">
+                <div class="question-box" id="question-text">
+                    ロード中...
+                </div>
+
+                <!-- 4択選択肢エリア -->
+                <div class="choices-container" id="choices-container">
+                    <div class="choices-title">この じかんは なにじなにぷんかな？ えらんでね！</div>
+                    <div class="choices-grid">
+                        <button class="btn-choice" data-choice-idx="0"></button>
+                        <button class="btn-choice" data-choice-idx="1"></button>
+                        <button class="btn-choice" data-choice-idx="2"></button>
+                        <button class="btn-choice" data-choice-idx="3"></button>
+                    </div>
+                </div>
+
+                <div class="pokemon-container">
+                    <!-- 自作の超高精細SVGモンスターボール -->
+                    <svg viewBox="0 0 100 100" width="220" height="220" id="pokeball-svg" class="pokemon-display"
+                        style="display: none;">
+                        <circle cx="50" cy="50" r="46" fill="#fff" stroke="#333" stroke-width="5" />
+                        <path d="M 9,50 A 41,41 0 0,1 91,50 Z" fill="#ff4f4f" stroke="#333" stroke-width="5" />
+                        <line x1="4" y1="50" x2="96" y2="50" stroke="#333" stroke-width="6" />
+                        <circle cx="50" cy="50" r="14" fill="#fff" stroke="#333" stroke-width="5" />
+                        <circle cx="50" cy="50" r="7" fill="#fff" stroke="#bbb" stroke-width="1.5" />
+                    </svg>
+                    <img src="" alt="ポケモン" class="pokemon-display" id="pokemon-img">
+                    <div class="pokemon-label" id="pokemon-name-label">ピカチュウ</div>
                 </div>
             </div>
-            
-            <div class="pokemon-container">
-                <!-- 自作の超高精細SVGモンスターボール -->
-                <svg viewBox="0 0 100 100" width="220" height="220" id="pokeball-svg" class="pokemon-display" style="display: none;">
-                    <circle cx="50" cy="50" r="46" fill="#fff" stroke="#333" stroke-width="5"/>
-                    <path d="M 9,50 A 41,41 0 0,1 91,50 Z" fill="#ff4f4f" stroke="#333" stroke-width="5"/>
-                    <line x1="4" y1="50" x2="96" y2="50" stroke="#333" stroke-width="6"/>
-                    <circle cx="50" cy="50" r="14" fill="#fff" stroke="#333" stroke-width="5"/>
-                    <circle cx="50" cy="50" r="7" fill="#fff" stroke="#bbb" stroke-width="1.5"/>
-                </svg>
-                <img src="" alt="ポケモン" class="pokemon-display" id="pokemon-img">
-                <div class="pokemon-label" id="pokemon-name-label">ピカチュウ</div>
+
+            <!-- 右パネル (時計) -->
+            <div class="right-panel">
+                <div class="clock-wrapper">
+                    <svg id="clock-svg" viewBox="0 0 400 400">
+                        <!-- 外側の縁 -->
+                        <circle cx="200" cy="200" r="190" fill="#fff" stroke="#333" stroke-width="8" />
+                        <circle cx="200" cy="200" r="175" fill="none" stroke="#ddd" stroke-width="2" />
+
+                        <!-- 電撃ヒントサークル -->
+                        <circle id="hint-circle" cx="200" cy="200" r="170" class="shockwave" />
+
+                        <!-- 目盛り -->
+                        <g id="clock-ticks"></g>
+
+                        <!-- 数字 -->
+                        <g id="clock-numbers"></g>
+
+                        <!-- ゴースト針 (半透明の現在時刻基準針) -->
+                        <g id="ghost-hands" opacity="0.35" style="display: none;">
+                            <!-- ゴースト短針 (時針) -->
+                            <line id="ghost-hour-hand" x1="200" y1="200" x2="200" y2="120" stroke="#7f8c8d"
+                                stroke-width="10" stroke-linecap="round" stroke-dasharray="6,4" />
+                            <!-- ゴースト長針 (分針) -->
+                            <line id="ghost-minute-hand" x1="200" y1="200" x2="200" y2="60" stroke="#95a5a6"
+                                stroke-width="6" stroke-linecap="round" stroke-dasharray="6,4" />
+                            <circle cx="200" cy="200" r="12" fill="#7f8c8d" />
+                        </g>
+
+                        <!-- 実際の針 -->
+                        <!-- 短針 (時針) - タッチ当たり判定を広げるためにグループ化 -->
+                        <g id="hour-hand-group" style="cursor: grab;">
+                            <line id="hour-hand" x1="200" y1="200" x2="200" y2="110" stroke="#333" stroke-width="12"
+                                stroke-linecap="round" />
+                            <!-- タッチしやすい大きな透明の線 -->
+                            <line x1="200" y1="200" x2="200" y2="105" stroke="transparent" stroke-width="32"
+                                stroke-linecap="round" />
+                            <circle cx="200" cy="110" r="15" fill="transparent" />
+                        </g>
+
+                        <!-- 長針 (分針) -->
+                        <g id="minute-hand-group" style="cursor: grab;">
+                            <line id="minute-hand" x1="200" y1="200" x2="200" y2="50" stroke="#ff5959" stroke-width="8"
+                                stroke-linecap="round" />
+                            <!-- タッチしやすいように大きな透明当たり判定 -->
+                            <line x1="200" y1="200" x2="200" y2="45" stroke="transparent" stroke-width="26"
+                                stroke-linecap="round" />
+                            <circle cx="200" cy="50" r="25" fill="transparent" />
+                            <!-- 先端の丸 -->
+                            <circle cx="200" cy="50" r="10" fill="#ff5959" />
+                        </g>
+
+                        <!-- 中心軸 -->
+                        <circle cx="200" cy="200" r="15" fill="#333" />
+                        <circle cx="200" cy="200" r="6" fill="#fff" />
+                    </svg>
+                </div>
+
+                <!-- デジタル時計表示 (ヒント時のみ表示) -->
+                <div class="digital-display" id="digital-clock">12:00</div>
+
+                <!-- コントロールボタン -->
+                <div class="controls">
+                    <button class="btn btn-hint" id="btn-hint">💡 ヒント</button>
+                    <button class="btn btn-check" id="btn-check">できた！</button>
+                </div>
             </div>
         </div>
 
-        <!-- 右パネル (時計) -->
-        <div class="right-panel">
-            <div class="clock-wrapper">
-                <svg id="clock-svg" viewBox="0 0 400 400">
-                    <!-- 外側の縁 -->
-                    <circle cx="200" cy="200" r="190" fill="#fff" stroke="#333" stroke-width="8"/>
-                    <circle cx="200" cy="200" r="175" fill="none" stroke="#ddd" stroke-width="2"/>
-                    
-                    <!-- 電撃ヒントサークル -->
-                    <circle id="hint-circle" cx="200" cy="200" r="170" class="shockwave" />
-
-                    <!-- 目盛り -->
-                    <g id="clock-ticks"></g>
-
-                    <!-- 数字 -->
-                    <g id="clock-numbers"></g>
-
-                    <!-- ゴースト針 (半透明の現在時刻基準針) -->
-                    <g id="ghost-hands" opacity="0.35" style="display: none;">
-                        <!-- ゴースト短針 (時針) -->
-                        <line id="ghost-hour-hand" x1="200" y1="200" x2="200" y2="120" stroke="#7f8c8d" stroke-width="10" stroke-linecap="round" stroke-dasharray="6,4" />
-                        <!-- ゴースト長針 (分針) -->
-                        <line id="ghost-minute-hand" x1="200" y1="200" x2="200" y2="60" stroke="#95a5a6" stroke-width="6" stroke-linecap="round" stroke-dasharray="6,4" />
-                        <circle cx="200" cy="200" r="12" fill="#7f8c8d" />
-                    </g>
-
-                    <!-- 実際の針 -->
-                    <!-- 短針 (時針) - タッチ当たり判定を広げるためにグループ化 -->
-                    <g id="hour-hand-group" style="cursor: grab;">
-                        <line id="hour-hand" x1="200" y1="200" x2="200" y2="110" stroke="#333" stroke-width="12" stroke-linecap="round" />
-                        <!-- タッチしやすい大きな透明の線 -->
-                        <line x1="200" y1="200" x2="200" y2="105" stroke="transparent" stroke-width="32" stroke-linecap="round" />
-                        <circle cx="200" cy="110" r="15" fill="transparent" />
-                    </g>
-
-                    <!-- 長針 (分針) -->
-                    <g id="minute-hand-group" style="cursor: grab;">
-                        <line id="minute-hand" x1="200" y1="200" x2="200" y2="50" stroke="#ff5959" stroke-width="8" stroke-linecap="round" />
-                        <!-- タッチしやすいように大きな透明当たり判定 -->
-                        <line x1="200" y1="200" x2="200" y2="45" stroke="transparent" stroke-width="26" stroke-linecap="round" />
-                        <circle cx="200" cy="50" r="25" fill="transparent" />
-                        <!-- 先端の丸 -->
-                        <circle cx="200" cy="50" r="10" fill="#ff5959" />
-                    </g>
-
-                    <!-- 中心軸 -->
-                    <circle cx="200" cy="200" r="15" fill="#333" />
-                    <circle cx="200" cy="200" r="6" fill="#fff" />
-                </svg>
-            </div>
-
-            <!-- デジタル時計表示 (ヒント時のみ表示) -->
-            <div class="digital-display" id="digital-clock">12:00</div>
-
-            <!-- コントロールボタン -->
-            <div class="controls">
-                <button class="btn btn-hint" id="btn-hint">💡 ヒント</button>
-                <button class="btn btn-check" id="btn-check">できた！</button>
-            </div>
+        <!-- エフェクト演出用オーバーレイ -->
+        <div id="effect-overlay">
+            <div class="huge-text" id="result-text">せいかい！</div>
         </div>
     </div>
 
-    <!-- エフェクト演出用オーバーレイ -->
-    <div id="effect-overlay">
-        <div class="huge-text" id="result-text">せいかい！</div>
-    </div>
-</div>
-
-<script>
-    // ポケモンの静的データ定義 (世代1〜9の御三家 + ピカチュウ系)
-    const POKEMON_DATA = {
-        "1": {
-            name: "カントー地方",
-            starters: [
-                { type: "grass", chain: [1, 2, 3], names: ["フシギダネ", "フシギソウ", "フシギバナ"] },
-                { type: "fire", chain: [4, 5, 6], names: ["ヒトカゲ", "リザード", "リザードン"] },
-                { type: "water", chain: [7, 8, 9], names: ["ゼニガメ", "カメール", "カメックス"] }
-            ]
-        },
-        "2": {
-            name: "ジョウト地方",
-            starters: [
-                { type: "grass", chain: [152, 153, 154], names: ["チコリータ", "ベイリーフ", "メガニウム"] },
-                { type: "fire", chain: [155, 156, 157], names: ["ヒノアラシ", "マグマラシ", "バクフーン"] },
-                { type: "water", chain: [158, 159, 160], names: ["ワニノコ", "アリゲイツ", "オーダイル"] }
-            ]
-        },
-        "3": {
-            name: "ホウエン地方",
-            starters: [
-                { type: "grass", chain: [252, 253, 254], names: ["キモリ", "ジュプトル", "ジュカイン"] },
-                { type: "fire", chain: [255, 256, 257], names: ["アチャモ", "ワカシャモ", "バシャーモ"] },
-                { type: "water", chain: [258, 259, 260], names: ["ミズゴロウ", "ヌマクロー", "ラグラージ"] }
-            ]
-        },
-        "4": {
-            name: "シンオウ地方",
-            starters: [
-                { type: "grass", chain: [387, 388, 389], names: ["ナエトル", "ハヤシガメ", "ドダイトス"] },
-                { type: "fire", chain: [390, 391, 392], names: ["ヒコザル", "モウカザル", "ゴウカザル"] },
-                { type: "water", chain: [393, 394, 395], names: ["ポッチャマ", "ポッタイシ", "エンペルト"] }
-            ]
-        },
-        "5": {
-            name: "イッシュ地方",
-            starters: [
-                { type: "grass", chain: [495, 496, 497], names: ["ツタージャ", "ジャノビー", "ジャローダ"] },
-                { type: "fire", chain: [498, 499, 500], names: ["ポカブ", "チャオブー", "エンブオー"] },
-                { type: "water", chain: [501, 502, 503], names: ["ミジュマル", "フタチマル", "ダイケンキ"] }
-            ]
-        },
-        "6": {
-            name: "カロス地方",
-            starters: [
-                { type: "grass", chain: [650, 651, 652], names: ["ハリマロン", "ハリボーグ", "ブリガロン"] },
-                { type: "fire", chain: [653, 654, 655], names: ["フォッコ", "テールナー", "マフォクシー"] },
-                { type: "water", chain: [656, 657, 658], names: ["ケロマツ", "ゲコガシラ", "ゲッコウガ"] }
-            ]
-        },
-        "7": {
-            name: "アローラ地方",
-            starters: [
-                { type: "grass", chain: [722, 723, 724], names: ["モクロー", "フクスロー", "ジュナイパー"] },
-                { type: "fire", chain: [725, 726, 727], names: ["ニャビー", "ニャヒート", "ガオガエン"] },
-                { type: "water", chain: [728, 729, 730], names: ["アシマリ", "オシャマリ", "アシレーヌ"] }
-            ]
-        },
-        "8": {
-            name: "ガラル地方",
-            starters: [
-                { type: "grass", chain: [810, 811, 812], names: ["サルノリ", "バチンキー", "ゴリランダー"] },
-                { type: "fire", chain: [813, 814, 815], names: ["ヒバニー", "ラビフット", "エースバーン"] },
-                { type: "water", chain: [816, 817, 818], names: ["メッソン", "ジメレオン", "インテレオン"] }
-            ]
-        },
-        "9": {
-            name: "パルデア地方",
-            starters: [
-                { type: "grass", chain: [906, 907, 908], names: ["ニャオハ", "ヤローテ", "マスカーニャ"] },
-                { type: "fire", chain: [909, 910, 911], names: ["ホゲータ", "アチゲータ", "ラウドボーン"] },
-                { type: "water", chain: [912, 913, 914], names: ["クワッス", "ウェルカモ", "ウェーニバル"] }
-            ]
-        },
-        "0": {
-            name: "とくべつ",
-            starters: [
-                { type: "electric", chain: [172, 25, 26], names: ["ピチュー", "ピカチュウ", "ライチュウ"] }
-            ]
-        }
-    };
-
-    // アプリケーションの状態
-    let selectedPokemon = null; // { type, chain, names, currentStage }
-    let gameState = "neutral";  // "neutral", "advance", "regress"
-    let targetHour = 12;
-    let targetMinute = 0;
-    let baseHour = 12;
-    let baseMinute = 0;
-    let displayHour = 12;
-    let displayMinute = 0;
-    let audioContext = null;
-    let currentLevel = 1; // ★現在の難易度レベル
-    let selectedChoiceIdx = null; // ユーザーが選んだ4択のインデックス (0〜3)
-    let currentChoices = []; // 生成された選択肢 [{ hour, minute, text }]
-
-    // 時計ドラッグ関連の変数
-    let activeDragHand = null;
-    let lastAngle = 0;
-    let accumulatedMinutes = 720; // 12:00 = 720分
-
-    // DOM要素の取得
-    const selectScreen = document.getElementById("select-screen");
-    const levelScreen = document.getElementById("level-screen");
-    const gameScreen = document.getElementById("game-screen");
-    const pokemonGrid = document.getElementById("pokemon-grid");
-    const btnHome = document.getElementById("btn-home");
-    const btnLevelBack = document.getElementById("btn-level-back");
-    const pokemonImg = document.getElementById("pokemon-img");
-    const pokeballSvg = document.getElementById("pokeball-svg");
-    const pokemonNameLabel = document.getElementById("pokemon-name-label");
-    const questionText = document.getElementById("question-text");
-    const choicesContainer = document.getElementById("choices-container");
-    const choiceButtons = document.querySelectorAll(".btn-choice");
-    const clockSvg = document.getElementById("clock-svg");
-    const hourHandGroup = document.getElementById("hour-hand-group");
-    const hourHand = document.getElementById("hour-hand");
-    const minuteHandGroup = document.getElementById("minute-hand-group");
-    const minuteHand = document.getElementById("minute-hand");
-    const btnCheck = document.getElementById("btn-check");
-    const btnHint = document.getElementById("btn-hint");
-    const digitalClock = document.getElementById("digital-clock");
-    const resultText = document.getElementById("result-text");
-    const hintCircle = document.getElementById("hint-circle");
-
-    // 初期起動時の処理
-    window.addEventListener("DOMContentLoaded", () => {
-        renderAllPokemonList();
-        initClockTicks();
-        initClockDrag();
-        
-        btnHome.addEventListener("click", goBackToSelect);
-        btnLevelBack.addEventListener("click", () => {
-            // レベル選択から相棒選択に戻る
-            levelScreen.classList.remove("active");
-            selectScreen.classList.add("active");
-        });
-        btnCheck.addEventListener("click", checkAnswer);
-        btnHint.addEventListener("click", toggleHint);
-
-        // ゲーム画面のどこかをタップしたら、間違いメッセージを消す
-        gameScreen.addEventListener("click", () => {
-            if (resultText.style.display === "block") {
-                resultText.style.display = "none";
+    <script>
+        // ポケモンの静的データ定義 (世代1〜9の御三家 + ピカチュウ系)
+        const POKEMON_DATA = {
+            "1": {
+                name: "カントー地方",
+                starters: [
+                    { type: "grass", chain: [1, 2, 3], names: ["フシギダネ", "フシギソウ", "フシギバナ"] },
+                    { type: "fire", chain: [4, 5, 6], names: ["ヒトカゲ", "リザード", "リザードン"] },
+                    { type: "water", chain: [7, 8, 9], names: ["ゼニガメ", "カメール", "カメックス"] }
+                ]
+            },
+            "2": {
+                name: "ジョウト地方",
+                starters: [
+                    { type: "grass", chain: [152, 153, 154], names: ["チコリータ", "ベイリーフ", "メガニウム"] },
+                    { type: "fire", chain: [155, 156, 157], names: ["ヒノアラシ", "マグマラシ", "バクフーン"] },
+                    { type: "water", chain: [158, 159, 160], names: ["ワニノコ", "アリゲイツ", "オーダイル"] }
+                ]
+            },
+            "3": {
+                name: "ホウエン地方",
+                starters: [
+                    { type: "grass", chain: [252, 253, 254], names: ["キモリ", "ジュプトル", "ジュカイン"] },
+                    { type: "fire", chain: [255, 256, 257], names: ["アチャモ", "ワカシャモ", "バシャーモ"] },
+                    { type: "water", chain: [258, 259, 260], names: ["ミズゴロウ", "ヌマクロー", "ラグラージ"] }
+                ]
+            },
+            "4": {
+                name: "シンオウ地方",
+                starters: [
+                    { type: "grass", chain: [387, 388, 389], names: ["ナエトル", "ハヤシガメ", "ドダイトス"] },
+                    { type: "fire", chain: [390, 391, 392], names: ["ヒコザル", "モウカザル", "ゴウカザル"] },
+                    { type: "water", chain: [393, 394, 395], names: ["ポッチャマ", "ポッタイシ", "エンペルト"] }
+                ]
+            },
+            "5": {
+                name: "イッシュ地方",
+                starters: [
+                    { type: "grass", chain: [495, 496, 497], names: ["ツタージャ", "ジャノビー", "ジャローダ"] },
+                    { type: "fire", chain: [498, 499, 500], names: ["ポカブ", "チャオブー", "エンブオー"] },
+                    { type: "water", chain: [501, 502, 503], names: ["ミジュマル", "フタチマル", "ダイケンキ"] }
+                ]
+            },
+            "6": {
+                name: "カロス地方",
+                starters: [
+                    { type: "grass", chain: [650, 651, 652], names: ["ハリマロン", "ハリボーグ", "ブリガロン"] },
+                    { type: "fire", chain: [653, 654, 655], names: ["フォッコ", "テールナー", "マフォクシー"] },
+                    { type: "water", chain: [656, 657, 658], names: ["ケロマツ", "ゲコガシラ", "ゲッコウガ"] }
+                ]
+            },
+            "7": {
+                name: "アローラ地方",
+                starters: [
+                    { type: "grass", chain: [722, 723, 724], names: ["モクロー", "フクスロー", "ジュナイパー"] },
+                    { type: "fire", chain: [725, 726, 727], names: ["ニャビー", "ニャヒート", "ガオガエン"] },
+                    { type: "water", chain: [728, 729, 730], names: ["アシマリ", "オシャマリ", "アシレーヌ"] }
+                ]
+            },
+            "8": {
+                name: "ガラル地方",
+                starters: [
+                    { type: "grass", chain: [810, 811, 812], names: ["サルノリ", "バチンキー", "ゴリランダー"] },
+                    { type: "fire", chain: [813, 814, 815], names: ["ヒバニー", "ラビフット", "エースバーン"] },
+                    { type: "water", chain: [816, 817, 818], names: ["メッソン", "ジメレオン", "インテレオン"] }
+                ]
+            },
+            "9": {
+                name: "パルデア地方",
+                starters: [
+                    { type: "grass", chain: [906, 907, 908], names: ["ニャオハ", "ヤローテ", "マスカーニャ"] },
+                    { type: "fire", chain: [909, 910, 911], names: ["ホゲータ", "アチゲータ", "ラウドボーン"] },
+                    { type: "water", chain: [912, 913, 914], names: ["クワッス", "ウェルカモ", "ウェーニバル"] }
+                ]
+            },
+            "0": {
+                name: "とくべつ",
+                starters: [
+                    { type: "electric", chain: [172, 25, 26], names: ["ピチュー", "ピカチュウ", "ライチュウ"] }
+                ]
             }
-            if (hintCircle.style.display === "block") {
-                hintCircle.style.display = "none";
-            }
-        });
+        };
 
-        // 4択ボタンのクリックイベント
-        choiceButtons.forEach(btn => {
-            btn.addEventListener("click", (e) => {
-                const targetBtn = e.currentTarget;
-                const idx = parseInt(targetBtn.getAttribute("data-choice-idx"));
-                selectedChoiceIdx = idx;
-                
-                // 選択表示のトグル
-                choiceButtons.forEach(b => b.classList.remove("selected"));
-                targetBtn.classList.add("selected");
+        // アプリケーションの状態
+        let selectedPokemon = null; // { type, chain, names, currentStage }
+        let gameState = "neutral";  // "neutral", "advance", "regress"
+        let targetHour = 12;
+        let targetMinute = 0;
+        let baseHour = 12;
+        let baseMinute = 0;
+        let displayHour = 12;
+        let displayMinute = 0;
+        let audioContext = null;
+        let currentLevel = 1; // ★現在の難易度レベル
+        let selectedChoiceIdx = null; // ユーザーが選んだ4択のインデックス (0〜3)
+        let currentChoices = []; // 生成された選択肢 [{ hour, minute, text }]
+
+        // 時計ドラッグ関連の変数
+        let activeDragHand = null;
+        let lastAngle = 0;
+        let accumulatedMinutes = 720; // 12:00 = 720分
+
+        // DOM要素の取得
+        const selectScreen = document.getElementById("select-screen");
+        const levelScreen = document.getElementById("level-screen");
+        const gameScreen = document.getElementById("game-screen");
+        const pokemonGrid = document.getElementById("pokemon-grid");
+        const btnHome = document.getElementById("btn-home");
+        const btnLevelBack = document.getElementById("btn-level-back");
+        const pokemonImg = document.getElementById("pokemon-img");
+        const pokeballSvg = document.getElementById("pokeball-svg");
+        const pokemonNameLabel = document.getElementById("pokemon-name-label");
+        const questionText = document.getElementById("question-text");
+        const choicesContainer = document.getElementById("choices-container");
+        const choiceButtons = document.querySelectorAll(".btn-choice");
+        const clockSvg = document.getElementById("clock-svg");
+        const hourHandGroup = document.getElementById("hour-hand-group");
+        const hourHand = document.getElementById("hour-hand");
+        const minuteHandGroup = document.getElementById("minute-hand-group");
+        const minuteHand = document.getElementById("minute-hand");
+        const btnCheck = document.getElementById("btn-check");
+        const btnHint = document.getElementById("btn-hint");
+        const digitalClock = document.getElementById("digital-clock");
+        const resultText = document.getElementById("result-text");
+        const hintCircle = document.getElementById("hint-circle");
+
+        // 初期起動時の処理
+        window.addEventListener("DOMContentLoaded", () => {
+            renderAllPokemonList();
+            initClockTicks();
+            initClockDrag();
+
+            btnHome.addEventListener("click", goBackToSelect);
+            btnLevelBack.addEventListener("click", () => {
+                // レベル選択から相棒選択に戻る
+                levelScreen.classList.remove("active");
+                selectScreen.classList.add("active");
             });
-        });
+            btnCheck.addEventListener("click", checkAnswer);
+            btnHint.addEventListener("click", toggleHint);
 
-        // レベルボタンのイベント登録
-        const levelButtons = document.querySelectorAll(".btn-level");
-        levelButtons.forEach(btn => {
-            btn.addEventListener("click", (e) => {
-                const targetBtn = e.currentTarget;
-                const levelNum = parseInt(targetBtn.getAttribute("data-level"));
-                currentLevel = levelNum;
-                
-                // ヘッダーのセレクトボックスの表示も連動させる
-                document.getElementById("level-select").value = currentLevel;
-                
-                // レベル決定後、ゲーム画面へ移行
-                startGameAfterLevelSelect();
+            // ゲーム画面のどこかをタップしたら、間違いメッセージを消す
+            gameScreen.addEventListener("click", () => {
+                if (resultText.style.display === "block") {
+                    resultText.style.display = "none";
+                }
+                if (hintCircle.style.display === "block") {
+                    hintCircle.style.display = "none";
+                }
             });
-        });
 
-        // ヘッダーのレベル選択の変更時に即時に問題へ反映（プレイ中）
-        const levelSelect = document.getElementById("level-select");
-        levelSelect.addEventListener("change", (e) => {
-            currentLevel = parseInt(e.target.value);
-            if (selectedPokemon) {
-                generateQuestion();
-            }
-        });
-    });
+            // 4択ボタンのクリックイベント
+            choiceButtons.forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    const targetBtn = e.currentTarget;
+                    const idx = parseInt(targetBtn.getAttribute("data-choice-idx"));
+                    selectedChoiceIdx = idx;
 
-    // ポケモン全員一覧の描画
-    function renderAllPokemonList() {
-        pokemonGrid.innerHTML = "";
-        
-        Object.keys(POKEMON_DATA).forEach(genKey => {
-            const genStarters = POKEMON_DATA[genKey].starters;
-            
-            genStarters.forEach(starter => {
-                const card = document.createElement("div");
-                card.className = `pokemon-card ${starter.type}`;
-                
-                // 選択画面では「最初の形態 (たね)」を表示して親しみやすくする
-                const firstStageId = starter.chain[0];
-                const imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${firstStageId}.png`;
-                
-                const badge = document.createElement("span");
-                badge.className = `type-badge ${starter.type}`;
-                badge.textContent = translateType(starter.type);
-                card.appendChild(badge);
-
-                const img = document.createElement("img");
-                img.src = imageUrl;
-                img.alt = starter.names[0];
-                img.loading = "lazy";
-                img.onerror = () => {
-                    img.src = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png";
-                };
-                card.appendChild(img);
-
-                const nameDiv = document.createElement("div");
-                nameDiv.className = "pokemon-name";
-                nameDiv.textContent = starter.names[0];
-                card.appendChild(nameDiv);
-
-                card.addEventListener("click", () => {
-                    selectedPokemon = {
-                        type: starter.type,
-                        chain: starter.chain,
-                        names: starter.names,
-                        currentStage: 1 // ★スタートは中間形態（ピカチュウ等）からにする！
-                    };
-                    showLevelSelect();
+                    // 選択表示のトグル
+                    choiceButtons.forEach(b => b.classList.remove("selected"));
+                    targetBtn.classList.add("selected");
                 });
+            });
 
-                pokemonGrid.appendChild(card);
+            // レベルボタンのイベント登録
+            const levelButtons = document.querySelectorAll(".btn-level");
+            levelButtons.forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    const targetBtn = e.currentTarget;
+                    const levelNum = parseInt(targetBtn.getAttribute("data-level"));
+                    currentLevel = levelNum;
+
+                    // ヘッダーのセレクトボックスの表示も連動させる
+                    document.getElementById("level-select").value = currentLevel;
+
+                    // レベル決定後、ゲーム画面へ移行
+                    startGameAfterLevelSelect();
+                });
+            });
+
+            // ヘッダーのレベル選択の変更時に即時に問題へ反映（プレイ中）
+            const levelSelect = document.getElementById("level-select");
+            levelSelect.addEventListener("change", (e) => {
+                currentLevel = parseInt(e.target.value);
+                if (selectedPokemon) {
+                    generateQuestion();
+                }
             });
         });
-    }
 
-    function translateType(type) {
-        switch (type) {
-            case "grass": return "くさ";
-            case "fire": return "ほのお";
-            case "water": return "みず";
-            case "electric": return "でんき";
-            default: return "ノーマル";
+        // ポケモン全員一覧の描画
+        function renderAllPokemonList() {
+            pokemonGrid.innerHTML = "";
+
+            Object.keys(POKEMON_DATA).forEach(genKey => {
+                const genStarters = POKEMON_DATA[genKey].starters;
+
+                genStarters.forEach(starter => {
+                    const card = document.createElement("div");
+                    card.className = `pokemon-card ${starter.type}`;
+
+                    // 選択画面では「最初の形態 (たね)」を表示して親しみやすくする
+                    const firstStageId = starter.chain[0];
+                    const imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${firstStageId}.png`;
+
+                    const badge = document.createElement("span");
+                    badge.className = `type-badge ${starter.type}`;
+                    badge.textContent = translateType(starter.type);
+                    card.appendChild(badge);
+
+                    const img = document.createElement("img");
+                    img.src = imageUrl;
+                    img.alt = starter.names[0];
+                    img.loading = "lazy";
+                    img.onerror = () => {
+                        img.src = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png";
+                    };
+                    card.appendChild(img);
+
+                    const nameDiv = document.createElement("div");
+                    nameDiv.className = "pokemon-name";
+                    nameDiv.textContent = starter.names[0];
+                    card.appendChild(nameDiv);
+
+                    card.addEventListener("click", () => {
+                        selectedPokemon = {
+                            type: starter.type,
+                            chain: starter.chain,
+                            names: starter.names,
+                            currentStage: 1 // ★スタートは中間形態（ピカチュウ等）からにする！
+                        };
+                        showLevelSelect();
+                    });
+
+                    pokemonGrid.appendChild(card);
+                });
+            });
         }
-    }
 
-    // レベル選択画面の表示
-    function showLevelSelect() {
-        if (!selectedPokemon) return;
-        
-        const firstStageId = selectedPokemon.chain[0];
-        const imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${firstStageId}.png`;
-        
-        document.getElementById("level-pokemon-img").src = imageUrl;
-        document.getElementById("level-pokemon-name").textContent = selectedPokemon.names[0];
-        
-        selectScreen.classList.remove("active");
-        levelScreen.classList.add("active");
-        
-        // AudioContextの初期化
-        if (!audioContext) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        }
-    }
-
-    // レベル選択後のゲーム開始
-    function startGameAfterLevelSelect() {
-        levelScreen.classList.remove("active");
-        gameScreen.classList.add("active");
-        btnHome.style.display = "block";
-        
-        // ヘッダーのレベル選択を表示する
-        document.querySelector(".level-select-container").style.display = "flex";
-        
-        gameState = "neutral";
-        updatePokemonDisplay();
-        
-        accumulatedMinutes = 720;
-        updateClockHands();
-        
-        generateQuestion();
-    }
-
-    // 選択画面へもどる
-    function goBackToSelect() {
-        gameScreen.classList.remove("active");
-        selectScreen.classList.add("active");
-        btnHome.style.display = "none";
-        
-        // ヘッダーのレベル選択を非表示にする
-        document.querySelector(".level-select-container").style.display = "none";
-        
-        hideHint();
-    }
-
-    // ポケモンのグラフィックとラベルを更新
-    function updatePokemonDisplay(animType) {
-        if (!selectedPokemon) return;
-        
-        const pokemonId = selectedPokemon.chain[selectedPokemon.currentStage];
-        const pokemonName = selectedPokemon.names[selectedPokemon.currentStage];
-        
-        // 最初のお題 (gameState === "neutral") ではモンスターボールを表示し、ポケモン名は隠す
-        if (gameState === "neutral") {
-            pokeballSvg.style.display = "block";
-            pokemonImg.style.display = "none";
-            pokemonNameLabel.textContent = "だれが でるかな？";
-            
-            // 揺れクラスをリセット
-            pokeballSvg.classList.remove("pokeball-shake-anim");
-        } else {
-            pokeballSvg.style.display = "none";
-            pokemonImg.style.display = "block";
-            pokemonImg.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonId}.png`;
-            pokemonNameLabel.textContent = pokemonName;
-
-            if (animType === "evolve") {
-                pokemonImg.classList.remove("evolve-anim", "devolve-anim");
-                void pokemonImg.offsetWidth;
-                pokemonImg.classList.add("evolve-anim");
-            } else if (animType === "devolve") {
-                pokemonImg.classList.remove("evolve-anim", "devolve-anim");
-                void pokemonImg.offsetWidth;
-                pokemonImg.classList.add("devolve-anim");
+        function translateType(type) {
+            switch (type) {
+                case "grass": return "くさ";
+                case "fire": return "ほのお";
+                case "water": return "みず";
+                case "electric": return "でんき";
+                default: return "ノーマル";
             }
         }
-    }
 
-    // 鳴き声の再生
-    function playPokemonCry() {
-        if (!selectedPokemon) return;
-        const pokemonId = selectedPokemon.chain[selectedPokemon.currentStage];
-        
-        const cryUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/cries/${pokemonId}.ogg`;
-        const audio = new Audio(cryUrl);
-        audio.volume = 0.5;
-        audio.play().catch(e => {
-            console.log("鳴き声の再生に失敗しました: ", e);
-        });
-    }
+        // レベル選択画面の表示
+        function showLevelSelect() {
+            if (!selectedPokemon) return;
 
-    // 薄い「ゴースト針（基準時刻）」の更新
-    function updateGhostHands(hour, minute) {
-        const ghostHands = document.getElementById("ghost-hands");
-        if (gameState === "neutral") {
-            ghostHands.style.display = "none";
-            return;
+            const firstStageId = selectedPokemon.chain[0];
+            const imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${firstStageId}.png`;
+
+            document.getElementById("level-pokemon-img").src = imageUrl;
+            document.getElementById("level-pokemon-name").textContent = selectedPokemon.names[0];
+
+            selectScreen.classList.remove("active");
+            levelScreen.classList.add("active");
+
+            // AudioContextの初期化
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
         }
-        ghostHands.style.display = "block";
-        
-        const totalMinutes = ((hour % 12) * 60 + minute) % 720;
-        
-        // ゴースト短針の回転角度
-        const hourAngle = totalMinutes * 0.5;
-        document.getElementById("ghost-hour-hand").setAttribute("transform", `rotate(${hourAngle}, 200, 200)`);
-        
-        // ゴースト長針の回転角度
-        const minuteAngle = minute * 6;
-        document.getElementById("ghost-minute-hand").setAttribute("transform", `rotate(${minuteAngle}, 200, 200)`);
-    }
 
-    // 問題の生成
-    function generateQuestion() {
-        hideHint();
-        
-        const currentName = selectedPokemon.names[selectedPokemon.currentStage];
+        // レベル選択後のゲーム開始
+        function startGameAfterLevelSelect() {
+            levelScreen.classList.remove("active");
+            gameScreen.classList.add("active");
+            btnHome.style.display = "block";
 
-        if (gameState === "neutral") {
-            // 最初の時刻合わせ
-            targetHour = Math.floor(Math.random() * 12) + 1;
-            
-            // レベルに応じた分の生成
-            if (currentLevel === 1) {
-                targetMinute = 0;
-            } else if (currentLevel === 2 || currentLevel === 3 || currentLevel === 6) {
-                const minutes = [0, 15, 30, 45];
-                targetMinute = minutes[Math.floor(Math.random() * minutes.length)];
-            } else if (currentLevel === 4 || currentLevel === 7) {
-                targetMinute = Math.floor(Math.random() * 12) * 5;
-            } else {
-                targetMinute = Math.floor(Math.random() * 60);
-            }
-            
-            const minuteStr = targetMinute === 0 ? "ちょうど" : `${targetMinute}ふん`;
-            
-            questionText.innerHTML = `${currentName}に あいたいな！<br>とけいの はりを <span style="color:var(--accent-color); font-size:28px;">${targetHour}じ ${minuteStr}</span> に あわせてね！`;
-            
-            // 基準時間合わせのときはゴースト針を非表示にする
-            updateGhostHands();
-        } 
-        else if (gameState === "advance") {
-            // 進める問題 (進化)
-            let diffHour = 0;
-            let diffMinute = 0;
-            
-            // 1. レベル別の増分とベース分の決定
-            if (currentLevel === 1) {
-                // レベル1: ちょうど単位
-                diffHour = Math.floor(Math.random() * 3) + 1;
-                diffMinute = 0;
-                baseMinute = 0;
-            } 
-            else if (currentLevel === 2) {
-                // レベル2: 30分刻み・繰り上がりなし
-                diffHour = Math.floor(Math.random() * 2) + 1;
-                diffMinute = Math.random() < 0.5 ? 0 : 30;
-                if (diffMinute === 30) {
-                    baseMinute = 0; // 0 + 30 = 30 (繰り上がりなし)
-                } else {
-                    baseMinute = Math.random() < 0.5 ? 0 : 30; // 0+0=0, 30+0=30
-                }
-            } 
-            else if (currentLevel === 3) {
-                // レベル3: 15分刻み・繰り上がりなし
-                diffHour = Math.floor(Math.random() * 2) + 1;
-                const options = [0, 15, 30, 45];
-                diffMinute = options[Math.floor(Math.random() * options.length)];
-                
-                const validBaseMinutes = options.filter(m => m + diffMinute < 60);
-                baseMinute = validBaseMinutes[Math.floor(Math.random() * validBaseMinutes.length)];
-            } 
-            else if (currentLevel === 4) {
-                // レベル4: 5分刻み・繰り上がりなし
-                diffHour = Math.floor(Math.random() * 2) + 1;
-                diffMinute = Math.floor(Math.random() * 12) * 5; // 0〜55
-                
-                const validBaseMinutes = [];
-                for (let m = 0; m < 60; m += 5) {
-                    if (m + diffMinute < 60) validBaseMinutes.push(m);
-                }
-                baseMinute = validBaseMinutes[Math.floor(Math.random() * validBaseMinutes.length)];
-            } 
-            else if (currentLevel === 5) {
-                // レベル5: 1分刻み・繰り上がりなし
-                diffHour = Math.floor(Math.random() * 2) + 1;
-                diffMinute = Math.floor(Math.random() * 60); // 0〜59
-                
-                const validBaseMinutes = [];
-                for (let m = 0; m < 60; m++) {
-                    if (m + diffMinute < 60) validBaseMinutes.push(m);
-                }
-                baseMinute = validBaseMinutes[Math.floor(Math.random() * validBaseMinutes.length)];
-            } 
-            else if (currentLevel === 6) {
-                // レベル6: 15分刻み・繰り上がりあり！
-                diffHour = Math.floor(Math.random() * 2) + 1;
-                const options = [15, 30, 45]; // 0分を除外
-                diffMinute = options[Math.floor(Math.random() * options.length)];
-                
-                const allOptions = [0, 15, 30, 45];
-                const validBaseMinutes = allOptions.filter(m => m + diffMinute >= 60);
-                baseMinute = validBaseMinutes[Math.floor(Math.random() * validBaseMinutes.length)];
-            } 
-            else if (currentLevel === 7) {
-                // レベル7: 5分刻み・繰り上がりあり！
-                diffHour = Math.floor(Math.random() * 2) + 1;
-                diffMinute = (Math.floor(Math.random() * 11) + 1) * 5; // 5〜55分
-                
-                const validBaseMinutes = [];
-                for (let m = 0; m < 60; m += 5) {
-                    if (m + diffMinute >= 60) validBaseMinutes.push(m);
-                }
-                baseMinute = validBaseMinutes[Math.floor(Math.random() * validBaseMinutes.length)];
-            } 
-            else if (currentLevel === 8) {
-                // レベル8: 1分刻み・繰り上がりあり！
-                diffHour = Math.floor(Math.random() * 2) + 1;
-                diffMinute = Math.floor(Math.random() * 59) + 1; // 1〜59分
-                
-                const validBaseMinutes = [];
-                for (let m = 0; m < 60; m++) {
-                    if (m + diffMinute >= 60) validBaseMinutes.push(m);
-                }
-                baseMinute = validBaseMinutes[Math.floor(Math.random() * validBaseMinutes.length)];
-            }
+            // ヘッダーのレベル選択を表示する
+            document.querySelector(".level-select-container").style.display = "flex";
 
-            // ベース時をランダムに決定
-            baseHour = Math.floor(Math.random() * 12) + 1;
-            
-            // 表示と針の位置をベース時間に強制セット
-            accumulatedMinutes = (baseHour % 12) * 60 + baseMinute;
+            gameState = "neutral";
+            updatePokemonDisplay();
+
+            accumulatedMinutes = 720;
             updateClockHands();
-            updateGhostHands(baseHour, baseMinute);
-            
-            // 目標時刻の計算
-            let totalMin = (baseHour * 60 + baseMinute) + (diffHour * 60 + diffMinute);
-            let targetTotalMin = totalMin % 720;
-            targetHour = Math.floor(targetTotalMin / 60) === 0 ? 12 : Math.floor(targetTotalMin / 60);
-            targetMinute = targetTotalMin % 60;
-            
-            let timeStr = "";
-            if (diffHour > 0) timeStr += `${diffHour}じかん`;
-            if (diffMinute > 0) {
-                timeStr += ` ${diffMinute}ぷん`;
-            }
-            
-            const nextPokemonName = selectedPokemon.names[selectedPokemon.currentStage + 1];
-            const baseMinStr = baseMinute === 0 ? "ちょうど" : `${baseMinute}ふん`;
-            
-            questionText.innerHTML = `いまの じかん【<span style="color:var(--primary-color); font-size:26px;">${baseHour}じ ${baseMinStr}</span>】（うすいはり）から<br><span style="color:var(--accent-color); font-size:28px;">${timeStr}ご</span> に <span style="color:var(--grass-color); font-weight:bold;">${nextPokemonName}</span> に しんか するよ！<br>その じかんに あわせてね！`;
-        } 
-        else if (gameState === "regress") {
-            // 戻す問題 (退化)
-            const prevPokemonName = selectedPokemon.names[0]; // 常に第1形態の名前を表示（サイクル: stage2→stage0）
-            let diffHour = 0;
-            let diffMinute = 0;
-            
-            // 1. レベル別の増分とベース分の決定
-            if (currentLevel === 1) {
-                // レベル1: ちょうど単位
-                diffHour = Math.floor(Math.random() * 3) + 1;
-                diffMinute = 0;
-                baseMinute = 0;
-            } 
-            else if (currentLevel === 2) {
-                // レベル2: 30分刻み・繰り下がりなし
-                diffHour = Math.floor(Math.random() * 2) + 1;
-                diffMinute = Math.random() < 0.5 ? 0 : 30;
-                if (diffMinute === 30) {
-                    baseMinute = 30; // 30 - 30 = 0 (繰り下がりなし)
-                } else {
-                    baseMinute = Math.random() < 0.5 ? 0 : 30;
-                }
-            } 
-            else if (currentLevel === 3) {
-                // レベル3: 15分刻み・繰り下がりなし
-                diffHour = Math.floor(Math.random() * 2) + 1;
-                const options = [0, 15, 30, 45];
-                diffMinute = options[Math.floor(Math.random() * options.length)];
-                
-                const validBaseMinutes = options.filter(m => m >= diffMinute);
-                baseMinute = validBaseMinutes[Math.floor(Math.random() * validBaseMinutes.length)];
-            } 
-            else if (currentLevel === 4) {
-                // レベル4: 5分刻み・繰り下がりなし
-                diffHour = Math.floor(Math.random() * 2) + 1;
-                diffMinute = Math.floor(Math.random() * 12) * 5;
-                
-                const validBaseMinutes = [];
-                for (let m = 0; m < 60; m += 5) {
-                    if (m >= diffMinute) validBaseMinutes.push(m);
-                }
-                baseMinute = validBaseMinutes[Math.floor(Math.random() * validBaseMinutes.length)];
-            } 
-            else if (currentLevel === 5) {
-                // レベル5: 1分刻み・繰り下がりなし
-                diffHour = Math.floor(Math.random() * 2) + 1;
-                diffMinute = Math.floor(Math.random() * 60);
-                
-                const validBaseMinutes = [];
-                for (let m = 0; m < 60; m++) {
-                    if (m >= diffMinute) validBaseMinutes.push(m);
-                }
-                baseMinute = validBaseMinutes[Math.floor(Math.random() * validBaseMinutes.length)];
-            } 
-            else if (currentLevel === 6) {
-                // レベル6: 15分刻み・繰り下がりあり！
-                diffHour = Math.floor(Math.random() * 2) + 1;
-                const options = [15, 30, 45];
-                diffMinute = options[Math.floor(Math.random() * options.length)];
-                
-                const allOptions = [0, 15, 30, 45];
-                const validBaseMinutes = allOptions.filter(m => m < diffMinute);
-                baseMinute = validBaseMinutes[Math.floor(Math.random() * validBaseMinutes.length)];
-            } 
-            else if (currentLevel === 7) {
-                // レベル7: 5分刻み・繰り下がりあり！
-                diffHour = Math.floor(Math.random() * 2) + 1;
-                diffMinute = (Math.floor(Math.random() * 11) + 1) * 5;
-                
-                const validBaseMinutes = [];
-                for (let m = 0; m < 60; m += 5) {
-                    if (m < diffMinute) validBaseMinutes.push(m);
-                }
-                baseMinute = validBaseMinutes[Math.floor(Math.random() * validBaseMinutes.length)];
-            } 
-            else if (currentLevel === 8) {
-                // レベル8: 1分刻み・繰り下がりあり！
-                diffHour = Math.floor(Math.random() * 2) + 1;
-                diffMinute = Math.floor(Math.random() * 59) + 1;
-                
-                const validBaseMinutes = [];
-                for (let m = 0; m < 60; m++) {
-                    if (m < diffMinute) validBaseMinutes.push(m);
-                }
-                baseMinute = validBaseMinutes[Math.floor(Math.random() * validBaseMinutes.length)];
-            }
 
-            // ベース時をランダムに決定
-            baseHour = Math.floor(Math.random() * 12) + 1;
-            
-            // 表示と針の位置をベース時間に強制セット
-            accumulatedMinutes = (baseHour % 12) * 60 + baseMinute;
-            updateClockHands();
-            updateGhostHands(baseHour, baseMinute);
-            
-            // 目標時刻の計算
-            let totalMin = (baseHour * 60 + baseMinute) - (diffHour * 60 + diffMinute);
-            if (totalMin < 0) totalMin += 720;
-            let targetTotalMin = totalMin % 720;
-            targetHour = Math.floor(targetTotalMin / 60) === 0 ? 12 : Math.floor(targetTotalMin / 60);
-            targetMinute = targetTotalMin % 60;
-            
-            let timeStr = "";
-            if (diffHour > 0) timeStr += `${diffHour}じかん`;
-            if (diffMinute > 0) {
-                timeStr += ` ${diffMinute}ぷん`;
-            }
-            
-            const baseMinStr = baseMinute === 0 ? "ちょうど" : `${baseMinute}ふん`;
-            questionText.innerHTML = `いまの じかん【<span style="color:var(--primary-color); font-size:26px;">${baseHour}じ ${baseMinStr}</span>】（うすいはり）から<br><span style="color:var(--secondary-color); font-size:28px;">${timeStr}まえ</span> は <span style="color:var(--accent-color); font-weight:bold;">${prevPokemonName}</span> だったよ！<br>その じかんに あわせてね！`;
+            generateQuestion();
         }
-        
-        // ポケモンのグラフィックとラベルを表示状態に同期更新
-        updatePokemonDisplay();
 
-        // 最初のお題（gameState === "neutral"）では4択は不要なので非表示にし、それ以降の問題で表示する
-        if (gameState === "neutral") {
-            choicesContainer.style.display = "none";
-        } else {
-            choicesContainer.style.display = "block";
-            setupChoices();
+        // 選択画面へもどる
+        function goBackToSelect() {
+            gameScreen.classList.remove("active");
+            selectScreen.classList.add("active");
+            btnHome.style.display = "none";
+
+            // ヘッダーのレベル選択を非表示にする
+            document.querySelector(".level-select-container").style.display = "none";
+
+            hideHint();
         }
-    }
 
-    // 答え合わせ (中間形態スタートの進化・退化ループ ＋ 4択＆針のダブルチェック)
-    function checkAnswer() {
-        // 判定の前に浮動小数点のズレを綺麗に四捨五入して整数（分）にスナップ！
-        accumulatedMinutes = Math.round(accumulatedMinutes);
-        updateClockHands();
+        // ポケモンのグラフィックとラベルを更新
+        function updatePokemonDisplay(animType) {
+            if (!selectedPokemon) return;
 
-        // 最初の問題 (ひたすら指定時間に針を合わせる) の答え合わせ
-        if (gameState === "neutral") {
-            const isClockCorrect = displayHour === targetHour && displayMinute === targetMinute;
-            
-            if (isClockCorrect) {
-                // モンスターボールを激しく揺らす！
+            const pokemonId = selectedPokemon.chain[selectedPokemon.currentStage];
+            const pokemonName = selectedPokemon.names[selectedPokemon.currentStage];
+
+            // 最初のお題 (gameState === "neutral") ではモンスターボールを表示し、ポケモン名は隠す
+            if (gameState === "neutral") {
+                pokeballSvg.style.display = "block";
+                pokemonImg.style.display = "none";
+                pokemonNameLabel.textContent = "だれが でるかな？";
+
+                // 揺れクラスをリセット
                 pokeballSvg.classList.remove("pokeball-shake-anim");
-                void pokeballSvg.offsetWidth; // リフロー
-                pokeballSvg.classList.add("pokeball-shake-anim");
-                
-                // 揺れが終わったタイミング (0.9秒後) でポケモン出現！
-                setTimeout(() => {
-                    pokeballSvg.style.display = "none";
-                    pokemonImg.style.display = "block";
-                    
-                    // 強制的に初期選択ポケモン（ピカチュウ等）を画像とラベルにセット
-                    const pokemonId = selectedPokemon.chain[selectedPokemon.currentStage];
-                    const pokemonName = selectedPokemon.names[selectedPokemon.currentStage];
-                    pokemonImg.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonId}.png`;
-                    pokemonNameLabel.textContent = pokemonName;
-                    
-                    // 出現ポップアニメーション
+            } else {
+                pokeballSvg.style.display = "none";
+                pokemonImg.style.display = "block";
+                pokemonImg.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonId}.png`;
+                pokemonNameLabel.textContent = pokemonName;
+
+                if (animType === "evolve") {
                     pokemonImg.classList.remove("evolve-anim", "devolve-anim");
                     void pokemonImg.offsetWidth;
                     pokemonImg.classList.add("evolve-anim");
-                    
-                    // 鳴き声と紙吹雪エフェクトを同時に再生！
-                    playPokemonCry();
-                    triggerSuccessEffect();
-                }, 900);
-                
-                setTimeout(() => {
-                    // 固定サイクル: neutral → 必ず advance (進める)
-                    gameState = "advance";
-                    generateQuestion();
-                }, 3400);
-            } else {
-                playFailureTone();
-                resultText.innerHTML = "とけいの はり を よくみて、ぴったり あわせてね！";
-                resultText.style.display = "block";
-                resultText.style.color = "var(--secondary-color)";
-                
-                hintCircle.style.display = "block";
-                setTimeout(() => {
-                    hintCircle.style.display = "none";
-                }, 2000);
-            }
-            return;
-        }
-
-        // 2問目以降（進める・戻す）の答え合わせ (4択＆針のダブルチェック)
-        // 1. 4択が選ばれているかチェック
-        if (selectedChoiceIdx === null) {
-            resultText.innerHTML = "なにじ なにぷんか、４つの なかから えらんでね！";
-            resultText.style.display = "block";
-            resultText.style.color = "var(--secondary-color)";
-            playFailureTone();
-            return;
-        }
-
-        // 2. 選択された4択の答えが正しいか
-        const chosen = currentChoices[selectedChoiceIdx];
-        const isChoiceCorrect = chosen.hour === targetHour && chosen.minute === targetMinute;
-
-        // 3. 時計の針が正しいか
-        const isClockCorrect = displayHour === targetHour && displayMinute === targetMinute;
-
-        // 両方正解ならクリア！
-        if (isChoiceCorrect && isClockCorrect) {
-            triggerSuccessEffect();
-            playPokemonCry();
-            
-            setTimeout(() => {
-                // 固定サイクル: neutral → advance → regress → neutral → ...
-                if (gameState === "advance") {
-                    // advance正解: stage 1→2 (中間→最終形態へ進化)
-                    selectedPokemon.currentStage = 2;
-                    updatePokemonDisplay("evolve");
-                    playSuccessSound();
-                    gameState = "regress"; // 次は戻す問題
-                } 
-                else if (gameState === "regress") {
-                    // regress正解: stage 2→0 (最終形態→第1形態へ退化)
-                    selectedPokemon.currentStage = 0;
-                    updatePokemonDisplay("devolve");
-                    playSuccessSound();
-                    // 次は再びneutral (時刻合わせ) に戻り、stageも1にリセット
-                    gameState = "neutral";
-                    selectedPokemon.currentStage = 1;
-                }
-                
-                generateQuestion();
-            }, 2500);
-        } else {
-            // 不正解時の演出と親切なメッセージヒント
-            playFailureTone();
-            
-            let message = "";
-            if (!isClockCorrect && isChoiceCorrect) {
-                message = "４たくは あっているよ！<br>とけいの はり を よくみて、ぴったり あわせてね！";
-                // 針だけ違うので、ヒントサークルを電撃風に点滅させる
-                hintCircle.style.display = "block";
-                setTimeout(() => {
-                    hintCircle.style.display = "none";
-                }, 2000);
-            } else if (isClockCorrect && !isChoiceCorrect) {
-                message = "とけいの はりは あっているよ！<br>４たくの なかから、ただしい じかんを えらびなおしてね！";
-            } else {
-                message = "とけいの はり も、えらんだ じかん も ちがうみたい！<br>もういちど よく かんがえてみてね！";
-            }
-            
-            resultText.innerHTML = message;
-            resultText.style.display = "block";
-            resultText.style.color = "var(--secondary-color)";
-        }
-    }
-
-    // 4択選択肢のセットアップ
-    function setupChoices() {
-        selectedChoiceIdx = null; // 選択をリセット
-        
-        // レベルに応じた刻み幅(step)
-        let step = 1;
-        if (currentLevel === 1) step = 60;
-        else if (currentLevel === 2) step = 30;
-        else if (currentLevel === 3 || currentLevel === 6) step = 15;
-        else if (currentLevel === 4 || currentLevel === 7) step = 5;
-        
-        const dummies = [];
-        let attempts = 0;
-        while (dummies.length < 3 && attempts < 100) {
-            attempts++;
-            let dHour = targetHour;
-            let dMinute = targetMinute;
-            
-            const rand = Math.random();
-            if (rand < 0.33) {
-                // 時のみ変更
-                const offset = (Math.random() < 0.5 ? -1 : 1) * (Math.floor(Math.random() * 3) + 1);
-                dHour = ((targetHour - 1 + offset + 12) % 12) + 1;
-            } else if (rand < 0.66) {
-                // 分のみ変更
-                if (step === 60) {
-                    const offset = (Math.random() < 0.5 ? -1 : 1) * (Math.floor(Math.random() * 4) + 1);
-                    dHour = ((targetHour - 1 + offset + 12) % 12) + 1;
-                } else {
-                    const offsetSteps = (Math.random() < 0.5 ? -1 : 1) * (Math.floor(Math.random() * 4) + 1);
-                    dMinute = (targetMinute + offsetSteps * step + 60) % 60;
-                }
-            } else {
-                // 両方変更
-                const offsetHour = (Math.random() < 0.5 ? -1 : 1) * (Math.floor(Math.random() * 2) + 1);
-                dHour = ((targetHour - 1 + offsetHour + 12) % 12) + 1;
-                
-                if (step < 60) {
-                    const offsetSteps = (Math.random() < 0.5 ? -1 : 1) * (Math.floor(Math.random() * 3) + 1);
-                    dMinute = (targetMinute + offsetSteps * step + 60) % 60;
+                } else if (animType === "devolve") {
+                    pokemonImg.classList.remove("evolve-anim", "devolve-anim");
+                    void pokemonImg.offsetWidth;
+                    pokemonImg.classList.add("devolve-anim");
                 }
             }
-            
-            const isDuplicate = (dHour === targetHour && dMinute === targetMinute) ||
-                                dummies.some(d => d.hour === dHour && d.minute === dMinute);
-            
-            if (!isDuplicate) {
-                dummies.push({ hour: dHour, minute: dMinute });
+        }
+
+        // 鳴き声の再生
+        function playPokemonCry() {
+            if (!selectedPokemon) return;
+            const pokemonId = selectedPokemon.chain[selectedPokemon.currentStage];
+
+            const cryUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/cries/${pokemonId}.ogg`;
+            const audio = new Audio(cryUrl);
+            audio.volume = 0.5;
+            audio.play().catch(e => {
+                console.log("鳴き声の再生に失敗しました: ", e);
+            });
+        }
+
+        // 薄い「ゴースト針（基準時刻）」の更新
+        function updateGhostHands(hour, minute) {
+            const ghostHands = document.getElementById("ghost-hands");
+            if (gameState === "neutral") {
+                ghostHands.style.display = "none";
+                return;
             }
+            ghostHands.style.display = "block";
+
+            const totalMinutes = ((hour % 12) * 60 + minute) % 720;
+
+            // ゴースト短針の回転角度
+            const hourAngle = totalMinutes * 0.5;
+            document.getElementById("ghost-hour-hand").setAttribute("transform", `rotate(${hourAngle}, 200, 200)`);
+
+            // ゴースト長針の回転角度
+            const minuteAngle = minute * 6;
+            document.getElementById("ghost-minute-hand").setAttribute("transform", `rotate(${minuteAngle}, 200, 200)`);
         }
-        
-        // セーフガード
-        while (dummies.length < 3) {
-            let dHour = Math.floor(Math.random() * 12) + 1;
-            let dMinute = step === 60 ? 0 : (Math.floor(Math.random() * (60 / step)) * step) % 60;
-            const isDuplicate = (dHour === targetHour && dMinute === targetMinute) ||
-                                dummies.some(d => d.hour === dHour && d.minute === dMinute);
-            if (!isDuplicate) {
-                dummies.push({ hour: dHour, minute: dMinute });
-            }
-        }
-        
-        // 選択肢の配列構築
-        const list = [
-            { hour: targetHour, minute: targetMinute, isCorrect: true },
-            ...dummies.map(d => ({ hour: d.hour, minute: d.minute, isCorrect: false }))
-        ];
-        
-        // シャッフル
-        for (let i = list.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [list[i], list[j]] = [list[j], list[i]];
-        }
-        
-        currentChoices = list;
-        
-        // UIに反映
-        choiceButtons.forEach((btn, idx) => {
-            const item = currentChoices[idx];
-            const minStr = item.minute === 0 ? "ちょうど" : `${item.minute}ぷん`;
-            btn.textContent = `${item.hour}じ ${minStr}`;
-            btn.classList.remove("selected");
-        });
-    }
 
-    // 正解時の演出エフェクト
-    function triggerSuccessEffect() {
-        resultText.textContent = "せいかい！";
-        resultText.style.color = "var(--accent-color)";
-        resultText.style.display = "block";
-        
-        for (let i = 0; i < 40; i++) {
-            createConfetti();
-        }
-        
-        playSuccessTone();
-
-        setTimeout(() => {
-            resultText.style.display = "none";
-        }, 2200);
-    }
-
-    // 不正解時のヒント誘導エフェクト
-    function triggerFailureEffect() {
-        resultText.textContent = "あれれ？";
-        resultText.style.color = "var(--secondary-color)";
-        resultText.style.display = "block";
-        
-        hintCircle.style.display = "block";
-        playFailureTone();
-
-        setTimeout(() => {
-            resultText.style.display = "none";
-        }, 1500);
-    }
-
-    // 紙吹雪
-    function createConfetti() {
-        const confetti = document.createElement("div");
-        confetti.className = "confetti";
-        
-        const colors = ["#ffcb05", "#3b4cca", "#ff5959", "#4caf50", "#2196f3"];
-        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        
-        confetti.style.left = Math.random() * 100 + "vw";
-        confetti.style.top = "-20px";
-        
-        const size = Math.random() * 10 + 10;
-        confetti.style.width = size + "px";
-        confetti.style.height = size + "px";
-        
-        confetti.style.animationDuration = Math.random() * 2 + 1.5 + "s";
-        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
-        
-        document.body.appendChild(confetti);
-        
-        confetti.addEventListener("animationend", () => {
-            confetti.remove();
-        });
-    }
-
-    // ヒントの表示切り替え
-    function toggleHint() {
-        if (digitalClock.style.display === "block") {
+        // 問題の生成
+        function generateQuestion() {
             hideHint();
-        } else {
-            showHint();
-        }
-    }
 
-    function showHint() {
-        digitalClock.style.display = "block";
-        digitalClock.textContent = `せいかいは ➡️ ${targetHour}:${targetMinute.toString().padStart(2, '0')}`;
-        hintCircle.style.display = "block";
-    }
+            const currentName = selectedPokemon.names[selectedPokemon.currentStage];
 
-    function hideHint() {
-        digitalClock.style.display = "none";
-        hintCircle.style.display = "none";
-    }
+            if (gameState === "neutral") {
+                // 最初の時刻合わせ
+                targetHour = Math.floor(Math.random() * 12) + 1;
 
-    // ----------------------------------------------------
-    // 時計盤の描画およびダブル・ドラッグ操作システム
-    // ----------------------------------------------------
+                // レベルに応じた分の生成
+                if (currentLevel === 1) {
+                    targetMinute = 0;
+                } else if (currentLevel <= 5) {
+                    targetMinute = Math.floor(Math.random() * 12) * 5; // 0〜55の5分刻み
+                } else {
+                    targetMinute = Math.floor(Math.random() * 60); // 0〜59の1分刻み
+                }
 
-    // 時計の目盛りを動的に作成
-    function initClockTicks() {
-        const ticksGroup = document.getElementById("clock-ticks");
-        const numbersGroup = document.getElementById("clock-numbers");
-        ticksGroup.innerHTML = "";
-        numbersGroup.innerHTML = "";
+                // バグ修正: 初期針位置(12:00)と一致しないようにする
+                if (targetHour === 12 && targetMinute === 0) {
+                    targetHour = Math.floor(Math.random() * 11) + 1; // 1〜11時に変更
+                }
 
-        for (let i = 0; i < 60; i++) {
-            const angle = i * 6;
-            const rad = (angle - 90) * Math.PI / 180;
-            
-            const isFiveMinute = i % 5 === 0;
-            const rStart = isFiveMinute ? 155 : 163;
-            const rEnd = 170;
-            
-            const x1 = 200 + rStart * Math.cos(rad);
-            const y1 = 200 + rStart * Math.sin(rad);
-            const x2 = 200 + rEnd * Math.cos(rad);
-            const y2 = 200 + rEnd * Math.sin(rad);
+                const minuteStr = targetMinute === 0 ? `${targetHour}じ` : `${targetHour}じ ${targetMinute}ふん`;
 
-            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-            line.setAttribute("x1", x1);
-            line.setAttribute("y1", y1);
-            line.setAttribute("x2", x2);
-            line.setAttribute("y2", y2);
-            line.setAttribute("stroke", isFiveMinute ? "#333" : "#aaa");
-            line.setAttribute("stroke-width", isFiveMinute ? "4" : "2");
-            ticksGroup.appendChild(line);
-        }
+                questionText.innerHTML = `${currentName}に あいたいな！<br>とけいの はりを <span style="color:var(--accent-color); font-size:28px;">${minuteStr}</span> に あわせてね！`;
 
-        for (let num = 1; num <= 12; num++) {
-            const angle = num * 30;
-            const rad = (angle - 90) * Math.PI / 180;
-            const r = 135;
-            
-            const x = 200 + r * Math.cos(rad);
-            const y = 200 + r * Math.sin(rad);
-
-            const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            text.setAttribute("x", x);
-            text.setAttribute("y", y + 10);
-            text.setAttribute("text-anchor", "middle");
-            text.setAttribute("font-size", "34");
-            text.setAttribute("font-weight", "800");
-            text.setAttribute("font-family", "'Outfit', sans-serif");
-            text.setAttribute("fill", "#2c3e50");
-            text.textContent = num;
-            numbersGroup.appendChild(text);
-        }
-    }
-
-    // ドラッグ操作ロジックのバインド
-    function initClockDrag() {
-        minuteHandGroup.addEventListener("mousedown", (e) => dragStart(e, "minute"));
-        minuteHandGroup.addEventListener("touchstart", (e) => dragStart(e, "minute"), { passive: false });
-
-        hourHandGroup.addEventListener("mousedown", (e) => dragStart(e, "hour"));
-        hourHandGroup.addEventListener("touchstart", (e) => dragStart(e, "hour"), { passive: false });
-
-        window.addEventListener("mousemove", dragMove);
-        window.addEventListener("touchmove", dragMove, { passive: false });
-
-        window.addEventListener("mouseup", dragEnd);
-        window.addEventListener("touchend", dragEnd);
-    }
-
-    function dragStart(e, handType) {
-        e.preventDefault();
-        initAudioContext();
-        
-        isDragging = true;
-        activeDragHand = handType;
-        document.body.style.cursor = "grabbing";
-        
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        
-        const rect = clockSvg.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        
-        lastAngle = Math.atan2(clientY - centerY, clientX - centerX) * 180 / Math.PI;
-    }
-
-    function dragMove(e) {
-        if (!isDragging) return;
-        e.preventDefault();
-        
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        
-        const rect = clockSvg.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        
-        let currentAngle = Math.atan2(clientY - centerY, clientX - centerX) * 180 / Math.PI;
-        
-        if (activeDragHand === "minute") {
-            let dAngle = currentAngle - lastAngle;
-            if (dAngle > 180) dAngle -= 360;
-            if (dAngle < -180) dAngle += 360;
-            
-            let dMinutes = dAngle / 6;
-            accumulatedMinutes += dMinutes;
-            
-            if (accumulatedMinutes < 0) accumulatedMinutes += 720;
-            accumulatedMinutes = accumulatedMinutes % 720;
-            
-            updateClockHands();
-            lastAngle = currentAngle;
-        } 
-        else if (activeDragHand === "hour") {
-            let relativeAngle = currentAngle + 90;
-            if (relativeAngle < 0) relativeAngle += 360;
-            if (relativeAngle >= 360) relativeAngle -= 360;
-            
-            let h = Math.round(relativeAngle / 30);
-            if (h === 0) h = 12;
-            if (h > 12) h = 12;
-            
-            if (h !== displayHour) {
-                playTickSound();
+                // 基準時間合わせのときはゴースト針を非表示にする
+                updateGhostHands();
             }
-            
-            accumulatedMinutes = (h % 12) * 60 + displayMinute;
-            
-            updateClockHands();
-        }
-    }
+            else if (gameState === "advance") {
+                // 進める問題 (進化)
+                let diffHour = 0;
+                let diffMinute = 0;
 
-    function dragEnd() {
-        if (isDragging) {
-            isDragging = false;
-            activeDragHand = null;
-            document.body.style.cursor = "default";
-            
+                // 1. レベル別の増分とベース分の決定
+                if (currentLevel === 1) {
+                    // レベル1: 時間のみ (分は0)
+                    diffHour = Math.floor(Math.random() * 3) + 1;
+                    diffMinute = 0;
+                    baseMinute = 0;
+                }
+                else if (currentLevel === 2) {
+                    // レベル2: 1時間未満・5分刻み・繰り上がりなし
+                    diffHour = 0;
+                    diffMinute = (Math.floor(Math.random() * 11) + 1) * 5; // 5〜55分
+
+                    const validBaseMinutes = [];
+                    for (let m = 0; m < 60; m += 5) {
+                        if (m + diffMinute < 60) validBaseMinutes.push(m);
+                    }
+                    baseMinute = validBaseMinutes[Math.floor(Math.random() * validBaseMinutes.length)];
+                }
+                else if (currentLevel === 3) {
+                    // レベル3: 1時間未満・5分刻み・繰り上がりあり
+                    diffHour = 0;
+                    diffMinute = (Math.floor(Math.random() * 11) + 1) * 5; // 5〜55分
+
+                    const validBaseMinutes = [];
+                    for (let m = 0; m < 60; m += 5) {
+                        if (m + diffMinute >= 60) validBaseMinutes.push(m);
+                    }
+                    baseMinute = validBaseMinutes[Math.floor(Math.random() * validBaseMinutes.length)];
+                }
+                else if (currentLevel === 4) {
+                    // レベル4: 1時間超え・5分刻み・繰り上がりなし
+                    diffHour = Math.floor(Math.random() * 2) + 1;
+                    diffMinute = (Math.floor(Math.random() * 11) + 1) * 5; // 5〜55分
+
+                    const validBaseMinutes = [];
+                    for (let m = 0; m < 60; m += 5) {
+                        if (m + diffMinute < 60) validBaseMinutes.push(m);
+                    }
+                    baseMinute = validBaseMinutes[Math.floor(Math.random() * validBaseMinutes.length)];
+                }
+                else if (currentLevel === 5) {
+                    // レベル5: 1時間超え・5分刻み・繰り上がりあり
+                    diffHour = Math.floor(Math.random() * 2) + 1;
+                    diffMinute = (Math.floor(Math.random() * 11) + 1) * 5; // 5〜55分
+
+                    const validBaseMinutes = [];
+                    for (let m = 0; m < 60; m += 5) {
+                        if (m + diffMinute >= 60) validBaseMinutes.push(m);
+                    }
+                    baseMinute = validBaseMinutes[Math.floor(Math.random() * validBaseMinutes.length)];
+                }
+                else if (currentLevel === 6) {
+                    // レベル6: 1時間超え・1分刻み・繰り上がりあり
+                    diffHour = Math.floor(Math.random() * 2) + 1;
+                    diffMinute = Math.floor(Math.random() * 59) + 1; // 1〜59分
+
+                    const validBaseMinutes = [];
+                    for (let m = 0; m < 60; m++) {
+                        if (m + diffMinute >= 60) validBaseMinutes.push(m);
+                    }
+                    baseMinute = validBaseMinutes[Math.floor(Math.random() * validBaseMinutes.length)];
+                }
+
+                // ベース時をランダムに決定
+                baseHour = Math.floor(Math.random() * 12) + 1;
+
+                // 表示と針の位置をベース時間に強制セット
+                accumulatedMinutes = (baseHour % 12) * 60 + baseMinute;
+                updateClockHands();
+                updateGhostHands(baseHour, baseMinute);
+
+                // 目標時刻の計算
+                let totalMin = (baseHour * 60 + baseMinute) + (diffHour * 60 + diffMinute);
+                let targetTotalMin = totalMin % 720;
+                targetHour = Math.floor(targetTotalMin / 60) === 0 ? 12 : Math.floor(targetTotalMin / 60);
+                targetMinute = targetTotalMin % 60;
+
+                let timeStr = "";
+                if (diffHour > 0) timeStr += `${diffHour}じかん`;
+                if (diffMinute > 0) {
+                    timeStr += ` ${diffMinute}ぷん`;
+                }
+
+                const nextPokemonName = selectedPokemon.names[selectedPokemon.currentStage + 1];
+                const baseMinStr = `${baseMinute}ふん`;
+
+                questionText.innerHTML = `いまの じかん【<span style="color:var(--primary-color); font-size:26px;">${baseHour}じ ${baseMinStr}</span>】（うすいはり）から<br><span style="color:var(--accent-color); font-size:28px;">${timeStr}ご</span> に <span style="color:var(--grass-color); font-weight:bold;">${nextPokemonName}</span> に しんか するよ！<br>その じかんに あわせてね！`;
+            }
+            else if (gameState === "regress") {
+                // 戻す問題 (退化)
+                const prevPokemonName = selectedPokemon.names[0]; // 常に第1形態の名前を表示（サイクル: stage2→stage0）
+                let diffHour = 0;
+                let diffMinute = 0;
+
+                // 1. レベル別の増分とベース分の決定
+                if (currentLevel === 1) {
+                    // レベル1: 時間のみ
+                    diffHour = Math.floor(Math.random() * 3) + 1;
+                    diffMinute = 0;
+                    baseMinute = 0;
+                }
+                else if (currentLevel === 2) {
+                    // レベル2: 1時間未満・5分刻み・繰り下がりなし
+                    diffHour = 0;
+                    diffMinute = (Math.floor(Math.random() * 11) + 1) * 5; // 5〜55分
+
+                    const validBaseMinutes = [];
+                    for (let m = 0; m < 60; m += 5) {
+                        if (m >= diffMinute) validBaseMinutes.push(m);
+                    }
+                    baseMinute = validBaseMinutes[Math.floor(Math.random() * validBaseMinutes.length)];
+                }
+                else if (currentLevel === 3) {
+                    // レベル3: 1時間未満・5分刻み・繰り下がりあり
+                    diffHour = 0;
+                    diffMinute = (Math.floor(Math.random() * 11) + 1) * 5; // 5〜55分
+
+                    const validBaseMinutes = [];
+                    for (let m = 0; m < 60; m += 5) {
+                        if (m < diffMinute) validBaseMinutes.push(m);
+                    }
+                    baseMinute = validBaseMinutes[Math.floor(Math.random() * validBaseMinutes.length)];
+                }
+                else if (currentLevel === 4) {
+                    // レベル4: 1時間超え・5分刻み・繰り下がりなし
+                    diffHour = Math.floor(Math.random() * 2) + 1;
+                    diffMinute = (Math.floor(Math.random() * 11) + 1) * 5; // 5〜55分
+
+                    const validBaseMinutes = [];
+                    for (let m = 0; m < 60; m += 5) {
+                        if (m >= diffMinute) validBaseMinutes.push(m);
+                    }
+                    baseMinute = validBaseMinutes[Math.floor(Math.random() * validBaseMinutes.length)];
+                }
+                else if (currentLevel === 5) {
+                    // レベル5: 1時間超え・5分刻み・繰り下がりあり
+                    diffHour = Math.floor(Math.random() * 2) + 1;
+                    diffMinute = (Math.floor(Math.random() * 11) + 1) * 5; // 5〜55分
+
+                    const validBaseMinutes = [];
+                    for (let m = 0; m < 60; m += 5) {
+                        if (m < diffMinute) validBaseMinutes.push(m);
+                    }
+                    baseMinute = validBaseMinutes[Math.floor(Math.random() * validBaseMinutes.length)];
+                }
+                else if (currentLevel === 6) {
+                    // レベル6: 1時間超え・1分刻み・繰り下がりあり
+                    diffHour = Math.floor(Math.random() * 2) + 1;
+                    diffMinute = Math.floor(Math.random() * 59) + 1; // 1〜59分
+
+                    const validBaseMinutes = [];
+                    for (let m = 0; m < 60; m++) {
+                        if (m < diffMinute) validBaseMinutes.push(m);
+                    }
+                    baseMinute = validBaseMinutes[Math.floor(Math.random() * validBaseMinutes.length)];
+                }
+
+                // ベース時をランダムに決定
+                baseHour = Math.floor(Math.random() * 12) + 1;
+
+                // 表示と針の位置をベース時間に強制セット
+                accumulatedMinutes = (baseHour % 12) * 60 + baseMinute;
+                updateClockHands();
+                updateGhostHands(baseHour, baseMinute);
+
+                // 目標時刻の計算
+                let totalMin = (baseHour * 60 + baseMinute) - (diffHour * 60 + diffMinute);
+                if (totalMin < 0) totalMin += 720;
+                let targetTotalMin = totalMin % 720;
+                targetHour = Math.floor(targetTotalMin / 60) === 0 ? 12 : Math.floor(targetTotalMin / 60);
+                targetMinute = targetTotalMin % 60;
+
+                let timeStr = "";
+                if (diffHour > 0) timeStr += `${diffHour}じかん`;
+                if (diffMinute > 0) {
+                    timeStr += ` ${diffMinute}ぷん`;
+                }
+
+                const baseMinStr = `${baseMinute}ふん`;
+                questionText.innerHTML = `いまの じかん【<span style="color:var(--primary-color); font-size:26px;">${baseHour}じ ${baseMinStr}</span>】（うすいはり）から<br><span style="color:var(--secondary-color); font-size:28px;">${timeStr}まえ</span> は <span style="color:var(--accent-color); font-weight:bold;">${prevPokemonName}</span> だったよ！<br>その じかんに あわせてね！`;
+            }
+
+            // ポケモンのグラフィックとラベルを表示状態に同期更新
+            updatePokemonDisplay();
+
+            // 最初のお題（gameState === "neutral"）では4択は不要なので非表示にし、それ以降の問題で表示する
+            if (gameState === "neutral") {
+                choicesContainer.style.display = "none";
+            } else {
+                choicesContainer.style.display = "block";
+                setupChoices();
+            }
+        }
+
+        // 答え合わせ (中間形態スタートの進化・退化ループ ＋ 4択＆針のダブルチェック)
+        function checkAnswer() {
+            // 判定の前に浮動小数点のズレを綺麗に四捨五入して整数（分）にスナップ！
             accumulatedMinutes = Math.round(accumulatedMinutes);
             updateClockHands();
-            playTickSound();
+
+            // 最初の問題 (ひたすら指定時間に針を合わせる) の答え合わせ
+            if (gameState === "neutral") {
+                const isClockCorrect = displayHour === targetHour && displayMinute === targetMinute;
+
+                if (isClockCorrect) {
+                    // モンスターボールを激しく揺らす！
+                    pokeballSvg.classList.remove("pokeball-shake-anim");
+                    void pokeballSvg.offsetWidth; // リフロー
+                    pokeballSvg.classList.add("pokeball-shake-anim");
+
+                    // 揺れが終わったタイミング (0.9秒後) でポケモン出現！
+                    setTimeout(() => {
+                        pokeballSvg.style.display = "none";
+                        pokemonImg.style.display = "block";
+
+                        // 強制的に初期選択ポケモン（ピカチュウ等）を画像とラベルにセット
+                        const pokemonId = selectedPokemon.chain[selectedPokemon.currentStage];
+                        const pokemonName = selectedPokemon.names[selectedPokemon.currentStage];
+                        pokemonImg.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonId}.png`;
+                        pokemonNameLabel.textContent = pokemonName;
+
+                        // 出現ポップアニメーション
+                        pokemonImg.classList.remove("evolve-anim", "devolve-anim");
+                        void pokemonImg.offsetWidth;
+                        pokemonImg.classList.add("evolve-anim");
+
+                        // 鳴き声と紙吹雪エフェクトを同時に再生！
+                        playPokemonCry();
+                        triggerSuccessEffect();
+                    }, 900);
+
+                    setTimeout(() => {
+                        // 固定サイクル: neutral → 必ず advance (進める)
+                        gameState = "advance";
+                        generateQuestion();
+                    }, 3400);
+                } else {
+                    playFailureTone();
+                    resultText.innerHTML = "とけいの はり を よくみて、ぴったり あわせてね！";
+                    resultText.style.display = "block";
+                    resultText.style.color = "var(--secondary-color)";
+
+                    hintCircle.style.display = "block";
+                    setTimeout(() => {
+                        hintCircle.style.display = "none";
+                    }, 2000);
+                }
+                return;
+            }
+
+            // 2問目以降（進める・戻す）の答え合わせ (4択＆針のダブルチェック)
+            // 1. 4択が選ばれているかチェック
+            if (selectedChoiceIdx === null) {
+                resultText.innerHTML = "なにじ なにぷんか、４つの なかから えらんでね！";
+                resultText.style.display = "block";
+                resultText.style.color = "var(--secondary-color)";
+                playFailureTone();
+                return;
+            }
+
+            // 2. 選択された4択の答えが正しいか
+            const chosen = currentChoices[selectedChoiceIdx];
+            const isChoiceCorrect = chosen.hour === targetHour && chosen.minute === targetMinute;
+
+            // 3. 時計の針が正しいか
+            const isClockCorrect = displayHour === targetHour && displayMinute === targetMinute;
+
+            // 両方正解ならクリア！
+            if (isChoiceCorrect && isClockCorrect) {
+                triggerSuccessEffect();
+                playPokemonCry();
+
+                setTimeout(() => {
+                    // 固定サイクル: neutral → advance → regress → neutral → ...
+                    if (gameState === "advance") {
+                        // advance正解: stage 1→2 (中間→最終形態へ進化)
+                        selectedPokemon.currentStage = 2;
+                        updatePokemonDisplay("evolve");
+                        playSuccessSound();
+                        gameState = "regress"; // 次は戻す問題
+                    }
+                    else if (gameState === "regress") {
+                        // regress正解: stage 2→0 (最終形態→第1形態へ退化)
+                        selectedPokemon.currentStage = 0;
+                        updatePokemonDisplay("devolve");
+                        playSuccessSound();
+                        // 次は再びneutral (時刻合わせ) に戻り、stageも1にリセット
+                        gameState = "neutral";
+                        selectedPokemon.currentStage = 1;
+                    }
+
+                    generateQuestion();
+                }, 2500);
+            } else {
+                // 不正解時の演出と親切なメッセージヒント
+                playFailureTone();
+
+                let message = "";
+                if (!isClockCorrect && isChoiceCorrect) {
+                    message = "４たくは あっているよ！<br>とけいの はり を よくみて、ぴったり あわせてね！";
+                    // 針だけ違うので、ヒントサークルを電撃風に点滅させる
+                    hintCircle.style.display = "block";
+                    setTimeout(() => {
+                        hintCircle.style.display = "none";
+                    }, 2000);
+                } else if (isClockCorrect && !isChoiceCorrect) {
+                    message = "とけいの はりは あっているよ！<br>４たくの なかから、ただしい じかんを えらびなおしてね！";
+                } else {
+                    message = "とけいの はり も、えらんだ じかん も ちがうみたい！<br>もういちど よく かんがえてみてね！";
+                }
+
+                resultText.innerHTML = message;
+                resultText.style.display = "block";
+                resultText.style.color = "var(--secondary-color)";
+            }
         }
-    }
 
-    // 長針と短針の位置更新
-    function updateClockHands() {
-        const totalMinutes = (Math.round(accumulatedMinutes) + 720) % 720;
-        
-        displayHour = Math.floor(totalMinutes / 60);
-        if (displayHour === 0) displayHour = 12;
-        displayMinute = totalMinutes % 60;
-        
-        const minuteAngle = displayMinute * 6;
-        minuteHandGroup.setAttribute("transform", `rotate(${minuteAngle}, 200, 200)`);
-        
-        const hourAngle = (totalMinutes % 720) * 0.5;
-        hourHandGroup.setAttribute("transform", `rotate(${hourAngle}, 200, 200)`);
-    }
+        // 4択選択肢のセットアップ
+        function setupChoices() {
+            selectedChoiceIdx = null; // 選択をリセット
 
-    // ----------------------------------------------------
-    // サウンドシステム (Web Audio API)
-    // ----------------------------------------------------
-    function initAudioContext() {
-        if (!audioContext) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            // レベルに応じた刻み幅(step)
+            let step = 1;
+            if (currentLevel === 1) step = 60;
+            else if (currentLevel <= 5) step = 5;
+            // currentLevel === 6: step = 1 (default)
+
+            const dummies = [];
+            let attempts = 0;
+            while (dummies.length < 3 && attempts < 100) {
+                attempts++;
+                let dHour = targetHour;
+                let dMinute = targetMinute;
+
+                const rand = Math.random();
+                if (rand < 0.33) {
+                    // 時のみ変更
+                    const offset = (Math.random() < 0.5 ? -1 : 1) * (Math.floor(Math.random() * 3) + 1);
+                    dHour = ((targetHour - 1 + offset + 12) % 12) + 1;
+                } else if (rand < 0.66) {
+                    // 分のみ変更
+                    if (step === 60) {
+                        const offset = (Math.random() < 0.5 ? -1 : 1) * (Math.floor(Math.random() * 4) + 1);
+                        dHour = ((targetHour - 1 + offset + 12) % 12) + 1;
+                    } else {
+                        const offsetSteps = (Math.random() < 0.5 ? -1 : 1) * (Math.floor(Math.random() * 4) + 1);
+                        dMinute = (targetMinute + offsetSteps * step + 60) % 60;
+                    }
+                } else {
+                    // 両方変更
+                    const offsetHour = (Math.random() < 0.5 ? -1 : 1) * (Math.floor(Math.random() * 2) + 1);
+                    dHour = ((targetHour - 1 + offsetHour + 12) % 12) + 1;
+
+                    if (step < 60) {
+                        const offsetSteps = (Math.random() < 0.5 ? -1 : 1) * (Math.floor(Math.random() * 3) + 1);
+                        dMinute = (targetMinute + offsetSteps * step + 60) % 60;
+                    }
+                }
+
+                const isDuplicate = (dHour === targetHour && dMinute === targetMinute) ||
+                    dummies.some(d => d.hour === dHour && d.minute === dMinute);
+
+                if (!isDuplicate) {
+                    dummies.push({ hour: dHour, minute: dMinute });
+                }
+            }
+
+            // セーフガード
+            while (dummies.length < 3) {
+                let dHour = Math.floor(Math.random() * 12) + 1;
+                let dMinute = step === 60 ? 0 : (Math.floor(Math.random() * (60 / step)) * step) % 60;
+                const isDuplicate = (dHour === targetHour && dMinute === targetMinute) ||
+                    dummies.some(d => d.hour === dHour && d.minute === dMinute);
+                if (!isDuplicate) {
+                    dummies.push({ hour: dHour, minute: dMinute });
+                }
+            }
+
+            // 選択肢の配列構築
+            const list = [
+                { hour: targetHour, minute: targetMinute, isCorrect: true },
+                ...dummies.map(d => ({ hour: d.hour, minute: d.minute, isCorrect: false }))
+            ];
+
+            // シャッフル
+            for (let i = list.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [list[i], list[j]] = [list[j], list[i]];
+            }
+
+            currentChoices = list;
+
+            // UIに反映
+            choiceButtons.forEach((btn, idx) => {
+                const item = currentChoices[idx];
+                const minStr = `${item.minute}ぷん`;
+                btn.textContent = `${item.hour}じ ${minStr}`;
+                btn.classList.remove("selected");
+            });
         }
-    }
 
-    function playTickSound() {
-        if (!audioContext) return;
-        const osc = audioContext.createOscillator();
-        const gain = audioContext.createGain();
-        osc.connect(gain);
-        gain.connect(audioContext.destination);
-        
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(800, audioContext.currentTime);
-        
-        gain.gain.setValueAtTime(0.05, audioContext.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.05);
-        
-        osc.start();
-        osc.stop(audioContext.currentTime + 0.05);
-    }
+        // 正解時の演出エフェクト
+        function triggerSuccessEffect() {
+            resultText.textContent = "せいかい！";
+            resultText.style.color = "var(--accent-color)";
+            resultText.style.display = "block";
 
-    function playSuccessTone() {
-        if (!audioContext) return;
-        const now = audioContext.currentTime;
-        playTone(523.25, now, 0.1);      // C5
-        playTone(659.25, now + 0.1, 0.1);  // E5
-        playTone(783.99, now + 0.2, 0.15); // G5
-        playTone(1046.50, now + 0.35, 0.3); // C6
-    }
+            for (let i = 0; i < 40; i++) {
+                createConfetti();
+            }
 
-    function playFailureTone() {
-        if (!audioContext) return;
-        const now = audioContext.currentTime;
-        playTone(293.66, now, 0.15);      // D4
-        playTone(220.00, now + 0.15, 0.3); // A3
-    }
+            playSuccessTone();
 
-    function playSuccessSound() {
-        if (!audioContext) return;
-        const now = audioContext.currentTime;
-        for (let i = 0; i < 8; i++) {
-            playTone(800 + i * 150, now + i * 0.08, 0.08);
+            setTimeout(() => {
+                resultText.style.display = "none";
+            }, 2200);
         }
-    }
 
-    function playTone(freq, startTime, duration) {
-        const osc = audioContext.createOscillator();
-        const gain = audioContext.createGain();
-        osc.connect(gain);
-        gain.connect(audioContext.destination);
-        
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(freq, startTime);
-        
-        gain.gain.setValueAtTime(0.1, startTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-        
-        osc.start(startTime);
-        osc.stop(startTime + duration);
-    }
-</script>
+        // 不正解時のヒント誘導エフェクト
+        function triggerFailureEffect() {
+            resultText.textContent = "あれれ？";
+            resultText.style.color = "var(--secondary-color)";
+            resultText.style.display = "block";
+
+            hintCircle.style.display = "block";
+            playFailureTone();
+
+            setTimeout(() => {
+                resultText.style.display = "none";
+            }, 1500);
+        }
+
+        // 紙吹雪
+        function createConfetti() {
+            const confetti = document.createElement("div");
+            confetti.className = "confetti";
+
+            const colors = ["#ffcb05", "#3b4cca", "#ff5959", "#4caf50", "#2196f3"];
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+            confetti.style.left = Math.random() * 100 + "vw";
+            confetti.style.top = "-20px";
+
+            const size = Math.random() * 10 + 10;
+            confetti.style.width = size + "px";
+            confetti.style.height = size + "px";
+
+            confetti.style.animationDuration = Math.random() * 2 + 1.5 + "s";
+            confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+            document.body.appendChild(confetti);
+
+            confetti.addEventListener("animationend", () => {
+                confetti.remove();
+            });
+        }
+
+        // ヒントの表示切り替え
+        function toggleHint() {
+            if (digitalClock.style.display === "block") {
+                hideHint();
+            } else {
+                showHint();
+            }
+        }
+
+        function showHint() {
+            digitalClock.style.display = "block";
+            digitalClock.textContent = `せいかいは ➡️ ${targetHour}:${targetMinute.toString().padStart(2, '0')}`;
+            hintCircle.style.display = "block";
+        }
+
+        function hideHint() {
+            digitalClock.style.display = "none";
+            hintCircle.style.display = "none";
+        }
+
+        // ----------------------------------------------------
+        // 時計盤の描画およびダブル・ドラッグ操作システム
+        // ----------------------------------------------------
+
+        // 時計の目盛りを動的に作成
+        function initClockTicks() {
+            const ticksGroup = document.getElementById("clock-ticks");
+            const numbersGroup = document.getElementById("clock-numbers");
+            ticksGroup.innerHTML = "";
+            numbersGroup.innerHTML = "";
+
+            for (let i = 0; i < 60; i++) {
+                const angle = i * 6;
+                const rad = (angle - 90) * Math.PI / 180;
+
+                const isFiveMinute = i % 5 === 0;
+                const rStart = isFiveMinute ? 155 : 163;
+                const rEnd = 170;
+
+                const x1 = 200 + rStart * Math.cos(rad);
+                const y1 = 200 + rStart * Math.sin(rad);
+                const x2 = 200 + rEnd * Math.cos(rad);
+                const y2 = 200 + rEnd * Math.sin(rad);
+
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", x1);
+                line.setAttribute("y1", y1);
+                line.setAttribute("x2", x2);
+                line.setAttribute("y2", y2);
+                line.setAttribute("stroke", isFiveMinute ? "#333" : "#aaa");
+                line.setAttribute("stroke-width", isFiveMinute ? "4" : "2");
+                ticksGroup.appendChild(line);
+            }
+
+            for (let num = 1; num <= 12; num++) {
+                const angle = num * 30;
+                const rad = (angle - 90) * Math.PI / 180;
+                const r = 135;
+
+                const x = 200 + r * Math.cos(rad);
+                const y = 200 + r * Math.sin(rad);
+
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", x);
+                text.setAttribute("y", y + 10);
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("font-size", "34");
+                text.setAttribute("font-weight", "800");
+                text.setAttribute("font-family", "'Outfit', sans-serif");
+                text.setAttribute("fill", "#2c3e50");
+                text.textContent = num;
+                numbersGroup.appendChild(text);
+            }
+        }
+
+        // ドラッグ操作ロジックのバインド
+        function initClockDrag() {
+            minuteHandGroup.addEventListener("mousedown", (e) => dragStart(e, "minute"));
+            minuteHandGroup.addEventListener("touchstart", (e) => dragStart(e, "minute"), { passive: false });
+
+            hourHandGroup.addEventListener("mousedown", (e) => dragStart(e, "hour"));
+            hourHandGroup.addEventListener("touchstart", (e) => dragStart(e, "hour"), { passive: false });
+
+            window.addEventListener("mousemove", dragMove);
+            window.addEventListener("touchmove", dragMove, { passive: false });
+
+            window.addEventListener("mouseup", dragEnd);
+            window.addEventListener("touchend", dragEnd);
+        }
+
+        function dragStart(e, handType) {
+            e.preventDefault();
+            initAudioContext();
+
+            isDragging = true;
+            activeDragHand = handType;
+            document.body.style.cursor = "grabbing";
+
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            const rect = clockSvg.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            lastAngle = Math.atan2(clientY - centerY, clientX - centerX) * 180 / Math.PI;
+        }
+
+        function dragMove(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            const rect = clockSvg.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            let currentAngle = Math.atan2(clientY - centerY, clientX - centerX) * 180 / Math.PI;
+
+            if (activeDragHand === "minute") {
+                let dAngle = currentAngle - lastAngle;
+                if (dAngle > 180) dAngle -= 360;
+                if (dAngle < -180) dAngle += 360;
+
+                let dMinutes = dAngle / 6;
+                accumulatedMinutes += dMinutes;
+
+                if (accumulatedMinutes < 0) accumulatedMinutes += 720;
+                accumulatedMinutes = accumulatedMinutes % 720;
+
+                updateClockHands();
+                lastAngle = currentAngle;
+            }
+            else if (activeDragHand === "hour") {
+                let relativeAngle = currentAngle + 90;
+                if (relativeAngle < 0) relativeAngle += 360;
+                if (relativeAngle >= 360) relativeAngle -= 360;
+
+                let h = Math.round(relativeAngle / 30);
+                if (h === 0) h = 12;
+                if (h > 12) h = 12;
+
+                if (h !== displayHour) {
+                    playTickSound();
+                }
+
+                accumulatedMinutes = (h % 12) * 60 + displayMinute;
+
+                updateClockHands();
+            }
+        }
+
+        function dragEnd() {
+            if (isDragging) {
+                isDragging = false;
+                activeDragHand = null;
+                document.body.style.cursor = "default";
+
+                accumulatedMinutes = Math.round(accumulatedMinutes);
+                updateClockHands();
+                playTickSound();
+            }
+        }
+
+        // 長針と短針の位置更新
+        function updateClockHands() {
+            const totalMinutes = (Math.round(accumulatedMinutes) + 720) % 720;
+
+            displayHour = Math.floor(totalMinutes / 60);
+            if (displayHour === 0) displayHour = 12;
+            displayMinute = totalMinutes % 60;
+
+            const minuteAngle = displayMinute * 6;
+            minuteHandGroup.setAttribute("transform", `rotate(${minuteAngle}, 200, 200)`);
+
+            const hourAngle = (totalMinutes % 720) * 0.5;
+            hourHandGroup.setAttribute("transform", `rotate(${hourAngle}, 200, 200)`);
+        }
+
+        // ----------------------------------------------------
+        // サウンドシステム (Web Audio API)
+        // ----------------------------------------------------
+        function initAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playTickSound() {
+            if (!audioContext) return;
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(800, audioContext.currentTime);
+
+            gain.gain.setValueAtTime(0.05, audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.05);
+
+            osc.start();
+            osc.stop(audioContext.currentTime + 0.05);
+        }
+
+        function playSuccessTone() {
+            if (!audioContext) return;
+            const now = audioContext.currentTime;
+            playTone(523.25, now, 0.1);      // C5
+            playTone(659.25, now + 0.1, 0.1);  // E5
+            playTone(783.99, now + 0.2, 0.15); // G5
+            playTone(1046.50, now + 0.35, 0.3); // C6
+        }
+
+        function playFailureTone() {
+            if (!audioContext) return;
+            const now = audioContext.currentTime;
+            playTone(293.66, now, 0.15);      // D4
+            playTone(220.00, now + 0.15, 0.3); // A3
+        }
+
+        function playSuccessSound() {
+            if (!audioContext) return;
+            const now = audioContext.currentTime;
+            for (let i = 0; i < 8; i++) {
+                playTone(800 + i * 150, now + i * 0.08, 0.08);
+            }
+        }
+
+        function playTone(freq, startTime, duration) {
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(freq, startTime);
+
+            gain.gain.setValueAtTime(0.1, startTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+            osc.start(startTime);
+            osc.stop(startTime + duration);
+        }
+    </script>
 
 </body>
+
 </html>
