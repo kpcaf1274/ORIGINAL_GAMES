@@ -389,10 +389,11 @@
     // Dynamic Fret frequency calculator
     function getFretFrequency(stringIdx, fret) {
       if (fret === 'X' || fret === 'x' || fret === -1 || fret === null || fret === undefined) {
-        return 0; // Mute
+        // Return negative frequency of open string to indicate muted soft-play string
+        return -openStringFreqs[stringIdx];
       }
       const f = parseInt(fret, 10);
-      if (isNaN(f) || f < 0) return 0;
+      if (isNaN(f) || f < 0) return -openStringFreqs[stringIdx];
       // freq = open * 2^(fret / 12)
       return parseFloat((openStringFreqs[stringIdx] * Math.pow(2, f / 12)).toFixed(2));
     }
@@ -777,8 +778,9 @@
       // Prevent rapid overlapping strum triggers dynamically
       // For slow strums, the total strum duration is 5 * delayStep.
       // We scale the cooldown to prevent overlap while maintaining responsiveness.
+      // Lower limit relaxed to 0.04s (40ms) to support hyper-fast alternate/rhythm strumming
       const strumDuration = 5 * delayStep;
-      const cooldown = Math.max(0.12, strumDuration * 0.8);
+      const cooldown = Math.max(0.04, strumDuration * 0.8);
 
       if (now - lastStrumTime < cooldown) return;
       lastStrumTime = now;
@@ -792,18 +794,24 @@
       let delayCount = 0;
 
       stringsOrder.forEach((stringIdx) => {
-        const freq = voicing[stringIdx];
-        if (freq && freq > 0) {
+        let freq = voicing[stringIdx];
+        if (freq && freq !== 0) {
+          const isMuted = freq < 0;
+          if (isMuted) freq = -freq; // Convert negative back to positive frequency
+
           const delay = delayCount * delayStep; // Dynamic strumming delay
           const playTime = now + delay;
-          const velocity = 1.0 - (delayCount * 0.04); // slightly quieter notes as strum completes
+          // Apply a 0.4x volume multiplier for muted strings
+          let velocity = 1.0 - (delayCount * 0.04);
+          if (isMuted) velocity *= 0.4;
 
           playString(freq, velocity, stringIdx, playTime);
 
           // Vibrate the visual canvas string exactly at sound time
           setTimeout(() => {
             if (canvasStrings[stringIdx]) {
-              canvasStrings[stringIdx].trigger(15);
+              // Soft vib for muted strings
+              canvasStrings[stringIdx].trigger(isMuted ? 7 : 15);
             }
           }, delay * 1000);
 
@@ -1343,12 +1351,16 @@
 
           // A. Swipe strum trigger check (Horizontal swipe)
           const displacementX = x - touchData.startX;
-          if (!touchData.hasStrummed && Math.abs(displacementX) > STRUM_GESTURE_DISPLACEMENT) {
-            touchData.hasStrummed = true;
+          if (Math.abs(displacementX) > STRUM_GESTURE_DISPLACEMENT) {
             const direction = displacementX > 0 ? 'down' : 'up'; // Left-to-Right is Down, Right-to-Left is Up
             const duration = Date.now() - touchData.time;
             const speed = duration > 0 ? Math.abs(displacementX) / duration : 1.0;
             triggerChordStrum(direction, speed);
+
+            // Reset start coordinates/time to enable seamless alternate back-and-forth strumming
+            touchData.startX = x;
+            touchData.time = Date.now();
+            touchData.hasStrummed = true;
           }
 
           // B. Direct drag plucking (triggers as finger moves across string)
@@ -1406,12 +1418,16 @@
 
         // A. Sweep Strum detection (Horizontal swipe)
         const displacementX = x - mouseStart.x;
-        if (!mouseStart.hasStrummed && Math.abs(displacementX) > STRUM_GESTURE_DISPLACEMENT) {
-          mouseStart.hasStrummed = true;
+        if (Math.abs(displacementX) > STRUM_GESTURE_DISPLACEMENT) {
           const direction = displacementX > 0 ? 'down' : 'up';
           const duration = Date.now() - mouseStart.time;
           const speed = duration > 0 ? Math.abs(displacementX) / duration : 1.0;
           triggerChordStrum(direction, speed);
+
+          // Reset start coordinates/time to enable seamless alternate back-and-forth strumming
+          mouseStart.x = x;
+          mouseStart.time = Date.now();
+          mouseStart.hasStrummed = true;
         }
 
         // B. Individual drag-crossing
@@ -1431,11 +1447,15 @@
         const distance = Math.abs(x - str.x);
         if (distance < STRING_PLUCK_THRESHOLD) {
           const voicing = chordVoicings[activeChord];
-          const freq = voicing[index];
+          let freq = voicing[index];
           
-          if (freq && freq > 0) {
-            playString(freq, 1.0, index, audioCtx.currentTime);
-            str.trigger(15);
+          if (freq && freq !== 0) {
+            const isMuted = freq < 0;
+            if (isMuted) freq = -freq;
+
+            const vol = isMuted ? 0.40 : 1.0;
+            playString(freq, vol, index, audioCtx.currentTime);
+            str.trigger(isMuted ? 7 : 15);
             // Lock this string for the current touch to prevent instant multi-triggering
             if (activeTouches[identifier]) {
               activeTouches[identifier].triggeredStrings.add(index);
@@ -1459,11 +1479,15 @@
           // Rate-limiting individual string plucking to 100ms
           if (now - lastPluckTimestamps[index] > 100) {
             const voicing = chordVoicings[activeChord];
-            const freq = voicing[index];
+            let freq = voicing[index];
 
-            if (freq && freq > 0) {
-              playString(freq, 0.85, index, audioCtx.currentTime);
-              str.trigger(12);
+            if (freq && freq !== 0) {
+              const isMuted = freq < 0;
+              if (isMuted) freq = -freq;
+
+              const vol = isMuted ? 0.35 : 0.85;
+              playString(freq, vol, index, audioCtx.currentTime);
+              str.trigger(isMuted ? 6 : 12);
               lastPluckTimestamps[index] = now;
             }
           }
