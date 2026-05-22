@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Virtual Cyber Guitar</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Outfit (modern display) & Rajdhani (cybernetic feel) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* Prevent scrolling, bounces, scaling, and default touch gestures */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      position: fixed;
+      background-color: #020617; /* bg-slate-950 */
+      color: #f8fafc; /* text-slate-50 */
+      font-family: 'Outfit', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .cyber-font {
+      font-family: 'Rajdhani', sans-serif;
+    }
+
+    /* Custom scrollbar for settings drawer */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.5);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(99, 102, 241, 0.4);
+      border-radius: 3px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(99, 102, 241, 0.6);
+    }
+
+    /* Glowing effects */
+    .glow-cyan {
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+    }
+    .glow-magenta {
+      box-shadow: 0 0 15px rgba(236, 72, 153, 0.4);
+    }
+    
+    /* Spring translation helper */
+    .joystick-spring {
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 flex flex-col justify-between h-screen w-full relative">
+
+  <!-- Main Radial Ambient Glows in Background -->
+  <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-950/40 via-slate-950 to-slate-950 pointer-events-none z-0"></div>
+  <div class="absolute bottom-0 left-0 right-0 h-[40vh] bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-cyan-950/20 via-transparent to-transparent pointer-events-none z-0"></div>
+
+  <!-- Top bar (Settings Gear & Title) -->
+  <header class="absolute top-0 left-0 right-0 h-14 flex items-center justify-between px-5 z-30 pointer-events-none">
+    <div class="flex items-center space-x-2">
+      <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.7)]"></span>
+      <h1 class="text-xs uppercase tracking-[0.2em] font-extrabold text-cyan-400/80 cyber-font">CYBER GUITAR v1.0</h1>
+    </div>
+    <!-- Interactive Gear Button -->
+    <button id="gear-btn" class="pointer-events-auto p-2 rounded-xl bg-slate-900/60 border border-slate-800/80 text-slate-300 active:text-white active:scale-95 transition-all duration-200 backdrop-blur-md shadow-lg" aria-label="Settings">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.99l1.005.831a1.125 1.125 0 0 1 .26 1.43l-1.297 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.83c.292-.24.437-.613.43-.991a6.937 6.937 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+      </svg>
+    </button>
+  </header>
+
+  <!-- ==================== TOP SECTION: ANALOG PADS (30%) ==================== -->
+  <section class="h-[30vh] min-h-[30vh] flex items-center justify-around px-4 pt-12 pb-2 relative z-10 select-none">
+    
+    <!-- Pad A Container -->
+    <div class="flex flex-col items-center justify-center space-y-1.5 w-1/2">
+      <span class="text-[10px] tracking-[0.2em] font-bold text-cyan-400/70 uppercase cyber-font">PAD A (CHORDS)</span>
+      <div id="pad-A" class="pad-container w-[35vw] h-[35vw] max-w-[140px] max-h-[140px] aspect-square rounded-full relative bg-slate-900/60 border border-slate-800/80 shadow-[inset_0_4px_12px_rgba(0,0,0,0.8),0_2px_8px_rgba(255,255,255,0.03)] backdrop-blur-sm flex items-center justify-center touch-none">
+        <!-- Dynamic Glowing Canvas behind the joystick -->
+        <canvas id="padA-canvas" class="absolute inset-0 w-full h-full rounded-full pointer-events-none z-0"></canvas>
+        <!-- The Floating Joystick Knob -->
+        <div id="knob-A" class="w-[11vw] h-[11vw] max-w-[44px] max-h-[44px] rounded-full bg-gradient-to-br from-slate-700 via-slate-800 to-slate-950 border border-slate-600/40 shadow-[0_5px_12px_rgba(0,0,0,0.7),inset_0_2px_3px_rgba(255,255,255,0.15)] flex items-center justify-center pointer-events-none select-none z-10">
+          <div class="w-3.5 h-3.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)] border border-cyan-300/30"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pad B Container -->
+    <div class="flex flex-col items-center justify-center space-y-1.5 w-1/2">
+      <span class="text-[10px] tracking-[0.2em] font-bold text-pink-400/70 uppercase cyber-font">PAD B (CHORDS)</span>
+      <div id="pad-B" class="pad-container w-[35vw] h-[35vw] max-w-[140px] max-h-[140px] aspect-square rounded-full relative bg-slate-900/60 border border-slate-800/80 shadow-[inset_0_4px_12px_rgba(0,0,0,0.8),0_2px_8px_rgba(255,255,255,0.03)] backdrop-blur-sm flex items-center justify-center touch-none">
+        <!-- Dynamic Glowing Canvas behind the joystick -->
+        <canvas id="padB-canvas" class="absolute inset-0 w-full h-full rounded-full pointer-events-none z-0"></canvas>
+        <!-- The Floating Joystick Knob -->
+        <div id="knob-B" class="w-[11vw] h-[11vw] max-w-[44px] max-h-[44px] rounded-full bg-gradient-to-br from-slate-700 via-slate-800 to-slate-950 border border-slate-600/40 shadow-[0_5px_12px_rgba(0,0,0,0.7),inset_0_2px_3px_rgba(255,255,255,0.15)] flex items-center justify-center pointer-events-none select-none z-10">
+          <div class="w-3.5 h-3.5 rounded-full bg-pink-400 shadow-[0_0_8px_rgba(244,114,182,0.8)] border border-pink-300/30"></div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ==================== MIDDLE SECTION: CHORD DISPLAY (10%) ==================== -->
+  <section id="chord-display-area" class="h-[10vh] min-h-[10vh] flex flex-col justify-center items-center relative z-10 border-y border-slate-900/60 bg-slate-950/40 backdrop-blur-sm transition-all duration-150 select-none">
+    <span class="text-[9px] tracking-[0.25em] text-slate-400 uppercase font-semibold">ACTIVE CHORD</span>
+    <!-- Active Chord Big Text -->
+    <div id="active-chord-text" class="text-4xl font-extrabold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-cyan-400 to-indigo-400 drop-shadow-[0_0_12px_rgba(45,212,191,0.3)] transition-transform duration-100 ease-out select-none">
+      C
+    </div>
+    <!-- Subtitle detailing source -->
+    <span id="active-chord-source" class="text-[9px] tracking-wide text-cyan-400/60 font-medium cyber-font mt-0.5">PAD A • NORTH</span>
+  </section>
+
+  <!-- ==================== BOTTOM SECTION: STRUM AREA (60%) ==================== -->
+  <section class="h-[60vh] min-h-[60vh] relative w-full overflow-hidden z-10 select-none bg-gradient-to-b from-slate-950 via-slate-900/80 to-slate-950">
+    <!-- Overlay guidelines inside Strum Area -->
+    <div class="absolute inset-x-0 bottom-4 text-center pointer-events-none opacity-20 flex flex-col items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 animate-pulse mb-1">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0-4.5 4.5M21 7.5H7.5" />
+      </svg>
+      <span class="text-[9px] tracking-[0.2em] font-semibold uppercase">Swipe Left / Right or Pluck Strings</span>
+    </div>
+    <!-- Sound Init Overlay (visible until first click/touch to bypass AudioContext policies) -->
+    <div id="audio-start-overlay" class="absolute inset-0 bg-slate-950/75 backdrop-blur-md z-20 flex flex-col items-center justify-center space-y-4 p-6 text-center transition-opacity duration-300">
+      <div class="w-16 h-16 rounded-full bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center animate-pulse">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-8 h-8 text-cyan-400">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
+        </svg>
+      </div>
+      <div>
+        <h2 class="text-lg font-bold text-white tracking-wider">AUDIO CONTEXT INACTIVE</h2>
+        <p class="text-xs text-slate-400 mt-1 max-w-[240px] mx-auto leading-relaxed">Tap anywhere to initialize high-fidelity guitar synthesis and start jamming!</p>
+      </div>
+      <button class="px-5 py-2.5 bg-gradient-to-r from-teal-500 to-indigo-600 rounded-xl text-xs font-bold tracking-widest uppercase hover:scale-105 active:scale-95 transition-all duration-150 shadow-lg shadow-teal-500/10">START PLAYING</button>
+    </div>
+
+    <!-- Canvas drawing guitar strings & vibrations -->
+    <canvas id="strum-canvas" class="w-full h-full block cursor-pointer z-10 relative"></canvas>
+  </section>
+
+  <!-- ==================== SETTINGS OVERLAY DRAWER ==================== -->
+  <!-- Blurred Backdrop -->
+  <div id="settings-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300 opacity-0 pointer-events-none"></div>
+  
+  <!-- Right Drawer -->
+  <aside id="settings-drawer" class="fixed inset-y-0 right-0 w-80 max-w-[85vw] bg-slate-950/95 border-l border-indigo-950/60 backdrop-blur-xl transform translate-x-full transition-transform duration-300 ease-out z-50 p-6 flex flex-col justify-between overflow-hidden shadow-2xl">
+    
+    <div class="flex flex-col h-full">
+      <!-- Drawer Header -->
+      <div class="flex items-center justify-between border-b border-slate-900 pb-4 mb-5">
+        <div class="flex items-center space-x-2">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4 text-cyan-400">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+          </svg>
+          <h2 class="text-sm font-bold tracking-widest text-slate-200 uppercase cyber-font">SETTINGS</h2>
+        </div>
+        <button id="close-settings-btn" class="p-1 rounded-lg text-slate-400 hover:text-white active:scale-95 transition-all">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Scrollable content area -->
+      <div class="flex-1 overflow-y-auto pr-1 custom-scrollbar space-y-6">
+        
+        <!-- Toggle: Mode Selection -->
+        <div class="space-y-2">
+          <label class="text-[10px] tracking-widest text-slate-400 uppercase font-bold">PAD CONTROL MODE</label>
+          <div class="grid grid-cols-2 gap-1 bg-slate-900/80 p-1 rounded-xl border border-slate-800/80">
+            <button id="mode-4-btn" class="py-2 text-xs font-bold rounded-lg transition-all duration-200 bg-gradient-to-r from-teal-500 to-indigo-600 text-white shadow-md">4-DIRECTION</button>
+            <button id="mode-8-btn" class="py-2 text-xs font-bold rounded-lg transition-all duration-200 text-slate-400 hover:text-slate-200">8-DIRECTION</button>
+          </div>
+        </div>
+
+        <hr class="border-slate-900 my-1">
+
+        <!-- CHORD MAPPINGS AREA -->
+        <div class="space-y-5">
+          <h3 class="text-xs font-extrabold tracking-widest text-cyan-400 cyber-font">CHORD MAPPING</h3>
+          
+          <!-- PAD A MAPPINGS -->
+          <div class="space-y-3">
+            <div class="flex items-center space-x-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+              <span class="text-[10px] font-extrabold tracking-wider text-slate-300">PAD A (CYAN)</span>
+            </div>
+            <div id="padA-selectors" class="grid grid-cols-2 gap-3 pl-3">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- PAD B MAPPINGS -->
+          <div class="space-y-3">
+            <div class="flex items-center space-x-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-pink-400"></span>
+              <span class="text-[10px] font-extrabold tracking-wider text-slate-300">PAD B (PINK)</span>
+            </div>
+            <div id="padB-selectors" class="grid grid-cols-2 gap-3 pl-3">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Drawer Footer -->
+      <div class="border-t border-slate-900 pt-4 mt-4 flex items-center justify-between text-[9px] text-slate-500 cyber-font font-medium">
+        <span>© 2026 CYBER SOUND LABS</span>
+        <span class="text-cyan-500/60 animate-pulse">SYNTH CONNECTED</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+  <script>
+    // ==================== 1. CHORD CONFIGURATIONS & STATE ====================
+    
+    // Frequencies of standard 6-string acoustic guitar voicings
+    // Arrays ordered String 6 (Low E) to String 1 (High E)
+    // 0 represents a muted string
+    const chordVoicings = {
+      'C':  [0, 130.81, 164.81, 196.00, 261.63, 329.63], // x-3-2-0-1-0 (C3-E3-G3-C4-E4)
+      'G':  [98.00, 123.47, 146.83, 196.00, 246.94, 392.00], // 3-2-0-0-0-3 (G2-B2-D3-G3-B3-G4)
+      'Am': [0, 110.00, 164.81, 220.00, 261.63, 329.63], // x-0-2-2-1-0 (A2-E3-A3-C4-E4)
+      'Em': [82.41, 123.47, 164.81, 196.00, 246.94, 329.63], // 0-2-2-0-0-0 (E2-B2-E3-G3-B3-E4)
+      'F':  [87.31, 130.81, 174.61, 220.00, 261.63, 349.23], // 1-3-3-2-1-1 (F2-C3-F3-A3-C4-F4)
+      'Dm': [0, 0, 146.83, 220.00, 293.66, 349.23], // x-x-0-2-3-1 (D3-A3-D4-F4)
+      'E':  [82.41, 123.47, 164.81, 207.65, 246.94, 329.63], // 0-2-2-1-0-0 (E2-B2-E3-G#3-B3-E4)
+      'D':  [0, 0, 146.83, 220.00, 293.66, 369.99], // x-x-0-2-3-2 (D3-A3-D4-F#4)
+      'G7': [98.00, 123.47, 146.83, 196.00, 246.94, 349.23], // 3-2-0-0-0-1 (G2-B2-D3-G3-B3-F4)
+      'C7': [0, 130.81, 164.81, 233.08, 261.63, 329.63], // x-3-2-3-1-0 (C3-E3-Bb3-C4-E4)
+      'Bm': [0, 123.47, 185.00, 246.94, 293.66, 369.99]  // x-2-4-4-3-2 (B2-F#3-B3-D4-F#4)
+    };
+
+    const chordsList = Object.keys(chordVoicings);
+
+    // Default Chord Mappings
+    let currentMode = 4; // 4 or 8 direction mode
+    
+    // Mappings object
+    const mappings = {
+      4: {
+        A: { N: 'C', E: 'G', S: 'Am', W: 'F' },
+        B: { N: 'Em', E: 'D', S: 'G7', W: 'C7' }
+      },
+      8: {
+        A: { N: 'C', NE: 'G', E: 'Am', SE: 'F', S: 'Em', SW: 'Dm', W: 'E', NW: 'D' },
+        B: { N: 'Em', NE: 'D', E: 'G7', SE: 'C7', S: 'Bm', SW: 'Am', W: 'F', NW: 'C' }
+      }
+    };
+
+    // State Variables
+    let activeChord = 'C';
+    let activeSource = 'PAD A • NORTH';
+    let lastActivePad = 'A'; // 'A' or 'B'
+    let selectedDirections = { A: null, B: null }; // Current selected direction keys
+
+    // Direction Names for UI
+    const directionNames = {
+      N: 'NORTH',
+      NE: 'NORTH-EAST',
+      E: 'EAST',
+      SE: 'SOUTH-EAST',
+      S: 'SOUTH',
+      SW: 'SOUTH-WEST',
+      W: 'WEST',
+      NW: 'NORTH-WEST'
+    };
+
+    // ==================== 2. WEB AUDIO API SYNTHESIS ENGINE ====================
+    let audioCtx = null;
+    let masterGain = null;
+    let noiseBuffer = null;
+
+    function initAudio() {
+      if (audioCtx) return;
+
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      audioCtx = new AudioContextClass();
+
+      // Create white noise buffer once (pluck acoustic transients)
+      const sampleRate = audioCtx.sampleRate;
+      const bufferSize = sampleRate * 0.04; // 40ms buffer
+      noiseBuffer = audioCtx.createBuffer(1, bufferSize, sampleRate);
+      const data = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+
+      // Dynamic Compressor to glue polyphony and avoid clipping
+      const compressor = audioCtx.createDynamicsCompressor();
+      compressor.threshold.setValueAtTime(-14, audioCtx.currentTime);
+      compressor.knee.setValueAtTime(25, audioCtx.currentTime);
+      compressor.ratio.setValueAtTime(10, audioCtx.currentTime);
+      compressor.attack.setValueAtTime(0.003, audioCtx.currentTime);
+      compressor.release.setValueAtTime(0.08, audioCtx.currentTime);
+
+      masterGain = audioCtx.createGain();
+      masterGain.gain.setValueAtTime(0.75, audioCtx.currentTime);
+
+      masterGain.connect(compressor);
+      compressor.connect(audioCtx.destination);
+
+      // Hide audio inactive overlay
+      const overlay = document.getElementById('audio-start-overlay');
+      overlay.classList.add('opacity-0');
+      setTimeout(() => overlay.remove(), 300);
+    }
+
+    // Trigger synthesis for a single string at a scheduled audio time
+    function playString(freq, velocity, stringIndex, startTime) {
+      if (!audioCtx) initAudio();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+
+      const dest = masterGain || audioCtx.destination;
+
+      // 1. Pluck Noise Transients (Emulates pick on string)
+      const noiseSource = audioCtx.createBufferSource();
+      noiseSource.buffer = noiseBuffer;
+
+      const noiseFilter = audioCtx.createBiquadFilter();
+      noiseFilter.type = 'bandpass';
+      noiseFilter.frequency.setValueAtTime(1200, startTime);
+      noiseFilter.Q.setValueAtTime(2.5, startTime);
+
+      const noiseGain = audioCtx.createGain();
+      noiseGain.gain.setValueAtTime(0.18 * velocity, startTime);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.022); // 22ms decay
+
+      noiseSource.connect(noiseFilter);
+      noiseFilter.connect(noiseGain);
+      noiseGain.connect(dest);
+
+      // 2. Dual Oscillators for Resonant Wood Body
+      // Triangle oscillator gives warmth, sawtooth gives metallic pluck sparkle
+      const oscTri = audioCtx.createOscillator();
+      oscTri.type = 'triangle';
+      oscTri.frequency.setValueAtTime(freq, startTime);
+      
+      // Pitch transient: Slight tension release bend
+      oscTri.detune.setValueAtTime(25, startTime);
+      oscTri.detune.exponentialRampToValueAtTime(0.01, startTime + 0.06);
+
+      const oscSaw = audioCtx.createOscillator();
+      oscSaw.type = 'sawtooth';
+      oscSaw.frequency.setValueAtTime(freq * 1.0015, startTime); // detuned micro-chorus
+      oscSaw.detune.setValueAtTime(15, startTime);
+      oscSaw.detune.exponentialRampToValueAtTime(0.01, startTime + 0.06);
+
+      // 3. String Resonance Damping Filter (Lowpass Sweep)
+      // Real strings dump high frequencies fast. Cutoff sweeps down exponentially.
+      const lowpass = audioCtx.createBiquadFilter();
+      lowpass.type = 'lowpass';
+      lowpass.Q.setValueAtTime(3.5, startTime);
+      
+      const pluckCutoff = freq * 9;
+      const sustainCutoff = freq * 2.2;
+      lowpass.frequency.setValueAtTime(pluckCutoff, startTime);
+      lowpass.frequency.exponentialRampToValueAtTime(sustainCutoff, startTime + 0.32);
+
+      // 4. Amplitude Volume Envelope
+      const stringGain = audioCtx.createGain();
+      stringGain.gain.setValueAtTime(0, startTime);
+      stringGain.gain.linearRampToValueAtTime(0.55 * velocity, startTime + 0.004); // 4ms attack
+      
+      // Decay time scaled: Low strings ring longer than high strings
+      const decayDuration = 1.9 + (5 - stringIndex) * 0.16;
+      stringGain.gain.exponentialRampToValueAtTime(0.001, startTime + decayDuration);
+
+      // 5. Oscillator gain balancing (Saw decay is much faster so string buzzing is transient)
+      const triGain = audioCtx.createGain();
+      triGain.gain.setValueAtTime(0.75, startTime);
+
+      const sawGain = audioCtx.createGain();
+      sawGain.gain.setValueAtTime(0.18, startTime);
+      sawGain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.35); // quick saw envelope decay
+
+      oscTri.connect(triGain);
+      triGain.connect(lowpass);
+
+      oscSaw.connect(sawGain);
+      sawGain.connect(lowpass);
+
+      lowpass.connect(stringGain);
+      stringGain.connect(dest);
+
+      // Start & Stop
+      noiseSource.start(startTime);
+      noiseSource.stop(startTime + 0.03);
+
+      oscTri.start(startTime);
+      oscTri.stop(startTime + decayDuration);
+
+      oscSaw.start(startTime);
+      oscSaw.stop(startTime + decayDuration);
+    }
+
+    // ==================== 3. DYNAMIC STRUM CONTROLLER ====================
+    let lastStrumTime = 0;
+
+    function triggerChordStrum(direction) {
+      if (!audioCtx) initAudio();
+      
+      const voicing = chordVoicings[activeChord];
+      if (!voicing) return;
+
+      const now = audioCtx.currentTime;
+      // Prevent rapid overlapping strum triggers (120ms threshold)
+      if (now - lastStrumTime < 0.12) return;
+      lastStrumTime = now;
+
+      // Pulse display UI
+      pulseChordUI();
+
+      // Down strum = Low E to High E (string 6 to 1, index 0 to 5)
+      // Up strum = High E to Low E (string 1 to 6, index 5 to 0)
+      const stringsOrder = direction === 'down' ? [0, 1, 2, 3, 4, 5] : [5, 4, 3, 2, 1, 0];
+      let delayCount = 0;
+
+      stringsOrder.forEach((stringIdx) => {
+        const freq = voicing[stringIdx];
+        if (freq && freq > 0) {
+          const delay = delayCount * 0.03; // 30ms strumming delay
+          const playTime = now + delay;
+          const velocity = 1.0 - (delayCount * 0.04); // slightly quieter notes as strum completes
+
+          playString(freq, velocity, stringIdx, playTime);
+
+          // Vibrate the visual canvas string exactly at sound time
+          setTimeout(() => {
+            if (canvasStrings[stringIdx]) {
+              canvasStrings[stringIdx].trigger(15);
+            }
+          }, delay * 1000);
+
+          delayCount++;
+        }
+      });
+    }
+
+    function pulseChordUI() {
+      const display = document.getElementById('active-chord-text');
+      const area = document.getElementById('chord-display-area');
+      
+      // Dynamic Scale/Glow
+      display.classList.remove('scale-100');
+      display.classList.add('scale-115', 'brightness-125');
+      
+      const colorClass = lastActivePad === 'A' ? 'bg-cyan-500/10' : 'bg-pink-500/10';
+      area.classList.add(colorClass);
+
+      setTimeout(() => {
+        display.classList.remove('scale-115', 'brightness-125');
+        display.classList.add('scale-100');
+        area.classList.remove(colorClass);
+      }, 150);
+    }
+
+    // ==================== 4. ANALOG PADS CONTROLLER ====================
+    class AnalogPad {
+      constructor(padId) {
+        this.padId = padId; // 'A' or 'B'
+        this.container = document.getElementById(`pad-${padId}`);
+        this.knob = document.getElementById(`knob-${padId}`);
+        this.canvas = document.getElementById(`pad${padId}-canvas`);
+        this.ctx = this.canvas.getContext('2d');
+        this.touchId = null;
+        this.isActive = false;
+
+        // Bounding Dimensions
+        this.cx = 0;
+        this.cy = 0;
+        this.radius = 0;
+        this.knobMaxTravel = 0;
+
+        this.initResize();
+        this.bindEvents();
+      }
+
+      initResize() {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = this.container.getBoundingClientRect();
+        this.canvas.width = rect.width * dpr;
+        this.canvas.height = rect.height * dpr;
+        this.ctx.scale(dpr, dpr);
+        
+        this.cx = rect.width / 2;
+        this.cy = rect.height / 2;
+        this.radius = rect.width / 2;
+        this.knobMaxTravel = this.radius * 0.75;
+
+        this.drawPadBackground();
+      }
+
+      bindEvents() {
+        // Touch Listeners
+        this.container.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          if (this.touchId !== null) return;
+          const touch = e.changedTouches[0];
+          this.touchId = touch.identifier;
+          this.handleStart(touch.clientX, touch.clientY);
+        }, { passive: false });
+
+        window.addEventListener('touchmove', (e) => {
+          if (this.touchId === null) return;
+          for (let i = 0; i < e.touches.length; i++) {
+            if (e.touches[i].identifier === this.touchId) {
+              e.preventDefault();
+              this.handleDrag(e.touches[i].clientX, e.touches[i].clientY);
+              break;
+            }
+          }
+        }, { passive: false });
+
+        window.addEventListener('touchend', (e) => {
+          if (this.touchId === null) return;
+          for (let i = 0; i < e.changedTouches.length; i++) {
+            if (e.changedTouches[i].identifier === this.touchId) {
+              this.touchId = null;
+              this.handleEnd();
+              break;
+            }
+          }
+        });
+
+        window.addEventListener('touchcancel', (e) => {
+          if (this.touchId === null) return;
+          for (let i = 0; i < e.changedTouches.length; i++) {
+            if (e.changedTouches[i].identifier === this.touchId) {
+              this.touchId = null;
+              this.handleEnd();
+              break;
+            }
+          }
+        });
+
+        // Mouse Fallbacks for Desktop Testing
+        this.container.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          this.handleStart(e.clientX, e.clientY);
+        });
+
+        window.addEventListener('mousemove', (e) => {
+          if (!this.isActive) return;
+          this.handleDrag(e.clientX, e.clientY);
+        });
+
+        window.addEventListener('mouseup', () => {
+          if (!this.isActive) return;
+          this.handleEnd();
+        });
+      }
+
+      handleStart(clientX, clientY) {
+        initAudio(); // Wake AudioContext on touch start
+        this.isActive = true;
+        this.knob.classList.remove('joystick-spring');
+        this.handleDrag(clientX, clientY);
+      }
+
+      handleDrag(clientX, clientY) {
+        const rect = this.container.getBoundingClientRect();
+        const touchX = clientX - rect.left;
+        const touchY = clientY - rect.top;
+
+        // Vector from center
+        const dx = touchX - this.cx;
+        const dy = touchY - this.cy;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        let kx = dx;
+        let ky = dy;
+
+        // Bounded constraint inside the circle
+        if (distance > this.knobMaxTravel) {
+          kx = dx * (this.knobMaxTravel / distance);
+          ky = dy * (this.knobMaxTravel / distance);
+        }
+
+        // Apply visual position
+        this.knob.style.transform = `translate(${kx}px, ${ky}px)`;
+
+        // Calculate selected chord if thumb is moved significantly past deadzone (12px)
+        if (distance > 12) {
+          this.calculateChordDirection(dx, dy);
+        }
+      }
+
+      handleEnd() {
+        this.isActive = false;
+        
+        // Add spring transition class and return knob to center
+        this.knob.classList.add('joystick-spring');
+        this.knob.style.transform = 'translate(0px, 0px)';
+
+        selectedDirections[this.padId] = null;
+        this.drawPadBackground();
+      }
+
+      calculateChordDirection(dx, dy) {
+        // Get angle in radians (converted so 0 is East, increases clockwise)
+        let angle = Math.atan2(dy, dx);
+        if (angle < 0) angle += 2 * Math.PI;
+
+        let selectedDir = null;
+
+        if (currentMode === 4) {
+          // East, South, West, North (offset to align quadrants symmetrically)
+          const shifted = (angle + Math.PI / 4) % (2 * Math.PI);
+          const index = Math.floor(shifted / (Math.PI / 2));
+          const directions = ['E', 'S', 'W', 'N'];
+          selectedDir = directions[index];
+        } else {
+          // 8 Directions (offset to align octants symmetrically)
+          const shifted = (angle + Math.PI / 8) % (2 * Math.PI);
+          const index = Math.floor(shifted / (Math.PI / 4));
+          const directions = ['E', 'SE', 'S', 'SW', 'W', 'NW', 'N', 'NE'];
+          selectedDir = directions[index];
+        }
+
+        if (selectedDir && selectedDirections[this.padId] !== selectedDir) {
+          selectedDirections[this.padId] = selectedDir;
+          
+          // Fetch mapped chord
+          const activeMap = mappings[currentMode][this.padId];
+          const chordName = activeMap[selectedDir];
+
+          if (chordName) {
+            activeChord = chordName;
+            lastActivePad = this.padId;
+            activeSource = `PAD ${this.padId} • ${directionNames[selectedDir]}`;
+            
+            // Update center text display
+            document.getElementById('active-chord-text').innerText = activeChord;
+            document.getElementById('active-chord-source').innerText = activeSource;
+            
+            // Switch glowing borders of active display
+            const activeText = document.getElementById('active-chord-text');
+            const activeSourceText = document.getElementById('active-chord-source');
+            if (this.padId === 'A') {
+              activeText.className = "text-4xl font-extrabold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-cyan-400 to-indigo-400 drop-shadow-[0_0_12px_rgba(34,211,238,0.5)] transition-transform duration-100 ease-out select-none";
+              activeSourceText.className = "text-[9px] tracking-wide text-cyan-400/60 font-medium cyber-font mt-0.5";
+            } else {
+              activeText.className = "text-4xl font-extrabold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-rose-400 to-purple-400 drop-shadow-[0_0_12px_rgba(244,114,182,0.5)] transition-transform duration-100 ease-out select-none";
+              activeSourceText.className = "text-[9px] tracking-wide text-pink-400/60 font-medium cyber-font mt-0.5";
+            }
+          }
+          this.drawPadBackground();
+        }
+      }
+
+      drawPadBackground() {
+        const W = this.radius * 2;
+        const H = this.radius * 2;
+        const R = this.radius;
+        const cx = this.cx;
+        const cy = this.cy;
+
+        this.ctx.clearRect(0, 0, W, H);
+
+        const currentMap = mappings[currentMode][this.padId];
+        const activeDir = selectedDirections[this.padId];
+        
+        // Colors base
+        const glowColor = this.padId === 'A' ? 'rgba(6, 182, 212, ' : 'rgba(236, 72, 153, ';
+
+        // 1. Draw glowing background wedge for selected direction
+        if (activeDir) {
+          const numSectors = currentMode;
+          const sectorAngle = (2 * Math.PI) / numSectors;
+          let centerAngle = 0;
+
+          const keys = numSectors === 4 
+            ? ['E', 'S', 'W', 'N'] 
+            : ['E', 'SE', 'S', 'SW', 'W', 'NW', 'N', 'NE'];
+          
+          const idx = keys.indexOf(activeDir);
+          if (idx !== -1) {
+            centerAngle = idx * sectorAngle;
+            const startAngle = centerAngle - sectorAngle / 2;
+            const endAngle = centerAngle + sectorAngle / 2;
+
+            // Draw slice
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.moveTo(cx, cy);
+            this.ctx.arc(cx, cy, R, startAngle, endAngle);
+            this.ctx.closePath();
+
+            // Gradient fill
+            const radialGrad = this.ctx.createRadialGradient(cx, cy, 0, cx, cy, R);
+            radialGrad.addColorStop(0, glowColor + '0.35)');
+            radialGrad.addColorStop(0.6, glowColor + '0.12)');
+            radialGrad.addColorStop(1, glowColor + '0)');
+            this.ctx.fillStyle = radialGrad;
+            this.ctx.fill();
+            this.ctx.restore();
+          }
+        }
+
+        // 2. Draw Sector Divider Lines
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+        this.ctx.lineWidth = 1;
+        const numSectors = currentMode;
+        const step = (2 * Math.PI) / numSectors;
+        const offsetRotation = numSectors === 4 ? -Math.PI / 4 : -Math.PI / 8;
+
+        for (let i = 0; i < numSectors; i++) {
+          const angle = offsetRotation + i * step;
+          this.ctx.beginPath();
+          this.ctx.moveTo(cx, cy);
+          this.ctx.lineTo(cx + Math.cos(angle) * R, cy + Math.sin(angle) * R);
+          this.ctx.stroke();
+        }
+
+        // 3. Draw Chord Names around the perimeter
+        const activeLabelsKeys = numSectors === 4 
+          ? ['E', 'S', 'W', 'N'] 
+          : ['E', 'SE', 'S', 'SW', 'W', 'NW', 'N', 'NE'];
+
+        this.ctx.save();
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.font = "bold 11px 'Outfit'";
+
+        activeLabelsKeys.forEach((key, idx) => {
+          const angle = idx * ((2 * Math.PI) / numSectors);
+          // Position chord label slightly inside the perimeter
+          const labelR = R * 0.70;
+          const x = cx + Math.cos(angle) * labelR;
+          const y = cy + Math.sin(angle) * labelR;
+
+          const isSelected = activeDir === key;
+          const labelText = currentMap[key] || '-';
+
+          if (isSelected) {
+            // Draw neon highlighted text with backing glow
+            this.ctx.shadowColor = this.padId === 'A' ? '#06b6d4' : '#ec4899';
+            this.ctx.shadowBlur = 8;
+            this.ctx.fillStyle = '#ffffff';
+          } else {
+            this.ctx.shadowBlur = 0;
+            this.ctx.fillStyle = 'rgba(226, 232, 240, 0.5)';
+          }
+
+          this.ctx.fillText(labelText, x, y);
+        });
+        
+        this.ctx.restore();
+      }
+    }
+
+    // Initialize pads variables
+    let padA = null;
+    let padB = null;
+
+    function initPads() {
+      padA = new AnalogPad('A');
+      padB = new AnalogPad('B');
+    }
+
+    // ==================== 5. STRUM AREA (60% CANVAS) & VIBRATIONS ====================
+    class GuitarString {
+      constructor(x, index) {
+        this.x = x;
+        this.index = index; // 0 to 5 (Low to High)
+        this.amplitude = 0;
+        this.frequency = 0.35 + (5 - index) * 0.06; // vibration frequency
+        this.phase = 0;
+        this.decay = 0.94; // damped rate per frame
+      }
+
+      trigger(force = 15) {
+        this.amplitude = force;
+        this.phase = 0;
+      }
+
+      update() {
+        if (this.amplitude > 0.05) {
+          this.phase += this.frequency;
+          this.amplitude *= this.decay;
+        } else {
+          this.amplitude = 0;
+        }
+      }
+
+      draw(ctx, H) {
+        ctx.save();
+        
+        const isBass = this.index < 3;
+        // Bass strings (brass/gold glow) vs treble strings (steel/silver)
+        const baseColor = isBass ? 'rgba(230, 150, 20, 0.5)' : 'rgba(226, 232, 240, 0.6)';
+        const pluckColor = isBass ? 'rgba(251, 191, 36, 1)' : 'rgba(255, 255, 255, 1)';
+        
+        ctx.strokeStyle = this.amplitude > 0.8 ? pluckColor : baseColor;
+        ctx.lineWidth = 2.8 - this.index * 0.40; // thick on left, thin on right
+        
+        if (this.amplitude > 0.1) {
+          // Glowing shadow on plucking active state
+          ctx.shadowColor = isBass ? '#fbbf24' : '#818cf8';
+          ctx.shadowBlur = this.amplitude * 0.8;
+
+          ctx.beginPath();
+          ctx.moveTo(this.x, 0);
+          // Standing wave (First Harmonic) vibrating horizontally (quadratic curve to x + offset)
+          const offset = this.amplitude * Math.sin(this.phase);
+          ctx.quadraticCurveTo(this.x + offset, H / 2, this.x, H);
+          ctx.stroke();
+        } else {
+          ctx.beginPath();
+          ctx.moveTo(this.x, 0);
+          ctx.lineTo(this.x, H);
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      }
+    }
+
+    const canvas = document.getElementById('strum-canvas');
+    const ctx = canvas.getContext('2d');
+    let canvasStrings = [];
+    let canvasWidth = 0;
+    let canvasHeight = 0;
+
+    function resizeStrumCanvas() {
+      const dpr = window.devicePixelRatio || 1;
+      canvasWidth = canvas.clientWidth;
+      canvasHeight = canvas.clientHeight;
+      canvas.width = canvasWidth * dpr;
+      canvas.height = canvasHeight * dpr;
+      ctx.scale(dpr, dpr);
+
+      // Distribute 6 strings evenly in the central 70% width space
+      canvasStrings = [];
+      const padding = canvasWidth * 0.15;
+      const playableWidth = canvasWidth * 0.70;
+      const spacing = playableWidth / 5;
+
+      for (let i = 0; i < 6; i++) {
+        const x = padding + i * spacing;
+        canvasStrings.push(new GuitarString(x, i));
+      }
+    }
+
+    // Animation Loop for Guitar Strings
+    function animate() {
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+      // A. Draw a beautiful graphic soundhole in the absolute center (behind strings)
+      ctx.save();
+      const holeX = canvasWidth / 2;
+      const holeY = canvasHeight / 2;
+      const holeR = Math.min(canvasWidth * 0.25, canvasHeight * 0.25, 90);
+
+      // Outer Soundhole Radial Ring glow
+      const soundholeGrad = ctx.createRadialGradient(holeX, holeY, holeR * 0.5, holeX, holeY, holeR * 1.1);
+      soundholeGrad.addColorStop(0, 'rgba(2, 6, 23, 1)'); // absolute black depths
+      soundholeGrad.addColorStop(0.7, 'rgba(15, 23, 42, 0.95)');
+      soundholeGrad.addColorStop(0.95, 'rgba(99, 102, 241, 0.15)'); // glowing cyan/violet ring
+      soundholeGrad.addColorStop(1, 'rgba(99, 102, 241, 0)');
+
+      ctx.fillStyle = soundholeGrad;
+      ctx.beginPath();
+      ctx.arc(holeX, holeY, holeR * 1.1, 0, 2 * Math.PI);
+      ctx.fill();
+
+      // Soundhole gold inner trim
+      ctx.strokeStyle = 'rgba(230, 150, 20, 0.2)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(holeX, holeY, holeR * 0.8, 0, 2 * Math.PI);
+      ctx.stroke();
+
+      ctx.restore();
+
+      // B. Draw carbon fiber / horizontal fret stripes & fretboard inlays
+      ctx.save();
+      // Draw fret lines
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
+      ctx.lineWidth = 1;
+      const fretCount = 6;
+      for (let i = 1; i <= fretCount; i++) {
+        const fy = (canvasHeight / (fretCount + 1)) * i;
+        ctx.beginPath();
+        ctx.moveTo(0, fy);
+        ctx.lineTo(canvasWidth, fy);
+        ctx.stroke();
+
+        // Draw elegant glowing fret marker dots (Inlays) at fret 3 (index 2) and fret 5 (index 4)
+        if (i === 2 || i === 4) {
+          ctx.fillStyle = 'rgba(99, 102, 241, 0.15)'; // glowing indigo dots
+          ctx.beginPath();
+          ctx.arc(canvasWidth / 2, fy - (canvasHeight / (fretCount + 1)) / 2, 4, 0, 2 * Math.PI);
+          ctx.fill();
+        }
+      }
+      ctx.restore();
+
+      // C. Update & Draw strings
+      canvasStrings.forEach((str) => {
+        str.update();
+        str.draw(ctx, canvasHeight);
+      });
+
+      requestAnimationFrame(animate);
+    }
+
+    // ==================== 6. GESTURES & INTERACTION (STRUM AREA) ====================
+    let activeTouches = {}; // Maps touch identifier to touch data
+    const STRUM_GESTURE_DISPLACEMENT = 36; // Min pixels for gesture swipe triggers (Horizontal swipe)
+    const STRING_PLUCK_THRESHOLD = 18; // Horizontal pixel proximity for pluck selection
+
+    function setupStrumInteractions() {
+      // 1. TOUCH EVENTS (Mobile Multi-touch friendly)
+      canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        initAudio();
+
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          const t = e.changedTouches[i];
+          const rect = canvas.getBoundingClientRect();
+          const x = t.clientX - rect.left;
+          const y = t.clientY - rect.top;
+
+          activeTouches[t.identifier] = {
+            startX: x,
+            startY: y,
+            currX: x,
+            currY: y,
+            hasStrummed: false,
+            triggeredStrings: new Set(),
+            time: Date.now()
+          };
+
+          // Pluck single string directly on hit-detection
+          checkIndividualPluck(x, y, t.identifier);
+        }
+      }, { passive: false });
+
+      canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          const t = e.changedTouches[i];
+          const touchData = activeTouches[t.identifier];
+          if (!touchData) continue;
+
+          const rect = canvas.getBoundingClientRect();
+          const x = t.clientX - rect.left;
+          const y = t.clientY - rect.top;
+
+          const prevX = touchData.currX;
+          touchData.currX = x;
+          touchData.currY = y;
+
+          // A. Swipe strum trigger check (Horizontal swipe)
+          const displacementX = x - touchData.startX;
+          if (!touchData.hasStrummed && Math.abs(displacementX) > STRUM_GESTURE_DISPLACEMENT) {
+            touchData.hasStrummed = true;
+            const direction = displacementX > 0 ? 'down' : 'up'; // Left-to-Right is Down, Right-to-Left is Up
+            triggerChordStrum(direction);
+          }
+
+          // B. Direct drag plucking (triggers as finger moves across string)
+          if (!touchData.hasStrummed) {
+            checkDragCrossing(prevX, x, touchData.triggeredStrings);
+          }
+        }
+      }, { passive: false });
+
+      const handleTouchEnd = (e) => {
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          const t = e.changedTouches[i];
+          delete activeTouches[t.identifier];
+        }
+      };
+
+      canvas.addEventListener('touchend', handleTouchEnd);
+      canvas.addEventListener('touchcancel', handleTouchEnd);
+
+      // 2. MOUSE EVENTS (Desktop fallback testing)
+      let isMouseDown = false;
+      let mouseStart = { x: 0, y: 0, currX: 0, hasStrummed: false, triggeredStrings: new Set() };
+
+      canvas.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        initAudio();
+        isMouseDown = true;
+
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        mouseStart = {
+          x: x,
+          y: y,
+          currX: x,
+          hasStrummed: false,
+          triggeredStrings: new Set()
+        };
+
+        // Pluck immediately on-click if hitting a string coordinate
+        checkIndividualPluck(x, y, 'mouse');
+      });
+
+      canvas.addEventListener('mousemove', (e) => {
+        if (!isMouseDown) return;
+        
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const prevX = mouseStart.currX;
+        mouseStart.currX = x;
+
+        // A. Sweep Strum detection (Horizontal swipe)
+        const displacementX = x - mouseStart.x;
+        if (!mouseStart.hasStrummed && Math.abs(displacementX) > STRUM_GESTURE_DISPLACEMENT) {
+          mouseStart.hasStrummed = true;
+          const direction = displacementX > 0 ? 'down' : 'up';
+          triggerChordStrum(direction);
+        }
+
+        // B. Individual drag-crossing
+        if (!mouseStart.hasStrummed) {
+          checkDragCrossing(prevX, x, mouseStart.triggeredStrings);
+        }
+      });
+
+      window.addEventListener('mouseup', () => {
+        isMouseDown = false;
+      });
+    }
+
+    // Direct tap pluck on a specific string
+    function checkIndividualPluck(x, y, identifier) {
+      canvasStrings.forEach((str, index) => {
+        const distance = Math.abs(x - str.x);
+        if (distance < STRING_PLUCK_THRESHOLD) {
+          const voicing = chordVoicings[activeChord];
+          const freq = voicing[index];
+          
+          if (freq && freq > 0) {
+            playString(freq, 1.0, index, audioCtx.currentTime);
+            str.trigger(15);
+            // Lock this string for the current touch to prevent instant multi-triggering
+            if (activeTouches[identifier]) {
+              activeTouches[identifier].triggeredStrings.add(index);
+            }
+          }
+        }
+      });
+    }
+
+    // Trigger plucking on-drag as coordinate crosses a string
+    let lastPluckTimestamps = [0, 0, 0, 0, 0, 0];
+
+    function checkDragCrossing(prevX, currX, triggeredStringsSet) {
+      canvasStrings.forEach((str, index) => {
+        const crossed = (prevX < str.x && currX >= str.x) || (prevX > str.x && currX <= str.x);
+        
+        if (crossed && !triggeredStringsSet.has(index)) {
+          triggeredStringsSet.add(index);
+
+          const now = Date.now();
+          // Rate-limiting individual string plucking to 100ms
+          if (now - lastPluckTimestamps[index] > 100) {
+            const voicing = chordVoicings[activeChord];
+            const freq = voicing[index];
+
+            if (freq && freq > 0) {
+              playString(freq, 0.85, index, audioCtx.currentTime);
+              str.trigger(12);
+              lastPluckTimestamps[index] = now;
+            }
+          }
+        }
+      });
+    }
+
+    // ==================== 7. SETTINGS & DYNAMICS CUSTOMIZATION ====================
+    function setupSettingsPanel() {
+      const gearBtn = document.getElementById('gear-btn');
+      const closeBtn = document.getElementById('close-settings-btn');
+      const backdrop = document.getElementById('settings-backdrop');
+      const drawer = document.getElementById('settings-drawer');
+
+      // Toggles
+      const mode4Btn = document.getElementById('mode-4-btn');
+      const mode8Btn = document.getElementById('mode-8-btn');
+
+      // Open settings
+      gearBtn.addEventListener('click', () => {
+        backdrop.classList.remove('pointer-events-none', 'opacity-0');
+        backdrop.classList.add('opacity-100');
+        drawer.classList.remove('translate-x-full');
+        drawer.classList.add('translate-x-0');
+      });
+
+      // Close settings helper
+      const closeSettings = () => {
+        backdrop.classList.add('pointer-events-none');
+        backdrop.classList.remove('opacity-100');
+        backdrop.classList.add('opacity-0');
+        drawer.classList.remove('translate-x-0');
+        drawer.classList.add('translate-x-full');
+      };
+
+      closeBtn.addEventListener('click', closeSettings);
+      backdrop.addEventListener('click', closeSettings);
+
+      // Mode Toggles click
+      mode4Btn.addEventListener('click', () => {
+        if (currentMode === 4) return;
+        currentMode = 4;
+        toggleModeUI();
+        repopulateSelectors();
+        redrawPads();
+      });
+
+      mode8Btn.addEventListener('click', () => {
+        if (currentMode === 8) return;
+        currentMode = 8;
+        toggleModeUI();
+        repopulateSelectors();
+        redrawPads();
+      });
+
+      // Initial populate
+      toggleModeUI();
+      repopulateSelectors();
+    }
+
+    function toggleModeUI() {
+      const mode4Btn = document.getElementById('mode-4-btn');
+      const mode8Btn = document.getElementById('mode-8-btn');
+
+      const activeClasses = 'bg-gradient-to-r from-teal-500 to-indigo-600 text-white shadow-md';
+      const inactiveClasses = 'text-slate-400 hover:text-slate-200';
+
+      if (currentMode === 4) {
+        mode4Btn.className = `py-2 text-xs font-bold rounded-lg transition-all duration-200 ${activeClasses}`;
+        mode8Btn.className = `py-2 text-xs font-bold rounded-lg transition-all duration-200 ${inactiveClasses}`;
+      } else {
+        mode4Btn.className = `py-2 text-xs font-bold rounded-lg transition-all duration-200 ${inactiveClasses}`;
+        mode8Btn.className = `py-2 text-xs font-bold rounded-lg transition-all duration-200 ${activeClasses}`;
+      }
+    }
+
+    function repopulateSelectors() {
+      const padAContainer = document.getElementById('padA-selectors');
+      const padBContainer = document.getElementById('padB-selectors');
+
+      padAContainer.innerHTML = '';
+      padBContainer.innerHTML = '';
+
+      const directions = currentMode === 4 
+        ? ['N', 'E', 'S', 'W'] 
+        : ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+
+      // Populate Pad A selectors
+      directions.forEach(dir => {
+        const item = createSelectorElement('A', dir);
+        padAContainer.appendChild(item);
+      });
+
+      // Populate Pad B selectors
+      directions.forEach(dir => {
+        const item = createSelectorElement('B', dir);
+        padBContainer.appendChild(item);
+      });
+    }
+
+    // Helper to build sleek dropdown selector inside settings drawer
+    function createSelectorElement(padId, direction) {
+      const wrapper = document.createElement('div');
+      wrapper.className = "flex flex-col space-y-1";
+
+      const label = document.createElement('span');
+      label.className = "text-[9px] tracking-wide text-slate-500 font-bold cyber-font";
+      label.innerText = `${directionNames[direction]}`;
+      
+      const select = document.createElement('select');
+      select.className = "bg-slate-900 border border-slate-800 rounded-lg py-1.5 px-2 text-xs font-semibold text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 shadow-inner";
+
+      chordsList.forEach(chord => {
+        const opt = document.createElement('option');
+        opt.value = chord;
+        opt.innerText = chord;
+        if (mappings[currentMode][padId][direction] === chord) {
+          opt.selected = true;
+        }
+        select.appendChild(opt);
+      });
+
+      select.addEventListener('change', (e) => {
+        mappings[currentMode][padId][direction] = e.target.value;
+        redrawPads();
+
+        // If the edited direction happens to be the currently playing one, update displaying chord
+        if (selectedDirections[padId] === direction) {
+          activeChord = e.target.value;
+          document.getElementById('active-chord-text').innerText = activeChord;
+        }
+      });
+
+      wrapper.appendChild(label);
+      wrapper.appendChild(select);
+      return wrapper;
+    }
+
+    function redrawPads() {
+      if (padA) padA.drawPadBackground();
+      if (padB) padB.drawPadBackground();
+    }
+
+    // ==================== 8. LIFECYCLE & INITIALIZATION ====================
+    window.addEventListener('DOMContentLoaded', () => {
+      // Bind click on Audio Active button
+      document.getElementById('audio-start-overlay').addEventListener('click', () => {
+        initAudio();
+      });
+
+      // Initializations
+      initPads();
+      resizeStrumCanvas();
+      setupStrumInteractions();
+      setupSettingsPanel();
+
+      // Trigger frame updates
+      requestAnimationFrame(animate);
+    });
+
+    window.addEventListener('resize', () => {
+      if (padA) padA.initResize();
+      if (padB) padB.initResize();
+      resizeStrumCanvas();
+    });
+
+  </script>
+</body>
+</html>
