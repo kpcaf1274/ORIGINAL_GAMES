@@ -181,9 +181,10 @@
         <!-- Toggle: Mode Selection -->
         <div class="space-y-2">
           <label class="text-[10px] tracking-widest text-slate-400 uppercase font-bold">PAD CONTROL MODE</label>
-          <div class="grid grid-cols-2 gap-1 bg-slate-900/80 p-1 rounded-xl border border-slate-800/80">
-            <button id="mode-4-btn" class="py-2 text-xs font-bold rounded-lg transition-all duration-200 bg-gradient-to-r from-teal-500 to-indigo-600 text-white shadow-md">4-DIRECTION</button>
-            <button id="mode-8-btn" class="py-2 text-xs font-bold rounded-lg transition-all duration-200 text-slate-400 hover:text-slate-200">8-DIRECTION</button>
+          <div class="grid grid-cols-3 gap-1 bg-slate-900/80 p-1 rounded-xl border border-slate-800/80">
+            <button id="mode-4-btn" class="py-2 text-[10px] font-bold rounded-lg transition-all duration-200 text-slate-400 hover:text-slate-200">4-DIR</button>
+            <button id="mode-6-btn" class="py-2 text-[10px] font-bold rounded-lg transition-all duration-200 text-slate-400 hover:text-slate-200">6-DIR</button>
+            <button id="mode-8-btn" class="py-2 text-[10px] font-bold rounded-lg transition-all duration-200 text-slate-400 hover:text-slate-200">8-DIR</button>
           </div>
         </div>
 
@@ -216,6 +217,151 @@
           </div>
 
         </div>
+
+        <hr class="border-slate-900 my-1">
+
+        <!-- CUSTOM CHORD CREATOR -->
+        <div class="space-y-4">
+          <h3 class="text-xs font-extrabold tracking-widest text-cyan-400 cyber-font">CREATE CUSTOM CHORD</h3>
+          
+          <div class="bg-slate-900/60 border border-slate-800/80 rounded-xl p-4 space-y-4 shadow-lg backdrop-blur-sm">
+            <!-- Quick Preset Template -->
+            <div class="space-y-1.5 p-2 bg-slate-950/40 border border-slate-800/60 rounded-lg">
+              <label class="text-[9px] tracking-wide text-cyan-400 font-bold uppercase cyber-font flex items-center justify-between">
+                <span>Quick Preset Template</span>
+                <span class="text-[8px] text-slate-500 font-medium lowercase">Auto-fills frets & name</span>
+              </label>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="text-[8px] text-slate-500 font-bold uppercase block mb-0.5">Root</label>
+                  <select id="template-root" class="w-full bg-slate-950 border border-slate-800 rounded-lg py-1 px-1.5 text-[10px] font-bold text-slate-200 focus:outline-none focus:ring-1 focus:ring-cyan-500/50">
+                    <option value="">- Select -</option>
+                    <option value="C">C</option>
+                    <option value="C#">C# / Db</option>
+                    <option value="D">D</option>
+                    <option value="D#">D# / Eb</option>
+                    <option value="E">E</option>
+                    <option value="F">F</option>
+                    <option value="F#">F# / Gb</option>
+                    <option value="G">G</option>
+                    <option value="G#">G# / Ab</option>
+                    <option value="A">A</option>
+                    <option value="A#">A# / Bb</option>
+                    <option value="B">B</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="text-[8px] text-slate-500 font-bold uppercase block mb-0.5">Type</label>
+                  <select id="template-type" class="w-full bg-slate-950 border border-slate-800 rounded-lg py-1 px-1.5 text-[10px] font-bold text-slate-200 focus:outline-none focus:ring-1 focus:ring-cyan-500/50">
+                    <option value="">Major</option>
+                    <option value="m">Minor (m)</option>
+                    <option value="7">7th (7)</option>
+                    <option value="M7">Major 7 (M7)</option>
+                    <option value="m7">Minor 7 (m7)</option>
+                    <option value="sus4">Sus 4 (sus4)</option>
+                    <option value="add9">Add 9 (add9)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chord Name Input -->
+            <div class="space-y-1">
+              <label class="text-[9px] tracking-wide text-slate-400 font-bold uppercase cyber-font">Chord Name</label>
+              <input type="text" id="custom-chord-name" placeholder="e.g. Cadd9" maxlength="8" class="w-full bg-slate-950 border border-slate-800/80 rounded-lg py-1.5 px-3 text-xs font-bold text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-cyan-500/50 uppercase">
+              <div id="chord-name-error" class="text-[8px] text-red-500 hidden font-semibold mt-0.5"></div>
+            </div>
+
+            <!-- Fret Selectors for 6 strings -->
+            <div class="space-y-1.5">
+              <label class="text-[9px] tracking-wide text-slate-400 font-bold uppercase cyber-font">Frets (Low E to High E)</label>
+              <div class="grid grid-cols-6 gap-1">
+                <!-- String 6 (E) -->
+                <div class="flex flex-col items-center space-y-1">
+                  <span class="text-[8px] text-slate-500 font-bold">E6</span>
+                  <select id="string-6-fret" class="bg-slate-950 border border-slate-800/80 rounded-lg p-1 text-[10px] font-bold text-slate-200 focus:outline-none w-full text-center">
+                    <option value="X">X</option>
+                    <option value="0">0</option>
+                    <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                    <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+                    <option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                  </select>
+                </div>
+                <!-- String 5 (A) -->
+                <div class="flex flex-col items-center space-y-1">
+                  <span class="text-[8px] text-slate-500 font-bold">A5</span>
+                  <select id="string-5-fret" class="bg-slate-950 border border-slate-800/80 rounded-lg p-1 text-[10px] font-bold text-slate-200 focus:outline-none w-full text-center">
+                    <option value="X">X</option>
+                    <option value="0">0</option>
+                    <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                    <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+                    <option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                  </select>
+                </div>
+                <!-- String 4 (D) -->
+                <div class="flex flex-col items-center space-y-1">
+                  <span class="text-[8px] text-slate-500 font-bold">D4</span>
+                  <select id="string-4-fret" class="bg-slate-950 border border-slate-800/80 rounded-lg p-1 text-[10px] font-bold text-slate-200 focus:outline-none w-full text-center">
+                    <option value="X">X</option>
+                    <option value="0">0</option>
+                    <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                    <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+                    <option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                  </select>
+                </div>
+                <!-- String 3 (G) -->
+                <div class="flex flex-col items-center space-y-1">
+                  <span class="text-[8px] text-slate-500 font-bold">G3</span>
+                  <select id="string-3-fret" class="bg-slate-950 border border-slate-800/80 rounded-lg p-1 text-[10px] font-bold text-slate-200 focus:outline-none w-full text-center">
+                    <option value="X">X</option>
+                    <option value="0">0</option>
+                    <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                    <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+                    <option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                  </select>
+                </div>
+                <!-- String 2 (B) -->
+                <div class="flex flex-col items-center space-y-1">
+                  <span class="text-[8px] text-slate-500 font-bold">B2</span>
+                  <select id="string-2-fret" class="bg-slate-950 border border-slate-800/80 rounded-lg p-1 text-[10px] font-bold text-slate-200 focus:outline-none w-full text-center">
+                    <option value="X">X</option>
+                    <option value="0">0</option>
+                    <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                    <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+                    <option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                  </select>
+                </div>
+                <!-- String 1 (E) -->
+                <div class="flex flex-col items-center space-y-1">
+                  <span class="text-[8px] text-slate-500 font-bold">E1</span>
+                  <select id="string-1-fret" class="bg-slate-950 border border-slate-800/80 rounded-lg p-1 text-[10px] font-bold text-slate-200 focus:outline-none w-full text-center">
+                    <option value="X">X</option>
+                    <option value="0">0</option>
+                    <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                    <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+                    <option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Create Button -->
+            <button id="add-chord-btn" class="w-full py-2 bg-gradient-to-r from-cyan-500 via-indigo-500 to-pink-500 rounded-lg text-xs font-bold tracking-widest uppercase hover:scale-[1.02] active:scale-95 transition-all shadow-[0_0_15px_rgba(99,102,241,0.25)] border border-indigo-400/20 text-white">
+              ADD CHORD
+            </button>
+          </div>
+        </div>
+
+        <hr class="border-slate-900 my-1">
+
+        <!-- DYNAMIC CUSTOM CHORDS LIBRARY MANAGER -->
+        <div class="space-y-3">
+          <label class="text-[10px] tracking-widest text-slate-400 uppercase font-bold">YOUR CUSTOM CHORDS</label>
+          <div id="custom-chords-list" class="space-y-1.5 max-h-[160px] overflow-y-auto pr-1 custom-scrollbar">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
       </div>
 
       <!-- Drawer Footer -->
@@ -230,39 +376,234 @@
   <script>
     // ==================== 1. CHORD CONFIGURATIONS & STATE ====================
     
-    // Frequencies of standard 6-string acoustic guitar voicings
-    // Arrays ordered String 6 (Low E) to String 1 (High E)
-    // 0 represents a muted string
-    const chordVoicings = {
-      'C':  [0, 130.81, 164.81, 196.00, 261.63, 329.63], // x-3-2-0-1-0 (C3-E3-G3-C4-E4)
-      'G':  [98.00, 123.47, 146.83, 196.00, 246.94, 392.00], // 3-2-0-0-0-3 (G2-B2-D3-G3-B3-G4)
-      'Am': [0, 110.00, 164.81, 220.00, 261.63, 329.63], // x-0-2-2-1-0 (A2-E3-A3-C4-E4)
-      'Em': [82.41, 123.47, 164.81, 196.00, 246.94, 329.63], // 0-2-2-0-0-0 (E2-B2-E3-G3-B3-E4)
-      'F':  [87.31, 130.81, 174.61, 220.00, 261.63, 349.23], // 1-3-3-2-1-1 (F2-C3-F3-A3-C4-F4)
-      'Dm': [0, 0, 146.83, 220.00, 293.66, 349.23], // x-x-0-2-3-1 (D3-A3-D4-F4)
-      'E':  [82.41, 123.47, 164.81, 207.65, 246.94, 329.63], // 0-2-2-1-0-0 (E2-B2-E3-G#3-B3-E4)
-      'D':  [0, 0, 146.83, 220.00, 293.66, 369.99], // x-x-0-2-3-2 (D3-A3-D4-F#4)
-      'G7': [98.00, 123.47, 146.83, 196.00, 246.94, 349.23], // 3-2-0-0-0-1 (G2-B2-D3-G3-B3-F4)
-      'C7': [0, 130.81, 164.81, 233.08, 261.63, 329.63], // x-3-2-3-1-0 (C3-E3-Bb3-C4-E4)
-      'Bm': [0, 123.47, 185.00, 246.94, 293.66, 369.99]  // x-2-4-4-3-2 (B2-F#3-B3-D4-F#4)
+    // Standard open strings E2, A2, D3, G3, B3, E4 frequencies
+    const openStringFreqs = [82.4069, 110.0000, 146.8324, 195.9977, 246.9417, 329.6276];
+
+    // Dynamic Fret frequency calculator
+    function getFretFrequency(stringIdx, fret) {
+      if (fret === 'X' || fret === 'x' || fret === -1 || fret === null || fret === undefined) {
+        return 0; // Mute
+      }
+      const f = parseInt(fret, 10);
+      if (isNaN(f) || f < 0) return 0;
+      // freq = open * 2^(fret / 12)
+      return parseFloat((openStringFreqs[stringIdx] * Math.pow(2, f / 12)).toFixed(2));
+    }
+
+    // Comprehensive default chord frets dictionary (Strings ordered Low E to High E)
+    const defaultChordFrets = {
+      // C Chords
+      'C': ['X', 3, 2, 0, 1, 0],
+      'C7': ['X', 3, 2, 3, 1, 0],
+      'CM7': ['X', 3, 2, 0, 0, 0],
+      'Cmaj7': ['X', 3, 2, 0, 0, 0],
+      'Cadd9': ['X', 3, 2, 0, 3, 0],
+      'Csus4': ['X', 3, 3, 0, 1, 1],
+      'Cm': ['X', 3, 5, 5, 4, 3],
+      'Cm7': ['X', 3, 5, 3, 4, 3],
+
+      // C# / Db Chords
+      'C#': ['X', 4, 6, 6, 6, 4],
+      'C#7': ['X', 4, 6, 4, 6, 4],
+      'C#M7': ['X', 4, 6, 5, 6, 4],
+      'C#maj7': ['X', 4, 6, 5, 6, 4],
+      'C#m': ['X', 4, 6, 6, 5, 4],
+      'C#m7': ['X', 4, 6, 4, 5, 4],
+      'C#sus4': ['X', 4, 6, 6, 7, 4],
+      'C#add9': ['X', 4, 6, 6, 4, 4],
+
+      // D Chords
+      'D': ['X', 'X', 0, 2, 3, 2],
+      'D7': ['X', 'X', 0, 2, 1, 2],
+      'DM7': ['X', 'X', 0, 2, 2, 2],
+      'Dmaj7': ['X', 'X', 0, 2, 2, 2],
+      'Dm': ['X', 'X', 0, 2, 3, 1],
+      'Dm7': ['X', 'X', 0, 2, 1, 1],
+      'Dsus4': ['X', 'X', 0, 2, 3, 3],
+      'Dadd9': ['X', 'X', 0, 2, 5, 2],
+
+      // D# / Eb Chords
+      'D#': ['X', 6, 8, 8, 8, 6],
+      'D#7': ['X', 6, 8, 6, 8, 6],
+      'D#M7': ['X', 6, 8, 7, 8, 6],
+      'D#maj7': ['X', 6, 8, 7, 8, 6],
+      'D#m': ['X', 6, 8, 8, 7, 6],
+      'D#m7': ['X', 6, 8, 6, 7, 6],
+      'D#sus4': ['X', 6, 8, 8, 9, 6],
+      'D#add9': ['X', 6, 8, 8, 6, 6],
+
+      // E Chords
+      'E': [0, 2, 2, 1, 0, 0],
+      'E7': [0, 2, 0, 1, 0, 0],
+      'EM7': [0, 2, 1, 1, 0, 0],
+      'Emaj7': [0, 2, 1, 1, 0, 0],
+      'Em': [0, 2, 2, 0, 0, 0],
+      'Em7': [0, 2, 0, 0, 0, 0],
+      'Esus4': [0, 2, 2, 2, 0, 0],
+      'Eadd9': [0, 2, 4, 1, 0, 0],
+
+      // F Chords
+      'F': [1, 3, 3, 2, 1, 1],
+      'F7': [1, 3, 1, 2, 1, 1],
+      'FM7': ['X', 3, 3, 2, 1, 0],
+      'Fmaj7': ['X', 3, 3, 2, 1, 0],
+      'Fm': [1, 3, 3, 1, 1, 1],
+      'Fm7': [1, 3, 1, 1, 1, 1],
+      'Fsus4': [1, 3, 3, 3, 1, 1],
+      'Fadd9': ['X', 3, 3, 2, 1, 3],
+
+      // F# / Gb Chords
+      'F#': [2, 4, 4, 3, 2, 2],
+      'F#7': [2, 4, 2, 3, 2, 2],
+      'F#M7': [2, 4, 3, 3, 2, 2],
+      'F#maj7': [2, 4, 3, 3, 2, 2],
+      'F#m': [2, 4, 4, 2, 2, 2],
+      'F#m7': [2, 4, 2, 2, 2, 2],
+      'F#sus4': [2, 4, 4, 4, 2, 2],
+      'F#add9': [2, 4, 4, 3, 2, 4],
+
+      // G Chords
+      'G': [3, 2, 0, 0, 0, 3],
+      'G7': [3, 2, 0, 0, 0, 1],
+      'GM7': [3, 2, 0, 0, 0, 2],
+      'Gmaj7': [3, 2, 0, 0, 0, 2],
+      'Gm': [3, 5, 5, 3, 3, 3],
+      'Gm7': [3, 5, 3, 3, 3, 3],
+      'Gsus4': [3, 3, 0, 0, 1, 3],
+      'Gadd9': [3, 2, 0, 2, 0, 3],
+
+      // G# / Ab Chords
+      'G#': [4, 6, 6, 5, 4, 4],
+      'G#7': [4, 6, 4, 5, 4, 4],
+      'G#M7': [4, 6, 5, 5, 4, 4],
+      'G#maj7': [4, 6, 5, 5, 4, 4],
+      'G#m': [4, 6, 6, 4, 4, 4],
+      'G#m7': [4, 6, 4, 4, 4, 4],
+      'G#sus4': [4, 6, 6, 6, 4, 4],
+      'G#add9': [4, 6, 6, 5, 4, 6],
+
+      // A Chords
+      'A': ['X', 0, 2, 2, 2, 0],
+      'A7': ['X', 0, 2, 0, 2, 0],
+      'AM7': ['X', 0, 2, 1, 2, 0],
+      'Amaj7': ['X', 0, 2, 1, 2, 0],
+      'Am': ['X', 0, 2, 2, 1, 0],
+      'Am7': ['X', 0, 2, 0, 1, 0],
+      'Asus4': ['X', 0, 2, 2, 3, 0],
+      'Aadd9': ['X', 0, 2, 4, 2, 0],
+
+      // A# / Bb Chords
+      'A#': ['X', 1, 3, 3, 3, 1],
+      'A#7': ['X', 1, 3, 1, 3, 1],
+      'A#M7': ['X', 1, 3, 2, 3, 1],
+      'A#maj7': ['X', 1, 3, 2, 3, 1],
+      'A#m': ['X', 1, 3, 3, 2, 1],
+      'A#m7': ['X', 1, 3, 1, 2, 1],
+      'A#sus4': ['X', 1, 3, 3, 4, 1],
+      'A#add9': ['X', 1, 3, 5, 3, 1],
+
+      // B Chords
+      'B': ['X', 2, 4, 4, 4, 2],
+      'B7': ['X', 2, 1, 2, 0, 2],
+      'BM7': ['X', 2, 4, 3, 4, 2],
+      'Bmaj7': ['X', 2, 4, 3, 4, 2],
+      'Bm': ['X', 2, 4, 4, 3, 2],
+      'Bm7': ['X', 2, 4, 2, 3, 2],
+      'Bsus4': ['X', 2, 4, 4, 5, 2],
+      'Badd9': ['X', 2, 4, 4, 2, 2]
     };
 
-    const chordsList = Object.keys(chordVoicings);
+    let customChords = {};
+    let chordFrets = {};
+    const chordVoicings = {};
+    let chordsList = [];
 
-    // Default Chord Mappings
-    let currentMode = 4; // 4 or 8 direction mode
-    
-    // Mappings object
-    const mappings = {
+    // Load custom chords from LocalStorage
+    function loadCustomChords() {
+      try {
+        const saved = localStorage.getItem('guitar_custom_chords');
+        if (saved) {
+          customChords = JSON.parse(saved);
+        } else {
+          customChords = {};
+        }
+      } catch (e) {
+        console.error('Error loading custom chords:', e);
+        customChords = {};
+      }
+      
+      // Merge with default chords
+      chordFrets = { ...defaultChordFrets, ...customChords };
+      
+      // Calculate all voicings
+      for (const [name, frets] of Object.entries(chordFrets)) {
+        chordVoicings[name] = frets.map((fret, index) => getFretFrequency(index, fret));
+      }
+      
+      // Update chords list
+      chordsList = Object.keys(chordFrets);
+    }
+
+    // Default Chord Mappings for 4, 6, and 8 modes
+    const defaultMappings = {
       4: {
         A: { N: 'C', E: 'G', S: 'Am', W: 'F' },
-        B: { N: 'Em', E: 'D', S: 'G7', W: 'C7' }
+        B: { N: 'CM7', E: 'G7', S: 'Am7', W: 'FM7' }
+      },
+      6: {
+        A: { N: 'C', NE: 'G', SE: 'Am', S: 'Em', SW: 'F', NW: 'Dm' },
+        B: { N: 'CM7', NE: 'G7', SE: 'Am7', S: 'E7', SW: 'FM7', NW: 'Dm7' }
       },
       8: {
         A: { N: 'C', NE: 'G', E: 'Am', SE: 'F', S: 'Em', SW: 'Dm', W: 'E', NW: 'D' },
-        B: { N: 'Em', NE: 'D', E: 'G7', SE: 'C7', S: 'Bm', SW: 'Am', W: 'F', NW: 'C' }
+        B: { N: 'CM7', NE: 'G7', E: 'Am7', SE: 'E7', S: 'FM7', SW: 'Dm7', W: 'C#M7', NW: 'F#m7' }
       }
     };
+
+    let mappings = JSON.parse(JSON.stringify(defaultMappings));
+    let currentMode = 4; // 4, 6, or 8 direction mode
+
+    function loadState() {
+      // 1. Load mode
+      try {
+        const savedMode = localStorage.getItem('guitar_current_mode');
+        if (savedMode) {
+          currentMode = parseInt(savedMode, 10);
+          if (![4, 6, 8].includes(currentMode)) currentMode = 4;
+        }
+      } catch (e) {
+        console.error('Error loading mode:', e);
+      }
+
+      // 2. Load custom chords & build chordVoicings
+      loadCustomChords();
+
+      // 3. Load mappings
+      try {
+        const saved = localStorage.getItem('guitar_chord_mappings');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          for (const m of [4, 6, 8]) {
+            if (parsed[m]) {
+              if (parsed[m].A) Object.assign(mappings[m].A, parsed[m].A);
+              if (parsed[m].B) Object.assign(mappings[m].B, parsed[m].B);
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Error loading mappings:', e);
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem('guitar_current_mode', currentMode.toString());
+        localStorage.setItem('guitar_chord_mappings', JSON.stringify(mappings));
+        localStorage.setItem('guitar_custom_chords', JSON.stringify(customChords));
+      } catch (e) {
+        console.error('Error saving state:', e);
+      }
+    }
 
     // State Variables
     let activeChord = 'C';
@@ -626,6 +967,11 @@
           const index = Math.floor(shifted / (Math.PI / 2));
           const directions = ['E', 'S', 'W', 'N'];
           selectedDir = directions[index];
+        } else if (currentMode === 6) {
+          // 6 Directions (SE, S, SW, NW, N, NE) - No shifted offset needed as 0-60 is SE, 60-120 is S, etc.
+          const index = Math.floor(angle / (Math.PI / 3));
+          const directions = ['SE', 'S', 'SW', 'NW', 'N', 'NE'];
+          selectedDir = directions[index];
         } else {
           // 8 Directions (offset to align octants symmetrically)
           const shifted = (angle + Math.PI / 8) % (2 * Math.PI);
@@ -688,11 +1034,15 @@
 
           const keys = numSectors === 4 
             ? ['E', 'S', 'W', 'N'] 
-            : ['E', 'SE', 'S', 'SW', 'W', 'NW', 'N', 'NE'];
+            : (numSectors === 6 ? ['SE', 'S', 'SW', 'NW', 'N', 'NE'] : ['E', 'SE', 'S', 'SW', 'W', 'NW', 'N', 'NE']);
           
           const idx = keys.indexOf(activeDir);
           if (idx !== -1) {
-            centerAngle = idx * sectorAngle;
+            if (numSectors === 6) {
+              centerAngle = idx * sectorAngle + sectorAngle / 2;
+            } else {
+              centerAngle = idx * sectorAngle;
+            }
             const startAngle = centerAngle - sectorAngle / 2;
             const endAngle = centerAngle + sectorAngle / 2;
 
@@ -719,7 +1069,7 @@
         this.ctx.lineWidth = 1;
         const numSectors = currentMode;
         const step = (2 * Math.PI) / numSectors;
-        const offsetRotation = numSectors === 4 ? -Math.PI / 4 : -Math.PI / 8;
+        const offsetRotation = numSectors === 4 ? -Math.PI / 4 : (numSectors === 6 ? 0 : -Math.PI / 8);
 
         for (let i = 0; i < numSectors; i++) {
           const angle = offsetRotation + i * step;
@@ -732,7 +1082,7 @@
         // 3. Draw Chord Names around the perimeter
         const activeLabelsKeys = numSectors === 4 
           ? ['E', 'S', 'W', 'N'] 
-          : ['E', 'SE', 'S', 'SW', 'W', 'NW', 'N', 'NE'];
+          : (numSectors === 6 ? ['SE', 'S', 'SW', 'NW', 'N', 'NE'] : ['E', 'SE', 'S', 'SW', 'W', 'NW', 'N', 'NE']);
 
         this.ctx.save();
         this.ctx.textAlign = 'center';
@@ -740,7 +1090,10 @@
         this.ctx.font = "bold 11px 'Outfit'";
 
         activeLabelsKeys.forEach((key, idx) => {
-          const angle = idx * ((2 * Math.PI) / numSectors);
+          let angle = idx * ((2 * Math.PI) / numSectors);
+          if (numSectors === 6) {
+            angle += ((2 * Math.PI) / numSectors) / 2;
+          }
           // Position chord label slightly inside the perimeter
           const labelR = R * 0.70;
           const x = cx + Math.cos(angle) * labelR;
@@ -1104,6 +1457,7 @@
 
       // Toggles
       const mode4Btn = document.getElementById('mode-4-btn');
+      const mode6Btn = document.getElementById('mode-6-btn');
       const mode8Btn = document.getElementById('mode-8-btn');
 
       // Open settings
@@ -1130,6 +1484,16 @@
       mode4Btn.addEventListener('click', () => {
         if (currentMode === 4) return;
         currentMode = 4;
+        saveState();
+        toggleModeUI();
+        repopulateSelectors();
+        redrawPads();
+      });
+
+      mode6Btn.addEventListener('click', () => {
+        if (currentMode === 6) return;
+        currentMode = 6;
+        saveState();
         toggleModeUI();
         repopulateSelectors();
         redrawPads();
@@ -1138,29 +1502,137 @@
       mode8Btn.addEventListener('click', () => {
         if (currentMode === 8) return;
         currentMode = 8;
+        saveState();
         toggleModeUI();
         repopulateSelectors();
         redrawPads();
       });
 
+      const chordNameInput = document.getElementById('custom-chord-name');
+      const errorDiv = document.getElementById('chord-name-error');
+
+      // Bind template auto-fill listeners
+      const templateRoot = document.getElementById('template-root');
+      const templateType = document.getElementById('template-type');
+
+      const handleTemplateChange = () => {
+        const root = templateRoot.value;
+        const type = templateType.value;
+        if (!root) return;
+
+        const chordName = root + type;
+        chordNameInput.value = chordName;
+
+        // Try to find the predefined frets for this chord
+        if (defaultChordFrets[chordName]) {
+          const frets = defaultChordFrets[chordName];
+          frets.forEach((fret, index) => {
+            const stringIdx = 6 - index; // 0 index is E6, 5 index is E1
+            const selectEl = document.getElementById(`string-${stringIdx}-fret`);
+            if (selectEl) {
+              selectEl.value = fret.toString();
+            }
+          });
+        }
+      };
+
+      templateRoot.addEventListener('change', handleTemplateChange);
+      templateType.addEventListener('change', handleTemplateChange);
+
+      // Bind Create Custom Chord click listener
+      const addChordBtn = document.getElementById('add-chord-btn');
+      addChordBtn.addEventListener('click', () => {
+        errorDiv.classList.add('hidden');
+        errorDiv.innerText = '';
+        
+        const rawName = chordNameInput.value.trim();
+        if (rawName.length === 0) {
+          errorDiv.innerText = 'Chord name cannot be empty.';
+          errorDiv.classList.remove('hidden');
+          return;
+        }
+
+        // Validate chord name format: Starts with A-G followed by optional standard chord letters
+        const validNameRegex = /^[A-G][a-zA-Z0-9#b\(\)\/+-]{0,9}$/;
+        if (!validNameRegex.test(rawName)) {
+          errorDiv.innerText = 'Invalid name. Must start with A-G (e.g. Cadd9, F#m).';
+          errorDiv.classList.remove('hidden');
+          return;
+        }
+
+        // Prevent overloading or duplicating built-in chords
+        if (defaultChordFrets.hasOwnProperty(rawName)) {
+          errorDiv.innerText = `"${rawName}" is a built-in chord.`;
+          errorDiv.classList.remove('hidden');
+          return;
+        }
+
+        // Gather fret coordinates
+        const frets = [
+          document.getElementById('string-6-fret').value,
+          document.getElementById('string-5-fret').value,
+          document.getElementById('string-4-fret').value,
+          document.getElementById('string-3-fret').value,
+          document.getElementById('string-2-fret').value,
+          document.getElementById('string-1-fret').value
+        ].map(val => val === 'X' ? 'X' : parseInt(val, 10));
+
+        // Save
+        customChords[rawName] = frets;
+        
+        // Reload State & build voicings
+        loadCustomChords();
+        saveState();
+
+        // UI updates
+        repopulateSelectors();
+        redrawPads();
+        renderCustomChordsManager();
+
+        // Clear input, dropdown selections and templates
+        chordNameInput.value = '';
+        templateRoot.value = '';
+        templateType.value = '';
+        ['6','5','4','3','2','1'].forEach(idx => {
+          document.getElementById(`string-${idx}-fret`).value = 'X';
+        });
+
+        // Small visual success effect on the button
+        addChordBtn.innerText = 'CHORD ADDED!';
+        addChordBtn.classList.remove('from-cyan-500', 'to-pink-500');
+        addChordBtn.classList.add('from-emerald-500', 'to-teal-600');
+        setTimeout(() => {
+          addChordBtn.innerText = 'ADD CHORD';
+          addChordBtn.classList.remove('from-emerald-500', 'to-teal-600');
+          addChordBtn.classList.add('from-cyan-500', 'via-indigo-500', 'to-pink-500');
+        }, 1200);
+      });
+
       // Initial populate
       toggleModeUI();
       repopulateSelectors();
+      renderCustomChordsManager();
     }
 
     function toggleModeUI() {
       const mode4Btn = document.getElementById('mode-4-btn');
+      const mode6Btn = document.getElementById('mode-6-btn');
       const mode8Btn = document.getElementById('mode-8-btn');
 
-      const activeClasses = 'bg-gradient-to-r from-teal-500 to-indigo-600 text-white shadow-md';
-      const inactiveClasses = 'text-slate-400 hover:text-slate-200';
+      const activeClasses = 'bg-gradient-to-r from-teal-500 to-indigo-600 text-white shadow-md font-bold';
+      const inactiveClasses = 'text-slate-400 hover:text-slate-200 font-bold';
+
+      // Reset classes
+      mode4Btn.className = `py-2 text-[10px] rounded-lg transition-all duration-200 ${inactiveClasses}`;
+      mode6Btn.className = `py-2 text-[10px] rounded-lg transition-all duration-200 ${inactiveClasses}`;
+      mode8Btn.className = `py-2 text-[10px] rounded-lg transition-all duration-200 ${inactiveClasses}`;
 
       if (currentMode === 4) {
-        mode4Btn.className = `py-2 text-xs font-bold rounded-lg transition-all duration-200 ${activeClasses}`;
-        mode8Btn.className = `py-2 text-xs font-bold rounded-lg transition-all duration-200 ${inactiveClasses}`;
+        mode4Btn.className = `py-2 text-[10px] rounded-lg transition-all duration-200 ${activeClasses}`;
+      } else if (currentMode === 6) {
+        mode6Btn.className = `py-2 text-[10px] rounded-lg transition-all duration-200 ${activeClasses}`;
       } else {
-        mode4Btn.className = `py-2 text-xs font-bold rounded-lg transition-all duration-200 ${inactiveClasses}`;
-        mode8Btn.className = `py-2 text-xs font-bold rounded-lg transition-all duration-200 ${activeClasses}`;
+        mode8Btn.className = `py-2 text-[10px] rounded-lg transition-all duration-200 ${activeClasses}`;
       }
     }
 
@@ -1173,7 +1645,7 @@
 
       const directions = currentMode === 4 
         ? ['N', 'E', 'S', 'W'] 
-        : ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+        : (currentMode === 6 ? ['N', 'NE', 'SE', 'S', 'SW', 'NW'] : ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']);
 
       // Populate Pad A selectors
       directions.forEach(dir => {
@@ -1188,6 +1660,75 @@
       });
     }
 
+    // Helper to group chords by their root note and populate select element
+    function populateGroupedSelect(selectElement, selectedValue) {
+      selectElement.innerHTML = '';
+      
+      const groups = {
+        'C Chords': [],
+        'C# / D♭ Chords': [],
+        'D Chords': [],
+        'D# / E♭ Chords': [],
+        'E Chords': [],
+        'F Chords': [],
+        'F# / G♭ Chords': [],
+        'G Chords': [],
+        'G# / A♭ Chords': [],
+        'A Chords': [],
+        'A# / B♭ Chords': [],
+        'B Chords': [],
+        'Custom / Others': []
+      };
+
+      // Group each chord
+      chordsList.forEach(chord => {
+        if (customChords.hasOwnProperty(chord)) {
+          groups['Custom / Others'].push(chord);
+        } else {
+          let root = chord.substring(0, 1).toUpperCase();
+          if (chord.length > 1 && (chord[1] === '#' || chord[1] === 'b' || chord[1] === '♭')) {
+            root += chord[1];
+          }
+          
+          let groupKey = null;
+          if (root === 'C#') groupKey = 'C# / D♭ Chords';
+          else if (root === 'D#') groupKey = 'D# / E♭ Chords';
+          else if (root === 'F#') groupKey = 'F# / G♭ Chords';
+          else if (root === 'G#') groupKey = 'G# / A♭ Chords';
+          else if (root === 'A#') groupKey = 'A# / B♭ Chords';
+          else if (groups[`${root} Chords`]) groupKey = `${root} Chords`;
+          
+          if (groupKey && groups[groupKey]) {
+            groups[groupKey].push(chord);
+          } else {
+            groups['Custom / Others'].push(chord);
+          }
+        }
+      });
+
+      // Create optgroups
+      for (const [groupName, chords] of Object.entries(groups)) {
+        if (chords.length === 0) continue;
+        
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = groupName;
+        optgroup.className = "bg-slate-950 text-indigo-400 font-bold text-[10px]";
+        
+        chords.forEach(chord => {
+          const opt = document.createElement('option');
+          opt.value = chord;
+          opt.innerText = chord;
+          opt.className = "bg-slate-900 text-slate-200 font-semibold text-xs";
+          if (selectedValue === chord) {
+            opt.selected = true;
+          }
+          optgroup.appendChild(opt);
+        });
+        
+        selectElement.appendChild(optgroup);
+      }
+    }
+
     // Helper to build sleek dropdown selector inside settings drawer
     function createSelectorElement(padId, direction) {
       const wrapper = document.createElement('div');
@@ -1200,18 +1741,12 @@
       const select = document.createElement('select');
       select.className = "bg-slate-900 border border-slate-800 rounded-lg py-1.5 px-2 text-xs font-semibold text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 shadow-inner";
 
-      chordsList.forEach(chord => {
-        const opt = document.createElement('option');
-        opt.value = chord;
-        opt.innerText = chord;
-        if (mappings[currentMode][padId][direction] === chord) {
-          opt.selected = true;
-        }
-        select.appendChild(opt);
-      });
+      const currentSelected = mappings[currentMode][padId][direction];
+      populateGroupedSelect(select, currentSelected);
 
       select.addEventListener('change', (e) => {
         mappings[currentMode][padId][direction] = e.target.value;
+        saveState();
         redrawPads();
 
         // If the edited direction happens to be the currently playing one, update displaying chord
@@ -1226,6 +1761,83 @@
       return wrapper;
     }
 
+    function renderCustomChordsManager() {
+      const container = document.getElementById('custom-chords-list');
+      if (!container) return;
+      container.innerHTML = '';
+      
+      const customKeys = Object.keys(customChords);
+      if (customKeys.length === 0) {
+        const placeholder = document.createElement('div');
+        placeholder.className = "text-[10px] text-slate-600 italic py-2 text-center";
+        placeholder.innerText = "No custom chords yet.";
+        container.appendChild(placeholder);
+        return;
+      }
+      
+      customKeys.forEach(name => {
+        const item = document.createElement('div');
+        item.className = "flex items-center justify-between bg-slate-900/40 border border-slate-800/50 rounded-lg p-2 text-xs";
+        
+        const details = document.createElement('div');
+        details.className = "flex flex-col";
+        
+        const nameSpan = document.createElement('span');
+        nameSpan.className = "font-extrabold text-cyan-400 cyber-font tracking-wide";
+        nameSpan.innerText = name;
+        
+        const fretsSpan = document.createElement('span');
+        fretsSpan.className = "text-[9px] text-slate-500 font-semibold";
+        fretsSpan.innerText = customChords[name].map(f => f === 'X' || f === 'x' ? 'x' : f).join('-');
+        
+        details.appendChild(nameSpan);
+        details.appendChild(fretsSpan);
+        
+        const delBtn = document.createElement('button');
+        delBtn.className = "p-1 rounded-lg text-slate-500 hover:text-red-400 active:scale-90 transition-all";
+        delBtn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+          </svg>
+        `;
+        
+        delBtn.addEventListener('click', () => {
+          deleteCustomChord(name);
+        });
+        
+        item.appendChild(details);
+        item.appendChild(delBtn);
+        container.appendChild(item);
+      });
+    }
+
+    function deleteCustomChord(name) {
+      if (!customChords[name]) return;
+      
+      delete customChords[name];
+      loadCustomChords();
+      
+      for (const m of [4, 6, 8]) {
+        for (const pad of ['A', 'B']) {
+          for (const dir of Object.keys(mappings[m][pad])) {
+            if (mappings[m][pad][dir] === name) {
+              mappings[m][pad][dir] = defaultMappings[m][pad][dir];
+            }
+          }
+        }
+      }
+      
+      if (activeChord === name) {
+        activeChord = 'C';
+        document.getElementById('active-chord-text').innerText = activeChord;
+      }
+      
+      saveState();
+      repopulateSelectors();
+      redrawPads();
+      renderCustomChordsManager();
+    }
+
     function redrawPads() {
       if (padA) padA.drawPadBackground();
       if (padB) padB.drawPadBackground();
@@ -1237,6 +1849,9 @@
       document.getElementById('audio-start-overlay').addEventListener('click', () => {
         initAudio();
       });
+
+      // Load State from LocalStorage
+      loadState();
 
       // Initializations
       initPads();
