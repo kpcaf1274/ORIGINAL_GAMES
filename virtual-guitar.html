@@ -362,6 +362,13 @@
           </div>
         </div>
 
+        <!-- RESET TO DEFAULTS BUTTON -->
+        <div class="pt-4 border-t border-slate-900/60">
+          <button id="reset-defaults-btn" class="w-full py-2 bg-gradient-to-r from-amber-600 to-rose-600 rounded-lg text-[10px] font-bold tracking-widest uppercase hover:scale-[1.02] active:scale-95 transition-all shadow-[0_0_15px_rgba(225,29,72,0.15)] border border-rose-500/20 text-white">
+            RESET TO DEFAULTS
+          </button>
+        </div>
+
       </div>
 
       <!-- Drawer Footer -->
@@ -1606,6 +1613,40 @@
           addChordBtn.classList.remove('from-emerald-500', 'to-teal-600');
           addChordBtn.classList.add('from-cyan-500', 'via-indigo-500', 'to-pink-500');
         }, 1200);
+      });
+
+      // Bind Reset Defaults click listener
+      const resetBtn = document.getElementById('reset-defaults-btn');
+      resetBtn.addEventListener('click', () => {
+        localStorage.removeItem('guitar_current_mode');
+        localStorage.removeItem('guitar_chord_mappings');
+        localStorage.removeItem('guitar_custom_chords');
+
+        currentMode = 4;
+        mappings = JSON.parse(JSON.stringify(defaultMappings));
+        customChords = {};
+
+        loadCustomChords();
+
+        activeChord = 'C';
+        lastActivePad = 'A';
+        activeSource = 'PAD A • NORTH';
+        document.getElementById('active-chord-text').innerText = activeChord;
+        document.getElementById('active-chord-source').innerText = activeSource;
+
+        toggleModeUI();
+        repopulateSelectors();
+        redrawPads();
+        renderCustomChordsManager();
+
+        resetBtn.innerText = 'RESET COMPLETE!';
+        resetBtn.classList.remove('from-amber-600', 'to-rose-600');
+        resetBtn.classList.add('from-emerald-500', 'to-teal-600');
+        setTimeout(() => {
+          resetBtn.innerText = 'RESET TO DEFAULTS';
+          resetBtn.classList.remove('from-emerald-500', 'to-teal-600');
+          resetBtn.classList.add('from-amber-600', 'to-rose-600');
+        }, 1500);
       });
 
       // Initial populate
