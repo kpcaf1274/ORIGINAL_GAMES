@@ -150,6 +150,8 @@
 
     <!-- Canvas drawing guitar strings & vibrations -->
     <canvas id="strum-canvas" class="w-full h-full block cursor-pointer z-10 relative"></canvas>
+    <!-- Debug HUD: shows strum speed info -->
+    <div id="strum-debug" style="position:absolute;top:8px;left:8px;z-index:30;background:rgba(0,0,0,0.7);color:#0ff;font-size:11px;font-family:monospace;padding:6px 10px;border-radius:6px;pointer-events:none;opacity:0;transition:opacity 0.2s">--</div>
   </section>
 
   <!-- ==================== SETTINGS OVERLAY DRAWER ==================== -->
@@ -676,96 +678,55 @@
       if (!audioCtx) initAudio();
       if (audioCtx.state === 'suspended') audioCtx.resume();
 
-      // Absolute safety wrap to prevent Web Audio timeline exceptions from muting the synthesizer
       try {
         const dest = masterGain || audioCtx.destination;
-        const now = audioCtx.currentTime;
-        // Schedule strictly 5ms in the future compared to physical audio context time to prevent timeline scheduling crashes
-        const safeStart = Math.max(startTime, now + 0.005);
+        // Always schedule at least 10ms in the future to prevent past-time scheduling errors
+        const safeStart = Math.max(startTime, audioCtx.currentTime + 0.010);
 
-        // 1. Pluck Noise Transients (Emulates pick on string)
+        // Decay time: Low strings ring longer than high strings
+        const decayDuration = 1.8 + (5 - stringIndex) * 0.15;
+
+        // ---- Noise Transient (pick attack) ----
         const noiseSource = audioCtx.createBufferSource();
         noiseSource.buffer = noiseBuffer;
-
-        const noiseFilter = audioCtx.createBiquadFilter();
-        noiseFilter.type = 'bandpass';
-        noiseFilter.frequency.setValueAtTime(1200, safeStart);
-        noiseFilter.Q.setValueAtTime(2.5, safeStart);
-
         const noiseGain = audioCtx.createGain();
-        noiseGain.gain.setValueAtTime(0.18 * velocity, safeStart);
-        noiseGain.gain.exponentialRampToValueAtTime(0.001, safeStart + 0.022); // 22ms decay
-
-        noiseSource.connect(noiseFilter);
-        noiseFilter.connect(noiseGain);
+        noiseGain.gain.setValueAtTime(0.12 * velocity, safeStart);
+        // setTargetAtTime is safe even near 0 (uses time constant, not exponential to-value)
+        noiseGain.gain.setTargetAtTime(0.001, safeStart, 0.012);
+        noiseSource.connect(noiseGain);
         noiseGain.connect(dest);
+        noiseSource.start(safeStart);
+        noiseSource.stop(safeStart + 0.06);
 
-        // 2. Dual Oscillators for Resonant Wood Body
-        // Triangle oscillator gives warmth, sawtooth gives metallic pluck sparkle
-        const oscTri = audioCtx.createOscillator();
-        oscTri.type = 'triangle';
-        oscTri.frequency.setValueAtTime(freq, safeStart);
-        
-        // Pitch transient: Slight tension release bend
-        oscTri.detune.setValueAtTime(25, safeStart);
-        oscTri.detune.exponentialRampToValueAtTime(0.01, safeStart + 0.06);
+        // ---- Tone Oscillator ----
+        const osc = audioCtx.createOscillator();
+        osc.type = 'triangle';
+        osc.frequency.value = freq;
 
-        const oscSaw = audioCtx.createOscillator();
-        oscSaw.type = 'sawtooth';
-        oscSaw.frequency.setValueAtTime(freq * 1.0015, safeStart); // detuned micro-chorus
-        oscSaw.detune.setValueAtTime(15, safeStart);
-        oscSaw.detune.exponentialRampToValueAtTime(0.01, safeStart + 0.06);
-
-        // 3. String Resonance Damping Filter (Lowpass Sweep)
-        // Real strings dump high frequencies fast. Cutoff sweeps down exponentially.
+        // Low-pass filter to emulate string resonance
         const lowpass = audioCtx.createBiquadFilter();
         lowpass.type = 'lowpass';
-        lowpass.Q.setValueAtTime(3.5, safeStart);
-        
-        const pluckCutoff = freq * 9;
-        const sustainCutoff = freq * 2.2;
-        lowpass.frequency.setValueAtTime(pluckCutoff, safeStart);
-        lowpass.frequency.exponentialRampToValueAtTime(sustainCutoff, safeStart + 0.32);
+        lowpass.frequency.value = Math.min(freq * 6, (audioCtx.sampleRate / 2) - 100);
+        lowpass.Q.value = 2.0;
 
-        // 4. Amplitude Volume Envelope
-        const stringGain = audioCtx.createGain();
-        stringGain.gain.setValueAtTime(0.001, safeStart); // Start at small positive value to anchor ramp correctly
-        stringGain.gain.linearRampToValueAtTime(0.55 * velocity, safeStart + 0.004); // 4ms attack
-        
-        // Decay time scaled: Low strings ring longer than high strings
-        const decayDuration = 1.9 + (5 - stringIndex) * 0.16;
-        stringGain.gain.exponentialRampToValueAtTime(0.001, safeStart + decayDuration);
+        // Amplitude envelope: fast attack, smooth decay via time constant
+        const envGain = audioCtx.createGain();
+        envGain.gain.setValueAtTime(0.001, safeStart);
+        envGain.gain.linearRampToValueAtTime(0.5 * velocity, safeStart + 0.005); // 5ms attack
+        envGain.gain.setTargetAtTime(0.001, safeStart + 0.005, decayDuration / 5); // smooth decay
 
-        // 5. Oscillator gain balancing (Saw decay is much faster so string buzzing is transient)
-        const triGain = audioCtx.createGain();
-        triGain.gain.setValueAtTime(0.75, safeStart);
+        osc.connect(lowpass);
+        lowpass.connect(envGain);
+        envGain.connect(dest);
 
-        const sawGain = audioCtx.createGain();
-        sawGain.gain.setValueAtTime(0.18, safeStart);
-        sawGain.gain.exponentialRampToValueAtTime(0.001, safeStart + 0.35); // quick saw envelope decay
-
-        oscTri.connect(triGain);
-        triGain.connect(lowpass);
-
-        oscSaw.connect(sawGain);
-        sawGain.connect(lowpass);
-
-        lowpass.connect(stringGain);
-        stringGain.connect(dest);
-
-        // Start & Stop
-        noiseSource.start(safeStart);
-        noiseSource.stop(safeStart + 0.03);
-
-        oscTri.start(safeStart);
-        oscTri.stop(safeStart + decayDuration);
-
-        oscSaw.start(safeStart);
-        oscSaw.stop(safeStart + decayDuration);
+        osc.start(safeStart);
+        osc.stop(safeStart + decayDuration);
       } catch (e) {
-        console.warn("Recovered from Web Audio scheduling timeline glitch:", e);
+        // Silently recover — next strum will work fine
+        console.warn('playString skipped:', e.message);
       }
     }
+
 
     // ==================== 3. DYNAMIC STRUM CONTROLLER ====================
     let lastStrumTime = 0;
@@ -777,10 +738,17 @@
       if (!voicing) return;
 
       // Calculate dynamic delay step based on strum speed
-      // Base speed: 0.3 px/ms maps to 0.03s delay
-      // Fast speed limit (0.008s at speed >= 0.9 px/ms)
-      // Slow speed limit (0.09s at speed <= 0.1 px/ms)
-      const delayStep = speed ? Math.max(0.008, Math.min(0.09, 0.009 / speed)) : 0.03;
+      // Fast limit: 5ms (speed >= 1.5 px/ms), Slow limit: 200ms (speed <= 0.045 px/ms)
+      const delayStep = speed ? Math.max(0.005, Math.min(0.20, 0.009 / speed)) : 0.03;
+
+      // Show debug HUD
+      const dbg = document.getElementById('strum-debug');
+      if (dbg) {
+        dbg.textContent = `spd:${speed.toFixed(3)} px/ms  delay:${Math.round(delayStep*1000)}ms`;
+        dbg.style.opacity = '1';
+        clearTimeout(dbg._t);
+        dbg._t = setTimeout(() => { dbg.style.opacity = '0'; }, 2000);
+      }
 
       const now = audioCtx.currentTime;
       // Prevent rapid overlapping strum triggers dynamically
@@ -801,6 +769,9 @@
       const stringsOrder = direction === 'down' ? [0, 1, 2, 3, 4, 5] : [5, 4, 3, 2, 1, 0];
       let delayCount = 0;
 
+      // Base time: start all strings from a fixed 15ms-ahead base so delays are correctly spaced
+      const baseTime = now + 0.015;
+
       stringsOrder.forEach((stringIdx) => {
         let freq = voicing[stringIdx];
         if (freq && freq !== 0) {
@@ -808,7 +779,7 @@
           if (isMuted) freq = -freq; // Convert negative back to positive frequency
 
           const delay = delayCount * delayStep; // Dynamic strumming delay
-          const playTime = now + delay;
+          const playTime = baseTime + delay; // Schedule relative to fixed base, not now
           // Apply a 0.4x volume multiplier for muted strings
           let velocity = 1.0 - (delayCount * 0.04);
           if (isMuted) velocity *= 0.4;
@@ -1333,7 +1304,7 @@
             currY: y,
             hasStrummed: false,
             triggeredStrings: new Set(),
-            time: Date.now()
+            armTime: Date.now() // Time when strum gesture was armed
           };
 
           // Pluck single string directly on hit-detection
@@ -1352,6 +1323,7 @@
           const rect = canvas.getBoundingClientRect();
           const x = t.clientX - rect.left;
           const y = t.clientY - rect.top;
+          const now = Date.now();
 
           const prevX = touchData.currX;
           touchData.currX = x;
@@ -1359,16 +1331,26 @@
 
           // A. Swipe strum trigger check (Horizontal swipe)
           const displacementX = x - touchData.startX;
-          if (Math.abs(displacementX) > STRUM_GESTURE_DISPLACEMENT) {
-            const direction = displacementX > 0 ? 'down' : 'up'; // Left-to-Right is Down, Right-to-Left is Up
-            const duration = Date.now() - touchData.time;
-            const speed = duration > 0 ? Math.abs(displacementX) / duration : 1.0;
-            const safeSpeed = Math.min(speed, 1.5); // Cap maximum speed to prevent scheduling node overflow
+          const currentDirection = displacementX > 0 ? 'down' : 'up';
+
+          // Direction reversal: re-arm strumming when finger swings back
+          if (touchData.hasStrummed && touchData.lastStrumDirection !== currentDirection) {
+            touchData.startX = x;
+            touchData.hasStrummed = false;
+            touchData.armTime = Date.now(); // Restart timing for new direction
+          }
+
+          // Fire strum only if not yet fired in this direction
+          if (!touchData.hasStrummed && Math.abs(displacementX) > STRUM_GESTURE_DISPLACEMENT) {
+            const direction = currentDirection;
+            // Speed = how fast did we travel exactly 36px in this direction
+            const elapsed = Date.now() - touchData.armTime;
+            const speed = elapsed > 0 ? STRUM_GESTURE_DISPLACEMENT / elapsed : 1.0;
+            const safeSpeed = Math.min(Math.max(speed, 0.05), 1.5);
             triggerChordStrum(direction, safeSpeed);
 
-            // Reset start coordinates/time to enable seamless alternate back-and-forth strumming
-            touchData.startX = x;
-            touchData.time = Date.now();
+            // Lock: no more strums until direction reversal
+            touchData.lastStrumDirection = direction;
             touchData.hasStrummed = true;
           }
 
@@ -1408,7 +1390,7 @@
           currX: x,
           hasStrummed: false,
           triggeredStrings: new Set(),
-          time: Date.now()
+          armTime: Date.now() // Time when strum gesture was armed
         };
 
         // Pluck immediately on-click if hitting a string coordinate
@@ -1421,22 +1403,31 @@
         const rect = canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-
         const prevX = mouseStart.currX;
         mouseStart.currX = x;
 
         // A. Sweep Strum detection (Horizontal swipe)
         const displacementX = x - mouseStart.x;
-        if (Math.abs(displacementX) > STRUM_GESTURE_DISPLACEMENT) {
-          const direction = displacementX > 0 ? 'down' : 'up';
-          const duration = Date.now() - mouseStart.time;
-          const speed = duration > 0 ? Math.abs(displacementX) / duration : 1.0;
-          const safeSpeed = Math.min(speed, 1.5); // Cap maximum speed to prevent scheduling node overflow
+        const currentDirection = displacementX > 0 ? 'down' : 'up';
+
+        // Direction reversal: re-arm strumming when mouse swings back
+        if (mouseStart.hasStrummed && mouseStart.lastStrumDirection !== currentDirection) {
+          mouseStart.x = x;
+          mouseStart.hasStrummed = false;
+          mouseStart.armTime = Date.now(); // Restart timing for new direction
+        }
+
+        // Fire strum only if not yet fired in this direction
+        if (!mouseStart.hasStrummed && Math.abs(displacementX) > STRUM_GESTURE_DISPLACEMENT) {
+          const direction = currentDirection;
+          // Speed = how fast did we travel exactly 36px in this direction
+          const elapsed = Date.now() - mouseStart.armTime;
+          const speed = elapsed > 0 ? STRUM_GESTURE_DISPLACEMENT / elapsed : 1.0;
+          const safeSpeed = Math.min(Math.max(speed, 0.05), 1.5);
           triggerChordStrum(direction, safeSpeed);
 
-          // Reset start coordinates/time to enable seamless alternate back-and-forth strumming
-          mouseStart.x = x;
-          mouseStart.time = Date.now();
+          // Lock: no more strums until direction reversal
+          mouseStart.lastStrumDirection = direction;
           mouseStart.hasStrummed = true;
         }
 
