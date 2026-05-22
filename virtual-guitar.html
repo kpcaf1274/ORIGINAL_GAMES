@@ -1330,28 +1330,30 @@
           touchData.currY = y;
 
           // A. Swipe strum trigger check (Horizontal swipe)
-          const displacementX = x - touchData.startX;
+          let displacementX = x - touchData.startX;
           const currentDirection = displacementX > 0 ? 'down' : 'up';
 
           // Direction reversal: re-arm strumming when finger swings back
           if (touchData.hasStrummed && touchData.lastStrumDirection !== currentDirection) {
             touchData.startX = x;
             touchData.hasStrummed = false;
-            touchData.armTime = Date.now(); // Restart timing for new direction
+            touchData.armTime = Date.now();
+            displacementX = 0; // Prevent immediate re-fire with stale displacement
           }
 
           // Fire strum only if not yet fired in this direction
           if (!touchData.hasStrummed && Math.abs(displacementX) > STRUM_GESTURE_DISPLACEMENT) {
             const direction = currentDirection;
-            // Speed = how fast did we travel exactly 36px in this direction
             const elapsed = Date.now() - touchData.armTime;
             const speed = elapsed > 0 ? STRUM_GESTURE_DISPLACEMENT / elapsed : 1.0;
             const safeSpeed = Math.min(Math.max(speed, 0.05), 1.5);
             triggerChordStrum(direction, safeSpeed);
 
-            // Lock: no more strums until direction reversal
+            // Lock and reset anchor to fire position for correct next-reversal detection
             touchData.lastStrumDirection = direction;
             touchData.hasStrummed = true;
+            touchData.startX = x; // ← anchor at fire position: reversal only needs 36px back
+            touchData.armTime = Date.now();
           }
 
           // B. Direct drag plucking (triggers as finger moves across string)
@@ -1407,28 +1409,30 @@
         mouseStart.currX = x;
 
         // A. Sweep Strum detection (Horizontal swipe)
-        const displacementX = x - mouseStart.x;
+        let displacementX = x - mouseStart.x;
         const currentDirection = displacementX > 0 ? 'down' : 'up';
 
         // Direction reversal: re-arm strumming when mouse swings back
         if (mouseStart.hasStrummed && mouseStart.lastStrumDirection !== currentDirection) {
           mouseStart.x = x;
           mouseStart.hasStrummed = false;
-          mouseStart.armTime = Date.now(); // Restart timing for new direction
+          mouseStart.armTime = Date.now();
+          displacementX = 0; // Prevent immediate re-fire with stale displacement
         }
 
         // Fire strum only if not yet fired in this direction
         if (!mouseStart.hasStrummed && Math.abs(displacementX) > STRUM_GESTURE_DISPLACEMENT) {
           const direction = currentDirection;
-          // Speed = how fast did we travel exactly 36px in this direction
           const elapsed = Date.now() - mouseStart.armTime;
           const speed = elapsed > 0 ? STRUM_GESTURE_DISPLACEMENT / elapsed : 1.0;
           const safeSpeed = Math.min(Math.max(speed, 0.05), 1.5);
           triggerChordStrum(direction, safeSpeed);
 
-          // Lock: no more strums until direction reversal
+          // Lock and reset anchor to fire position for correct next-reversal detection
           mouseStart.lastStrumDirection = direction;
           mouseStart.hasStrummed = true;
+          mouseStart.x = x; // ← anchor at fire position: reversal only needs 36px back
+          mouseStart.armTime = Date.now();
         }
 
         // B. Individual drag-crossing
