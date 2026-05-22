@@ -676,87 +676,95 @@
       if (!audioCtx) initAudio();
       if (audioCtx.state === 'suspended') audioCtx.resume();
 
-      const dest = masterGain || audioCtx.destination;
+      // Absolute safety wrap to prevent Web Audio timeline exceptions from muting the synthesizer
+      try {
+        const dest = masterGain || audioCtx.destination;
+        const now = audioCtx.currentTime;
+        // Schedule strictly 5ms in the future compared to physical audio context time to prevent timeline scheduling crashes
+        const safeStart = Math.max(startTime, now + 0.005);
 
-      // 1. Pluck Noise Transients (Emulates pick on string)
-      const noiseSource = audioCtx.createBufferSource();
-      noiseSource.buffer = noiseBuffer;
+        // 1. Pluck Noise Transients (Emulates pick on string)
+        const noiseSource = audioCtx.createBufferSource();
+        noiseSource.buffer = noiseBuffer;
 
-      const noiseFilter = audioCtx.createBiquadFilter();
-      noiseFilter.type = 'bandpass';
-      noiseFilter.frequency.setValueAtTime(1200, startTime);
-      noiseFilter.Q.setValueAtTime(2.5, startTime);
+        const noiseFilter = audioCtx.createBiquadFilter();
+        noiseFilter.type = 'bandpass';
+        noiseFilter.frequency.setValueAtTime(1200, safeStart);
+        noiseFilter.Q.setValueAtTime(2.5, safeStart);
 
-      const noiseGain = audioCtx.createGain();
-      noiseGain.gain.setValueAtTime(0.18 * velocity, startTime);
-      noiseGain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.022); // 22ms decay
+        const noiseGain = audioCtx.createGain();
+        noiseGain.gain.setValueAtTime(0.18 * velocity, safeStart);
+        noiseGain.gain.exponentialRampToValueAtTime(0.001, safeStart + 0.022); // 22ms decay
 
-      noiseSource.connect(noiseFilter);
-      noiseFilter.connect(noiseGain);
-      noiseGain.connect(dest);
+        noiseSource.connect(noiseFilter);
+        noiseFilter.connect(noiseGain);
+        noiseGain.connect(dest);
 
-      // 2. Dual Oscillators for Resonant Wood Body
-      // Triangle oscillator gives warmth, sawtooth gives metallic pluck sparkle
-      const oscTri = audioCtx.createOscillator();
-      oscTri.type = 'triangle';
-      oscTri.frequency.setValueAtTime(freq, startTime);
-      
-      // Pitch transient: Slight tension release bend
-      oscTri.detune.setValueAtTime(25, startTime);
-      oscTri.detune.exponentialRampToValueAtTime(0.01, startTime + 0.06);
+        // 2. Dual Oscillators for Resonant Wood Body
+        // Triangle oscillator gives warmth, sawtooth gives metallic pluck sparkle
+        const oscTri = audioCtx.createOscillator();
+        oscTri.type = 'triangle';
+        oscTri.frequency.setValueAtTime(freq, safeStart);
+        
+        // Pitch transient: Slight tension release bend
+        oscTri.detune.setValueAtTime(25, safeStart);
+        oscTri.detune.exponentialRampToValueAtTime(0.01, safeStart + 0.06);
 
-      const oscSaw = audioCtx.createOscillator();
-      oscSaw.type = 'sawtooth';
-      oscSaw.frequency.setValueAtTime(freq * 1.0015, startTime); // detuned micro-chorus
-      oscSaw.detune.setValueAtTime(15, startTime);
-      oscSaw.detune.exponentialRampToValueAtTime(0.01, startTime + 0.06);
+        const oscSaw = audioCtx.createOscillator();
+        oscSaw.type = 'sawtooth';
+        oscSaw.frequency.setValueAtTime(freq * 1.0015, safeStart); // detuned micro-chorus
+        oscSaw.detune.setValueAtTime(15, safeStart);
+        oscSaw.detune.exponentialRampToValueAtTime(0.01, safeStart + 0.06);
 
-      // 3. String Resonance Damping Filter (Lowpass Sweep)
-      // Real strings dump high frequencies fast. Cutoff sweeps down exponentially.
-      const lowpass = audioCtx.createBiquadFilter();
-      lowpass.type = 'lowpass';
-      lowpass.Q.setValueAtTime(3.5, startTime);
-      
-      const pluckCutoff = freq * 9;
-      const sustainCutoff = freq * 2.2;
-      lowpass.frequency.setValueAtTime(pluckCutoff, startTime);
-      lowpass.frequency.exponentialRampToValueAtTime(sustainCutoff, startTime + 0.32);
+        // 3. String Resonance Damping Filter (Lowpass Sweep)
+        // Real strings dump high frequencies fast. Cutoff sweeps down exponentially.
+        const lowpass = audioCtx.createBiquadFilter();
+        lowpass.type = 'lowpass';
+        lowpass.Q.setValueAtTime(3.5, safeStart);
+        
+        const pluckCutoff = freq * 9;
+        const sustainCutoff = freq * 2.2;
+        lowpass.frequency.setValueAtTime(pluckCutoff, safeStart);
+        lowpass.frequency.exponentialRampToValueAtTime(sustainCutoff, safeStart + 0.32);
 
-      // 4. Amplitude Volume Envelope
-      const stringGain = audioCtx.createGain();
-      stringGain.gain.setValueAtTime(0, startTime);
-      stringGain.gain.linearRampToValueAtTime(0.55 * velocity, startTime + 0.004); // 4ms attack
-      
-      // Decay time scaled: Low strings ring longer than high strings
-      const decayDuration = 1.9 + (5 - stringIndex) * 0.16;
-      stringGain.gain.exponentialRampToValueAtTime(0.001, startTime + decayDuration);
+        // 4. Amplitude Volume Envelope
+        const stringGain = audioCtx.createGain();
+        stringGain.gain.setValueAtTime(0.001, safeStart); // Start at small positive value to anchor ramp correctly
+        stringGain.gain.linearRampToValueAtTime(0.55 * velocity, safeStart + 0.004); // 4ms attack
+        
+        // Decay time scaled: Low strings ring longer than high strings
+        const decayDuration = 1.9 + (5 - stringIndex) * 0.16;
+        stringGain.gain.exponentialRampToValueAtTime(0.001, safeStart + decayDuration);
 
-      // 5. Oscillator gain balancing (Saw decay is much faster so string buzzing is transient)
-      const triGain = audioCtx.createGain();
-      triGain.gain.setValueAtTime(0.75, startTime);
+        // 5. Oscillator gain balancing (Saw decay is much faster so string buzzing is transient)
+        const triGain = audioCtx.createGain();
+        triGain.gain.setValueAtTime(0.75, safeStart);
 
-      const sawGain = audioCtx.createGain();
-      sawGain.gain.setValueAtTime(0.18, startTime);
-      sawGain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.35); // quick saw envelope decay
+        const sawGain = audioCtx.createGain();
+        sawGain.gain.setValueAtTime(0.18, safeStart);
+        sawGain.gain.exponentialRampToValueAtTime(0.001, safeStart + 0.35); // quick saw envelope decay
 
-      oscTri.connect(triGain);
-      triGain.connect(lowpass);
+        oscTri.connect(triGain);
+        triGain.connect(lowpass);
 
-      oscSaw.connect(sawGain);
-      sawGain.connect(lowpass);
+        oscSaw.connect(sawGain);
+        sawGain.connect(lowpass);
 
-      lowpass.connect(stringGain);
-      stringGain.connect(dest);
+        lowpass.connect(stringGain);
+        stringGain.connect(dest);
 
-      // Start & Stop
-      noiseSource.start(startTime);
-      noiseSource.stop(startTime + 0.03);
+        // Start & Stop
+        noiseSource.start(safeStart);
+        noiseSource.stop(safeStart + 0.03);
 
-      oscTri.start(startTime);
-      oscTri.stop(startTime + decayDuration);
+        oscTri.start(safeStart);
+        oscTri.stop(safeStart + decayDuration);
 
-      oscSaw.start(startTime);
-      oscSaw.stop(startTime + decayDuration);
+        oscSaw.start(safeStart);
+        oscSaw.stop(safeStart + decayDuration);
+      } catch (e) {
+        console.warn("Recovered from Web Audio scheduling timeline glitch:", e);
+      }
     }
 
     // ==================== 3. DYNAMIC STRUM CONTROLLER ====================
@@ -1355,7 +1363,8 @@
             const direction = displacementX > 0 ? 'down' : 'up'; // Left-to-Right is Down, Right-to-Left is Up
             const duration = Date.now() - touchData.time;
             const speed = duration > 0 ? Math.abs(displacementX) / duration : 1.0;
-            triggerChordStrum(direction, speed);
+            const safeSpeed = Math.min(speed, 1.5); // Cap maximum speed to prevent scheduling node overflow
+            triggerChordStrum(direction, safeSpeed);
 
             // Reset start coordinates/time to enable seamless alternate back-and-forth strumming
             touchData.startX = x;
@@ -1422,7 +1431,8 @@
           const direction = displacementX > 0 ? 'down' : 'up';
           const duration = Date.now() - mouseStart.time;
           const speed = duration > 0 ? Math.abs(displacementX) / duration : 1.0;
-          triggerChordStrum(direction, speed);
+          const safeSpeed = Math.min(speed, 1.5); // Cap maximum speed to prevent scheduling node overflow
+          triggerChordStrum(direction, safeSpeed);
 
           // Reset start coordinates/time to enable seamless alternate back-and-forth strumming
           mouseStart.x = x;
