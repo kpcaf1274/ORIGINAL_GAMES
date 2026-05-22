@@ -761,15 +761,26 @@
     // ==================== 3. DYNAMIC STRUM CONTROLLER ====================
     let lastStrumTime = 0;
 
-    function triggerChordStrum(direction) {
+    function triggerChordStrum(direction, speed) {
       if (!audioCtx) initAudio();
       
       const voicing = chordVoicings[activeChord];
       if (!voicing) return;
 
+      // Calculate dynamic delay step based on strum speed
+      // Base speed: 0.3 px/ms maps to 0.03s delay
+      // Fast speed limit (0.008s at speed >= 0.9 px/ms)
+      // Slow speed limit (0.09s at speed <= 0.1 px/ms)
+      const delayStep = speed ? Math.max(0.008, Math.min(0.09, 0.009 / speed)) : 0.03;
+
       const now = audioCtx.currentTime;
-      // Prevent rapid overlapping strum triggers (120ms threshold)
-      if (now - lastStrumTime < 0.12) return;
+      // Prevent rapid overlapping strum triggers dynamically
+      // For slow strums, the total strum duration is 5 * delayStep.
+      // We scale the cooldown to prevent overlap while maintaining responsiveness.
+      const strumDuration = 5 * delayStep;
+      const cooldown = Math.max(0.12, strumDuration * 0.8);
+
+      if (now - lastStrumTime < cooldown) return;
       lastStrumTime = now;
 
       // Pulse display UI
@@ -783,7 +794,7 @@
       stringsOrder.forEach((stringIdx) => {
         const freq = voicing[stringIdx];
         if (freq && freq > 0) {
-          const delay = delayCount * 0.03; // 30ms strumming delay
+          const delay = delayCount * delayStep; // Dynamic strumming delay
           const playTime = now + delay;
           const velocity = 1.0 - (delayCount * 0.04); // slightly quieter notes as strum completes
 
@@ -1335,7 +1346,9 @@
           if (!touchData.hasStrummed && Math.abs(displacementX) > STRUM_GESTURE_DISPLACEMENT) {
             touchData.hasStrummed = true;
             const direction = displacementX > 0 ? 'down' : 'up'; // Left-to-Right is Down, Right-to-Left is Up
-            triggerChordStrum(direction);
+            const duration = Date.now() - touchData.time;
+            const speed = duration > 0 ? Math.abs(displacementX) / duration : 1.0;
+            triggerChordStrum(direction, speed);
           }
 
           // B. Direct drag plucking (triggers as finger moves across string)
@@ -1357,7 +1370,7 @@
 
       // 2. MOUSE EVENTS (Desktop fallback testing)
       let isMouseDown = false;
-      let mouseStart = { x: 0, y: 0, currX: 0, hasStrummed: false, triggeredStrings: new Set() };
+      let mouseStart = { x: 0, y: 0, currX: 0, hasStrummed: false, triggeredStrings: new Set(), time: 0 };
 
       canvas.addEventListener('mousedown', (e) => {
         e.preventDefault();
@@ -1373,7 +1386,8 @@
           y: y,
           currX: x,
           hasStrummed: false,
-          triggeredStrings: new Set()
+          triggeredStrings: new Set(),
+          time: Date.now()
         };
 
         // Pluck immediately on-click if hitting a string coordinate
@@ -1395,7 +1409,9 @@
         if (!mouseStart.hasStrummed && Math.abs(displacementX) > STRUM_GESTURE_DISPLACEMENT) {
           mouseStart.hasStrummed = true;
           const direction = displacementX > 0 ? 'down' : 'up';
-          triggerChordStrum(direction);
+          const duration = Date.now() - mouseStart.time;
+          const speed = duration > 0 ? Math.abs(displacementX) / duration : 1.0;
+          triggerChordStrum(direction, speed);
         }
 
         // B. Individual drag-crossing
