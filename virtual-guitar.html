@@ -87,7 +87,7 @@
   <main class="flex-1 flex flex-col w-full pt-14 relative z-10 select-none overflow-hidden">
 
     <!-- UPPER HALF: Chord Display (Left 50%) & Stacked PADs (Right 50%) -->
-    <div class="h-[38vh] min-h-[220px] max-h-[300px] flex w-full border-b border-slate-900/60 bg-slate-950/40 backdrop-blur-sm select-none">
+    <div class="h-[32vh] min-h-[225px] max-h-[250px] flex w-full border-b border-slate-900/60 bg-slate-950/40 backdrop-blur-sm select-none">
       
       <!-- Chord Display Area (Upper-Left) -->
       <section id="chord-display-area" class="w-1/2 h-full flex flex-col justify-center items-center relative border-r border-slate-900/60 px-4">
@@ -105,35 +105,35 @@
       </section>
 
       <!-- Stacked Analog Pads (Upper-Right) -->
-      <section class="w-1/2 h-full flex flex-col justify-around items-center py-2 px-1 relative">
+      <section class="w-1/2 h-full flex flex-col justify-around items-center py-1.5 px-1 relative">
         
         <!-- Pad A Container (Top) -->
-        <div class="flex flex-col items-center justify-center space-y-1 w-full flex-1">
+        <div class="flex flex-col items-center justify-center space-y-0.5 w-full flex-1">
           <span class="text-[8px] tracking-[0.2em] font-bold text-cyan-400/70 uppercase cyber-font">PAD A (CHORDS)</span>
-          <div id="pad-A" class="pad-container w-[22vw] h-[22vw] max-w-[95px] max-h-[95px] aspect-square rounded-full relative bg-slate-900/60 border border-slate-800/80 shadow-[inset_0_4px_12px_rgba(0,0,0,0.8),0_2px_8px_rgba(255,255,255,0.03)] backdrop-blur-sm flex items-center justify-center touch-none">
+          <div id="pad-A" class="pad-container w-[26vw] h-[26vw] max-w-[110px] max-h-[110px] aspect-square rounded-full relative bg-slate-900/60 border border-slate-800/80 shadow-[inset_0_4px_12px_rgba(0,0,0,0.8),0_2px_8px_rgba(255,255,255,0.03)] backdrop-blur-sm flex items-center justify-center touch-none">
             <!-- Dynamic Glowing Canvas behind the joystick -->
             <canvas id="padA-canvas" class="absolute inset-0 w-full h-full rounded-full pointer-events-none z-0"></canvas>
             <!-- The Floating Joystick Knob -->
-            <div id="knob-A" class="w-7 h-7 rounded-full bg-gradient-to-br from-slate-700 via-slate-800 to-slate-950 border border-slate-600/40 shadow-[0_4px_10px_rgba(0,0,0,0.7),inset_0_1.5px_2px_rgba(255,255,255,0.15)] flex items-center justify-center pointer-events-none select-none z-10">
-              <div class="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_6px_rgba(34,211,238,0.8)] border border-cyan-300/30"></div>
+            <div id="knob-A" class="w-9 h-9 rounded-full bg-gradient-to-br from-slate-700 via-slate-800 to-slate-950 border border-slate-600/40 shadow-[0_4px_10px_rgba(0,0,0,0.7),inset_0_1.5px_2px_rgba(255,255,255,0.15)] flex items-center justify-center pointer-events-none select-none z-10">
+              <div class="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_6px_rgba(34,211,238,0.8)] border border-cyan-300/30"></div>
             </div>
           </div>
         </div>
 
         <!-- Techy Divider -->
         <div class="w-2/3 border-t border-slate-900/80 relative">
-          <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-slate-800 border border-slate-700"></div>
+          <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-slate-800 border border-slate-700"></div>
         </div>
 
         <!-- Pad B Container (Bottom) -->
-        <div class="flex flex-col items-center justify-center space-y-1 w-full flex-1">
+        <div class="flex flex-col items-center justify-center space-y-0.5 w-full flex-1">
           <span class="text-[8px] tracking-[0.2em] font-bold text-pink-400/70 uppercase cyber-font">PAD B (CHORDS)</span>
-          <div id="pad-B" class="pad-container w-[22vw] h-[22vw] max-w-[95px] max-h-[95px] aspect-square rounded-full relative bg-slate-900/60 border border-slate-800/80 shadow-[inset_0_4px_12px_rgba(0,0,0,0.8),0_2px_8px_rgba(255,255,255,0.03)] backdrop-blur-sm flex items-center justify-center touch-none">
+          <div id="pad-B" class="pad-container w-[26vw] h-[26vw] max-w-[110px] max-h-[110px] aspect-square rounded-full relative bg-slate-900/60 border border-slate-800/80 shadow-[inset_0_4px_12px_rgba(0,0,0,0.8),0_2px_8px_rgba(255,255,255,0.03)] backdrop-blur-sm flex items-center justify-center touch-none">
             <!-- Dynamic Glowing Canvas behind the joystick -->
             <canvas id="padB-canvas" class="absolute inset-0 w-full h-full rounded-full pointer-events-none z-0"></canvas>
             <!-- The Floating Joystick Knob -->
-            <div id="knob-B" class="w-7 h-7 rounded-full bg-gradient-to-br from-slate-700 via-slate-800 to-slate-950 border border-slate-600/40 shadow-[0_4px_10px_rgba(0,0,0,0.7),inset_0_1.5px_2px_rgba(255,255,255,0.15)] flex items-center justify-center pointer-events-none select-none z-10">
-              <div class="w-2 h-2 rounded-full bg-pink-400 shadow-[0_0_6px_rgba(244,114,182,0.8)] border border-pink-300/30"></div>
+            <div id="knob-B" class="w-9 h-9 rounded-full bg-gradient-to-br from-slate-700 via-slate-800 to-slate-950 border border-slate-600/40 shadow-[0_4px_10px_rgba(0,0,0,0.7),inset_0_1.5px_2px_rgba(255,255,255,0.15)] flex items-center justify-center pointer-events-none select-none z-10">
+              <div class="w-2.5 h-2.5 rounded-full bg-pink-400 shadow-[0_0_6px_rgba(244,114,182,0.8)] border border-pink-300/30"></div>
             </div>
           </div>
         </div>
