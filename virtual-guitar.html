@@ -83,17 +83,17 @@
     </button>
   </header>
 
-  <!-- ==================== MAIN 2-COLUMN VIEWPORT ==================== -->
-  <main class="flex h-screen w-full pt-14 relative z-10 select-none overflow-hidden">
+  <!-- ==================== MAIN VIEWPORT (ROTATION-READY PORTRAIT) ==================== -->
+  <main class="flex-1 flex flex-col w-full pt-14 relative z-10 select-none overflow-hidden">
 
-    <!-- LEFT COLUMN: Active Chord Display (Top) & Interactive Strum Area (Bottom) -->
-    <div class="flex-1 flex flex-col h-full border-r border-slate-900/60 overflow-hidden">
+    <!-- UPPER HALF: Chord Display (Left 50%) & Stacked PADs (Right 50%) -->
+    <div class="h-[38vh] min-h-[220px] max-h-[300px] flex w-full border-b border-slate-900/60 bg-slate-950/40 backdrop-blur-sm select-none">
       
-      <!-- Chord Display Area (placed where Pad 1 used to be conceptually) -->
-      <section id="chord-display-area" class="h-[20vh] min-h-[100px] flex flex-col justify-center items-center relative z-10 bg-slate-950/40 backdrop-blur-sm transition-all duration-150 select-none border-b border-slate-900/60">
+      <!-- Chord Display Area (Upper-Left) -->
+      <section id="chord-display-area" class="w-1/2 h-full flex flex-col justify-center items-center relative border-r border-slate-900/60 px-4">
         <!-- Sci-Fi decorative frame bits -->
-        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[8px] tracking-[0.25em] text-slate-500/80 uppercase cyber-font select-none hidden md:inline">// SYSTEM.ACTIVE</span>
-        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[8px] tracking-[0.25em] text-slate-500/80 uppercase cyber-font select-none hidden md:inline">Telemetry [CHORD.ENG]</span>
+        <span class="absolute left-3 top-3 text-[7px] tracking-[0.25em] text-slate-500/80 uppercase cyber-font select-none">// SYSTEM.ACTIVE</span>
+        <span class="absolute right-3 top-3 text-[7px] tracking-[0.25em] text-slate-500/80 uppercase cyber-font select-none">TELEMETRY [CHORD.ENG]</span>
         
         <span class="text-[9px] tracking-[0.25em] text-slate-400 uppercase font-semibold">ACTIVE CHORD</span>
         <!-- Active Chord Big Text -->
@@ -104,72 +104,72 @@
         <span id="active-chord-source" class="text-[9px] tracking-wide text-cyan-400/60 font-medium cyber-font mt-1">PAD A • NORTH</span>
       </section>
 
-      <!-- Strum Area (Guitar Strings Canvas) -->
-      <section class="flex-1 relative w-full overflow-hidden z-10 select-none bg-gradient-to-b from-slate-950 via-slate-900/80 to-slate-950">
-        <!-- Overlay guidelines inside Strum Area -->
-        <div class="absolute inset-x-0 bottom-4 text-center pointer-events-none opacity-20 flex flex-col items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 animate-pulse mb-1">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0-4.5 4.5M21 7.5H7.5" />
-          </svg>
-          <span class="text-[9px] tracking-[0.2em] font-semibold uppercase">Swipe Left / Right or Pluck Strings</span>
-        </div>
-        <!-- Sound Init Overlay (visible until first click/touch to bypass AudioContext policies) -->
-        <div id="audio-start-overlay" class="absolute inset-0 bg-slate-950/75 backdrop-blur-md z-20 flex flex-col items-center justify-center space-y-4 p-6 text-center transition-opacity duration-300">
-          <div class="w-16 h-16 rounded-full bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center animate-pulse">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-8 h-8 text-cyan-400">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
-            </svg>
+      <!-- Stacked Analog Pads (Upper-Right) -->
+      <section class="w-1/2 h-full flex flex-col justify-around items-center py-2 px-1 relative">
+        
+        <!-- Pad A Container (Top) -->
+        <div class="flex flex-col items-center justify-center space-y-1 w-full flex-1">
+          <span class="text-[8px] tracking-[0.2em] font-bold text-cyan-400/70 uppercase cyber-font">PAD A (CHORDS)</span>
+          <div id="pad-A" class="pad-container w-[22vw] h-[22vw] max-w-[95px] max-h-[95px] aspect-square rounded-full relative bg-slate-900/60 border border-slate-800/80 shadow-[inset_0_4px_12px_rgba(0,0,0,0.8),0_2px_8px_rgba(255,255,255,0.03)] backdrop-blur-sm flex items-center justify-center touch-none">
+            <!-- Dynamic Glowing Canvas behind the joystick -->
+            <canvas id="padA-canvas" class="absolute inset-0 w-full h-full rounded-full pointer-events-none z-0"></canvas>
+            <!-- The Floating Joystick Knob -->
+            <div id="knob-A" class="w-7 h-7 rounded-full bg-gradient-to-br from-slate-700 via-slate-800 to-slate-950 border border-slate-600/40 shadow-[0_4px_10px_rgba(0,0,0,0.7),inset_0_1.5px_2px_rgba(255,255,255,0.15)] flex items-center justify-center pointer-events-none select-none z-10">
+              <div class="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_6px_rgba(34,211,238,0.8)] border border-cyan-300/30"></div>
+            </div>
           </div>
-          <div>
-            <h2 class="text-md font-bold text-white tracking-wider">AUDIO CONTEXT INACTIVE</h2>
-            <p class="text-[10px] text-slate-400 mt-1 max-w-[200px] mx-auto leading-relaxed">Tap anywhere to initialize high-fidelity guitar synthesis and start jamming!</p>
-          </div>
-          <button class="px-5 py-2 bg-gradient-to-r from-teal-500 to-indigo-600 rounded-xl text-[10px] font-bold tracking-widest uppercase hover:scale-105 active:scale-95 transition-all duration-150 shadow-lg shadow-teal-500/10">START PLAYING</button>
         </div>
 
-        <!-- Canvas drawing guitar strings & vibrations -->
-        <canvas id="strum-canvas" class="w-full h-full block cursor-pointer z-10 relative"></canvas>
-        <!-- Debug HUD: shows strum speed info -->
-        <div id="strum-debug" style="position:absolute;top:8px;left:8px;z-index:30;background:rgba(0,0,0,0.7);color:#0ff;font-size:11px;font-family:monospace;padding:6px 10px;border-radius:6px;pointer-events:none;opacity:0;transition:opacity 0.2s">--</div>
+        <!-- Techy Divider -->
+        <div class="w-2/3 border-t border-slate-900/80 relative">
+          <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-slate-800 border border-slate-700"></div>
+        </div>
+
+        <!-- Pad B Container (Bottom) -->
+        <div class="flex flex-col items-center justify-center space-y-1 w-full flex-1">
+          <span class="text-[8px] tracking-[0.2em] font-bold text-pink-400/70 uppercase cyber-font">PAD B (CHORDS)</span>
+          <div id="pad-B" class="pad-container w-[22vw] h-[22vw] max-w-[95px] max-h-[95px] aspect-square rounded-full relative bg-slate-900/60 border border-slate-800/80 shadow-[inset_0_4px_12px_rgba(0,0,0,0.8),0_2px_8px_rgba(255,255,255,0.03)] backdrop-blur-sm flex items-center justify-center touch-none">
+            <!-- Dynamic Glowing Canvas behind the joystick -->
+            <canvas id="padB-canvas" class="absolute inset-0 w-full h-full rounded-full pointer-events-none z-0"></canvas>
+            <!-- The Floating Joystick Knob -->
+            <div id="knob-B" class="w-7 h-7 rounded-full bg-gradient-to-br from-slate-700 via-slate-800 to-slate-950 border border-slate-600/40 shadow-[0_4px_10px_rgba(0,0,0,0.7),inset_0_1.5px_2px_rgba(255,255,255,0.15)] flex items-center justify-center pointer-events-none select-none z-10">
+              <div class="w-2 h-2 rounded-full bg-pink-400 shadow-[0_0_6px_rgba(244,114,182,0.8)] border border-pink-300/30"></div>
+            </div>
+          </div>
+        </div>
+
       </section>
 
     </div>
 
-    <!-- RIGHT COLUMN: Stacked Analog Pads (Pad A on Top, Pad B on Bottom) -->
-    <div class="w-[30%] max-w-[240px] min-w-[150px] flex flex-col h-full justify-around items-center py-4 px-2 bg-slate-950/20 backdrop-blur-md relative z-10">
-      
-      <!-- Pad A Container (Top) -->
-      <div class="flex flex-col items-center justify-center space-y-1.5 w-full flex-1">
-        <span class="text-[9px] tracking-[0.2em] font-bold text-cyan-400/70 uppercase cyber-font">PAD A (CHORDS)</span>
-        <div id="pad-A" class="pad-container w-[65%] max-w-[125px] aspect-square rounded-full relative bg-slate-900/60 border border-slate-800/80 shadow-[inset_0_4px_12px_rgba(0,0,0,0.8),0_2px_8px_rgba(255,255,255,0.03)] backdrop-blur-sm flex items-center justify-center touch-none">
-          <!-- Dynamic Glowing Canvas behind the joystick -->
-          <canvas id="padA-canvas" class="absolute inset-0 w-full h-full rounded-full pointer-events-none z-0"></canvas>
-          <!-- The Floating Joystick Knob -->
-          <div id="knob-A" class="w-9 h-9 rounded-full bg-gradient-to-br from-slate-700 via-slate-800 to-slate-950 border border-slate-600/40 shadow-[0_5px_12px_rgba(0,0,0,0.7),inset_0_2px_3px_rgba(255,255,255,0.15)] flex items-center justify-center pointer-events-none select-none z-10">
-            <div class="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)] border border-cyan-300/30"></div>
-          </div>
+    <!-- LOWER HALF: Full Width Strum Area (Strings Canvas) -->
+    <section class="flex-1 relative w-full overflow-hidden z-10 select-none bg-gradient-to-b from-slate-950 via-slate-900/80 to-slate-950">
+      <!-- Overlay guidelines inside Strum Area -->
+      <div class="absolute inset-x-0 bottom-4 text-center pointer-events-none opacity-20 flex flex-col items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 animate-pulse mb-1">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0-4.5 4.5M21 7.5H7.5" />
+        </svg>
+        <span class="text-[9px] tracking-[0.2em] font-semibold uppercase">Swipe Left / Right or Pluck Strings</span>
+      </div>
+      <!-- Sound Init Overlay (visible until first click/touch to bypass AudioContext policies) -->
+      <div id="audio-start-overlay" class="absolute inset-0 bg-slate-950/75 backdrop-blur-md z-20 flex flex-col items-center justify-center space-y-4 p-6 text-center transition-opacity duration-300">
+        <div class="w-16 h-16 rounded-full bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center animate-pulse">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-8 h-8 text-cyan-400">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
+          </svg>
         </div>
-      </div>
-
-      <!-- Techy Divider -->
-      <div class="w-3/4 border-t border-slate-900/80 my-2 relative">
-        <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-slate-800 border border-slate-700"></div>
-      </div>
-
-      <!-- Pad B Container (Bottom) -->
-      <div class="flex flex-col items-center justify-center space-y-1.5 w-full flex-1">
-        <span class="text-[9px] tracking-[0.2em] font-bold text-pink-400/70 uppercase cyber-font">PAD B (CHORDS)</span>
-        <div id="pad-B" class="pad-container w-[65%] max-w-[125px] aspect-square rounded-full relative bg-slate-900/60 border border-slate-800/80 shadow-[inset_0_4px_12px_rgba(0,0,0,0.8),0_2px_8px_rgba(255,255,255,0.03)] backdrop-blur-sm flex items-center justify-center touch-none">
-          <!-- Dynamic Glowing Canvas behind the joystick -->
-          <canvas id="padB-canvas" class="absolute inset-0 w-full h-full rounded-full pointer-events-none z-0"></canvas>
-          <!-- The Floating Joystick Knob -->
-          <div id="knob-B" class="w-9 h-9 rounded-full bg-gradient-to-br from-slate-700 via-slate-800 to-slate-950 border border-slate-600/40 shadow-[0_5px_12px_rgba(0,0,0,0.7),inset_0_2px_3px_rgba(255,255,255,0.15)] flex items-center justify-center pointer-events-none select-none z-10">
-            <div class="w-2.5 h-2.5 rounded-full bg-pink-400 shadow-[0_0_8px_rgba(244,114,182,0.8)] border border-pink-300/30"></div>
-          </div>
+        <div>
+          <h2 class="text-md font-bold text-white tracking-wider">AUDIO CONTEXT INACTIVE</h2>
+          <p class="text-[10px] text-slate-400 mt-1 max-w-[200px] mx-auto leading-relaxed">Tap anywhere to initialize high-fidelity guitar synthesis and start jamming!</p>
         </div>
+        <button class="px-5 py-2 bg-gradient-to-r from-teal-500 to-indigo-600 rounded-xl text-[10px] font-bold tracking-widest uppercase hover:scale-105 active:scale-95 transition-all duration-150 shadow-lg shadow-teal-500/10">START PLAYING</button>
       </div>
 
-    </div>
+      <!-- Canvas drawing guitar strings & vibrations -->
+      <canvas id="strum-canvas" class="w-full h-full block cursor-pointer z-10 relative"></canvas>
+      <!-- Debug HUD: shows strum speed info -->
+      <div id="strum-debug" style="position:absolute;top:8px;left:8px;z-index:30;background:rgba(0,0,0,0.7);color:#0ff;font-size:11px;font-family:monospace;padding:6px 10px;border-radius:6px;pointer-events:none;opacity:0;transition:opacity 0.2s">--</div>
+    </section>
 
   </main>
 
