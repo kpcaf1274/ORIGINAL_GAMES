@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0f2027">
+<title>ポケモンのうトレ</title>
+<style>
+  :root{
+    --bg:#0f2027; --bg2:#1b3a4b;
+    --panel:#f8f8f0; --ink:#20303a;
+    --line:#20303a;
+    --accent:#ffcb05; --accent2:#3b5ba7;
+    --red:#e3350d; --green:#3ba55d; --gray:#8a9aa5;
+    --tap:60px;
+    --safe-b:env(safe-area-inset-bottom, 0px);
+    --safe-t:env(safe-area-inset-top, 0px);
+  }
+  /* こどもモードは全体的に大きく・カラフルに */
+  body.kids{
+    --tap:78px;
+    --bg:#2a6fb5; --bg2:#7fd3f0;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    font-family:"Hiragino Maru Gothic ProN","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,system-ui,sans-serif;
+    background:linear-gradient(160deg,var(--bg),var(--bg2));
+    color:var(--ink);
+    overflow:hidden; overscroll-behavior:none;
+    -webkit-user-select:none; user-select:none;
+    -webkit-text-size-adjust:100%; touch-action:manipulation;
+  }
+  #app{height:100vh; height:100dvh; display:flex; flex-direction:column;
+       max-width:820px; margin:0 auto; padding-top:var(--safe-t);}
+  .screen{flex:1; min-height:0; display:flex; flex-direction:column;}
+  .screen.hidden{display:none;}
+  .scroll{flex:1; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:12px 12px 4px;}
+  .bar{flex:none; padding:8px 12px calc(8px + var(--safe-b));}
+
+  .panel{background:var(--panel); border:3px solid var(--line); border-radius:16px;
+         box-shadow:0 5px 0 rgba(0,0,0,.3), inset 0 0 0 3px #fff; padding:14px; margin-bottom:12px;}
+  h1{font-size:clamp(20px,5.5vw,26px); margin:0 0 10px; text-align:center;}
+  h1 .sub{display:block;font-size:12px;font-weight:normal;color:#5b6e7a;margin-top:5px;}
+  h2{font-size:clamp(16px,4.5vw,19px);margin:0 0 12px;border-bottom:3px solid var(--accent);padding-bottom:6px;}
+  h3{font-size:13px;margin:16px 0 8px;color:#40525e;font-weight:bold;}
+  h3:first-of-type{margin-top:4px;}
+  p.note{font-size:12px;color:#5b6e7a;line-height:1.75;margin:10px 0 0;}
+
+  .btn{font-family:inherit; font-size:16px; font-weight:bold; min-height:var(--tap);
+       padding:12px 18px; border-radius:14px; border:3px solid var(--line); background:#fff; color:var(--ink);
+       cursor:pointer; box-shadow:0 4px 0 var(--line); transition:transform .05s, box-shadow .05s;}
+  .btn:active{transform:translateY(3px); box-shadow:0 1px 0 var(--line);}
+  .btn.primary{background:var(--accent);}
+  .btn.blue{background:var(--accent2); color:#fff;}
+  .btn.big{font-size:19px; min-height:76px; width:100%; margin:8px 0;}
+  .btn.ghost{background:transparent;box-shadow:none;border-width:2px;min-height:44px;font-size:13px;padding:8px 14px;}
+
+  .row{display:flex; flex-wrap:wrap; gap:8px; align-items:center;}
+  .row.grow > *{flex:1 1 auto;}
+
+  .chip{display:inline-flex; align-items:center; justify-content:center; gap:6px;
+        border:3px solid var(--line); border-radius:999px; padding:0 16px; min-height:48px;
+        font-size:14px; font-weight:bold; background:#fff; cursor:pointer; box-shadow:0 3px 0 var(--line);}
+  .chip:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line);}
+  .chip.on{background:var(--accent);}
+  .chip input{display:none;}
+  .chip.wide{width:100%; border-radius:12px; justify-content:flex-start; text-align:left;
+             padding:10px 16px; min-height:56px; line-height:1.4;}
+  .chip.wide small{display:block;font-weight:normal;font-size:11px;color:#5b6e7a;}
+  .chip.wide.on small{color:#6b5a06;}
+
+  .stepper{display:flex;align-items:center;gap:12px;justify-content:center;}
+  .stepper .val{font-size:30px;font-weight:bold;min-width:110px;text-align:center;}
+  .stepper button{width:56px;height:56px;font-size:26px;font-weight:bold;line-height:1;font-family:inherit;
+    border:3px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;box-shadow:0 3px 0 var(--line);}
+  .stepper button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line);}
+  input[type=range]{width:100%;height:36px;accent-color:var(--accent2);}
+
+  /* ====== こども用の大きなカード ====== */
+  .cards{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:4px;}
+  .cards.c3{grid-template-columns:repeat(3,1fr);}
+  .cards.c1{grid-template-columns:1fr;}
+  .card{border:4px solid var(--line); border-radius:18px; background:#fff;
+        box-shadow:0 5px 0 var(--line); min-height:96px; cursor:pointer;
+        display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+        font-size:17px; font-weight:bold; line-height:1.25; text-align:center; padding:8px 4px;
+        font-family:inherit; color:var(--ink); transition:transform .05s, box-shadow .05s;}
+  .card:active{transform:translateY(3px); box-shadow:0 2px 0 var(--line);}
+  .card .ic{font-size:34px; line-height:1;}
+  .card .ic img{width:44px;height:44px;object-fit:contain;image-rendering:pixelated;}
+  .card small{font-size:11px;font-weight:normal;color:#5b6e7a;}
+  .card.on{background:var(--accent); box-shadow:0 5px 0 var(--line), inset 0 0 0 4px #fff;}
+  .card.on small{color:#6b5a06;}
+  .kidsq{font-size:19px; font-weight:bold; margin:2px 0 8px; display:flex; align-items:center; gap:8px;}
+  .kidsq .n{background:var(--accent2);color:#fff;border-radius:999px;width:30px;height:30px;flex:none;
+            display:flex;align-items:center;justify-content:center;font-size:16px;}
+  body.kids h1{font-size:clamp(24px,7.5vw,36px);}
+  body.kids .btn{font-size:19px;}
+  body.kids .btn.big{min-height:104px; font-size:25px;}
+  body.kids #question{font-size:clamp(30px,10vw,54px);}
+  body.kids #answerBox{font-size:clamp(30px,10vw,46px); min-height:72px;}
+  body.kids #keypad button{font-size:clamp(28px,9vw,42px); border-width:4px;}
+  body.kids #answerRow .btn{min-height:104px; font-size:19px;}
+  body.kids .hud span{font-size:14px;}
+  body.kids .panel{border-width:4px;}
+
+  .topbar{flex:none; display:flex; align-items:center; gap:8px; padding:8px 12px 0;}
+  .topbar .spacer{flex:1;}
+  .iconbtn{font-family:inherit; font-size:14px; font-weight:bold; border:3px solid var(--line);
+           background:#fff; border-radius:12px; min-height:46px; min-width:56px; padding:6px 12px;
+           box-shadow:0 3px 0 var(--line); cursor:pointer;}
+  .iconbtn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line);}
+  .iconbtn.light{background:rgba(255,255,255,.9);}
+
+  /* ====== HUD ====== */
+  .hud{display:flex; gap:6px; justify-content:space-between; align-items:center;
+       font-size:12px; font-weight:bold; padding:8px 12px 0;}
+  .hud span{background:rgba(255,255,255,.92);border:2px solid var(--line);border-radius:8px;
+            padding:6px 10px; white-space:nowrap;}
+
+  /* ====== N-Back ====== */
+  #gridWrap{flex:1; min-height:0; display:flex; align-items:center; justify-content:center; padding:10px;}
+  #grid{display:grid; grid-template-columns:repeat(3,1fr); gap:7px;
+        aspect-ratio:1/1; height:100%; max-width:100%; max-height:100%;}
+  .cell{border:3px solid #7c8f9b; border-radius:14px; background:#eef4f7;
+        display:flex; align-items:center; justify-content:center; overflow:hidden;}
+  .cell.active{border-color:var(--accent2); background:#dcecff;}
+  .cell img,.cell svg{width:84%; height:84%; object-fit:contain; image-rendering:pixelated; animation:pop .16s ease-out;}
+  .cell .fallback{font-size:min(9vw,44px); animation:pop .16s ease-out;}
+  @keyframes pop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+
+  #bigmsg{flex:1; display:flex; align-items:center; justify-content:center;
+          font-size:22vw; font-weight:bold; color:#fff; text-shadow:0 4px 0 rgba(0,0,0,.3);}
+  #bigmsg.small{font-size:11vw;}
+
+  #answerRow{display:flex; gap:8px;}
+  #answerRow .btn{flex:1; min-height:86px; font-size:15px; line-height:1.3; padding:6px; position:relative;}
+  #answerRow .btn small{display:block;font-size:10px;font-weight:normal;opacity:.75;margin-top:3px;}
+  .btn.lit{background:#9fd0ff!important;color:var(--ink)!important;}
+  .btn.good{background:var(--green)!important;color:#fff!important;}
+  .btn.bad{background:#ffb4a8!important;color:var(--ink)!important;}
+  .fbmark{position:absolute; top:2px; right:6px; font-size:26px;}
+
+  /* ====== 計算 ====== */
+  #mathBody{flex:1; min-height:0; display:flex; flex-direction:column; padding:8px 12px 0; gap:8px;}
+  .timerbar{height:14px;background:rgba(255,255,255,.75);border:3px solid var(--line);
+            border-radius:999px;overflow:hidden;flex:none;}
+  .timerbar > div{height:100%;background:var(--green);width:100%;}
+  .timerbar.warn > div{background:var(--red);}
+  #mathTop{display:flex; align-items:center; gap:10px; flex:none;}
+  #mathPoke{width:clamp(64px,18vw,110px);aspect-ratio:1;flex:none;display:flex;align-items:center;justify-content:center;}
+  #mathPoke img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;}
+  #mathPoke .fallback{font-size:clamp(34px,10vw,60px);}
+  .bubble{position:relative; flex:1; min-width:0; background:#fff; border:3px solid var(--line);
+    border-radius:16px; padding:10px; display:flex; align-items:center; justify-content:center; min-height:82px;}
+  .bubble:before{content:""; position:absolute; left:-13px; top:32px;
+    border:7px solid transparent; border-right-color:var(--line);}
+  #question{font-size:clamp(24px,7.5vw,42px); font-weight:bold; letter-spacing:.03em;
+            text-align:center; font-variant-numeric:tabular-nums; line-height:1.2;}
+  #answerBox{flex:none; font-size:clamp(26px,8vw,38px); font-weight:bold; text-align:center; letter-spacing:.08em;
+    border:3px dashed #7c8f9b; border-radius:14px; padding:6px; min-height:62px;
+    background:rgba(255,255,255,.94); font-variant-numeric:tabular-nums;
+    display:flex; align-items:center; justify-content:center;}
+  #answerBox.ok{border-color:var(--green);background:#e6f7ec;color:var(--green);border-style:solid;}
+  #answerBox.ng{border-color:var(--red);background:#fdeceb;color:var(--red);border-style:solid;
+                animation:shake .3s; font-size:clamp(19px,5.6vw,30px);}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+
+  #keypad{flex:1; min-height:0; display:grid; grid-template-columns:repeat(3,1fr);
+          grid-template-rows:repeat(4,1fr); gap:7px; margin-top:4px;}
+  #keypad button{font-family:inherit;font-size:clamp(22px,6vw,30px);font-weight:bold;
+    border:3px solid var(--line);border-radius:14px;background:#fff;cursor:pointer;
+    box-shadow:0 4px 0 var(--line); min-height:52px;}
+  #keypad button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line);}
+  #keypad .enter{background:var(--accent);}
+  #keypad .del{background:#ffd9d4;}
+
+  table.res{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px;}
+  table.res th,table.res td{border:2px solid #cfdae1;padding:8px 9px;text-align:left;}
+  table.res th{background:#eef4f7;width:46%;font-size:13px;}
+  table.res td{font-weight:bold;font-variant-numeric:tabular-nums;}
+  .badge{display:inline-block;background:var(--accent);border:3px solid var(--line);border-radius:999px;
+         padding:7px 16px;font-weight:bold;font-size:14px;margin:4px 6px 4px 0;}
+  body.kids .badge{font-size:19px;padding:10px 20px;}
+  #resBig{font-size:clamp(26px,8vw,40px);font-weight:bold;text-align:center;margin:6px 0;}
+  .hidden{display:none!important;}
+  .hist{font-size:12px;color:#5b6e7a;line-height:1.9;margin-top:10px;}
+  .kbd{display:inline-block;border:2px solid var(--line);border-bottom-width:3px;border-radius:5px;
+       padding:0 6px;font-size:11px;font-weight:bold;background:#fff;}
+  .lvup{color:var(--green);font-weight:bold;}
+  .lvdown{color:var(--red);font-weight:bold;}
+  #audioInfo{font-size:11px;color:#5b6e7a;margin-top:6px;}
+
+  @media (min-height:900px){
+    :root{--tap:66px;}
+    .btn.big{min-height:88px;font-size:21px;}
+    #answerRow .btn{min-height:100px;font-size:17px;}
+    .card{min-height:120px;font-size:19px;}
+    .card .ic{font-size:42px;}
+  }
+  @media (orientation:landscape) and (max-height:520px){
+    #answerRow .btn{min-height:62px;font-size:13px;}
+    body.kids .btn.big{min-height:64px;font-size:19px;}
+    .card{min-height:70px;font-size:15px;}
+    .card .ic{font-size:24px;}
+  }
+</style>
+</head>
+<body class="kids">
+<div id="app">
+
+  <!-- ================= こども：メニュー ================= -->
+  <div id="screenKidsMenu" class="screen">
+    <div class="topbar">
+      <div class="spacer"></div>
+      <button class="iconbtn light" id="toAdult">おとな ▸</button>
+    </div>
+    <div class="scroll">
+      <div class="panel">
+        <h1>ポケモン のうトレ</h1>
+        <button class="btn big primary" data-go="kidsNb">🧠　おなじ さがし</button>
+        <button class="btn big blue" data-go="kidsMath">🔢　けいさん</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= こども：おなじさがし設定 ================= -->
+  <div id="screenKidsNb" class="screen hidden">
+    <div class="scroll">
+      <div class="panel">
+        <div class="kidsq"><span class="n">1</span>なんこ まえと くらべる？</div>
+        <div class="cards" id="kNbN">
+          <button class="card on" data-v="1"><span class="ic">1️⃣</span>1こ まえ<small>やさしい</small></button>
+          <button class="card" data-v="2"><span class="ic">2️⃣</span>2こ まえ<small>むずかしい</small></button>
+        </div>
+
+        <div class="kidsq"><span class="n">2</span>なにを おぼえる？</div>
+        <div class="cards" id="kNbMode">
+          <button class="card on" data-v="pv"><span class="ic">👀</span>ばしょと<br>みため</button>
+          <button class="card" data-v="pa"><span class="ic">👂</span>ばしょと<br>なきごえ</button>
+        </div>
+
+        <div class="kidsq"><span class="n">3</span>はやさ</div>
+        <div class="cards" id="kNbSpeed">
+          <button class="card on" data-v="4500"><span class="ic">🐢</span>ゆっくり</button>
+          <button class="card" data-v="3500"><span class="ic">🐰</span>ふつう</button>
+        </div>
+      </div>
+    </div>
+    <div class="bar row grow">
+      <button class="btn" data-go="menu" style="flex:0 0 32%">◀ もどる</button>
+      <button class="btn primary" id="kNbGo">はじめる ▶</button>
+    </div>
+  </div>
+
+  <!-- ================= こども：けいさん設定 ================= -->
+  <div id="screenKidsMath" class="screen hidden">
+    <div class="scroll">
+      <div class="panel">
+        <div class="kidsq"><span class="n">1</span>どんな けいさん？</div>
+        <div class="cards" id="kOps">
+          <button class="card on" data-v="add"><span class="ic">➕</span>たしざん</button>
+          <button class="card on" data-v="sub"><span class="ic">➖</span>ひきざん</button>
+          <button class="card" data-v="mul"><span class="ic">✖️</span>かけざん</button>
+          <button class="card" data-v="div"><span class="ic">➗</span>わりざん</button>
+        </div>
+
+        <div class="kidsq"><span class="n">2</span>むずかしさ</div>
+        <div class="cards" id="kLevel">
+          <button class="card on" data-v="1"><span class="ic">⭐</span>やさしい<small>1けた × 1けた</small></button>
+          <button class="card" data-v="2"><span class="ic">⭐⭐</span>ふつう<small>2けた × 1けた</small></button>
+          <button class="card" data-v="3"><span class="ic">⭐⭐⭐</span>むずかしい<small>3けた × 1けた</small></button>
+          <button class="card" data-v="4"><span class="ic">🔥</span>エクストラ<small>2けた × 2けた</small></button>
+        </div>
+
+        <div class="kidsq"><span class="n">3</span>なんもん やる？</div>
+        <div class="cards c3" id="kCount">
+          <button class="card on" data-v="10"><span class="ic">🔟</span>10もん</button>
+          <button class="card" data-v="20"><span class="ic">2️⃣0️⃣</span>20もん</button>
+          <button class="card" data-v="30"><span class="ic">3️⃣0️⃣</span>30もん</button>
+        </div>
+
+        <div class="kidsq"><span class="n">4</span>なきごえ</div>
+        <div class="cards" id="kSound">
+          <button class="card on" data-v="on"><span class="ic">🔊</span>あり</button>
+          <button class="card" data-v="off"><span class="ic">🔇</span>なし</button>
+        </div>
+      </div>
+    </div>
+    <div class="bar row grow">
+      <button class="btn" data-go="menu" style="flex:0 0 32%">◀ もどる</button>
+      <button class="btn primary" id="kMathGo">はじめる ▶</button>
+    </div>
+  </div>
+
+  <!-- ================= おとな：メニュー ================= -->
+  <div id="screenMenu" class="screen hidden">
+    <div class="topbar">
+      <div class="spacer"></div>
+      <button class="iconbtn light" id="toKids">◂ こども</button>
+    </div>
+    <div class="scroll">
+      <div class="panel">
+        <h1>ポケモン脳トレ<span class="sub">Dual N-Back ＆ 計算トレーナー</span></h1>
+        <button class="btn big primary" data-go="nbackSetup">🧠　Dual N-Back</button>
+        <button class="btn big blue" data-go="mathSetup">🔢　計算トレーナー</button>
+        <p class="note">
+          画像と鳴き声は PokeAPI 等から読み込みます。読み込めない場合は絵文字と電子音で代用します。
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= おとな：N-Back設定 ================= -->
+  <div id="screenNbackSetup" class="screen hidden">
+    <div class="scroll">
+      <div class="panel">
+        <h2>Dual N-Back 設定</h2>
+        <h3>チャンネル（何を覚えるか）</h3>
+        <div class="row" id="nbMode" style="flex-direction:column">
+          <label class="chip wide on"><input type="radio" name="mode" value="pv" checked>
+            👁 位置 ＋ 見た目<small>音を使いません</small></label>
+          <label class="chip wide"><input type="radio" name="mode" value="pa">
+            🔊 位置 ＋ 鳴き声<small>マスにはモンスターボール。鳴き声で聞き分けます</small></label>
+          <label class="chip wide"><input type="radio" name="mode" value="pva">
+            🔥 位置 ＋ 見た目 ＋ 鳴き声（トリプル）<small>3チャンネル同時。かなり難しい</small></label>
+        </div>
+
+        <h3>N（何個前と比べるか）</h3>
+        <div class="stepper">
+          <button type="button" data-n="-1">−</button>
+          <div class="val"><span id="nbNVal">2</span>-Back</div>
+          <button type="button" data-n="1">＋</button>
+        </div>
+
+        <h3>1問あたりの時間</h3>
+        <div class="row" id="nbSpeed">
+          <label class="chip"><input type="radio" name="spd" value="4000">ゆっくり 4.0秒</label>
+          <label class="chip on"><input type="radio" name="spd" value="3200" checked>ふつう 3.2秒</label>
+          <label class="chip"><input type="radio" name="spd" value="2500">はやい 2.5秒</label>
+        </div>
+
+        <h3>試行数</h3>
+        <div class="row" id="nbTrials">
+          <label class="chip"><input type="radio" name="trl" value="15">15＋N</label>
+          <label class="chip on"><input type="radio" name="trl" value="20" checked>20＋N</label>
+          <label class="chip"><input type="radio" name="trl" value="30">30＋N</label>
+        </div>
+
+        <h3>1問ごとの正誤表示</h3>
+        <div class="row grow" id="nbFb">
+          <label class="chip"><input type="radio" name="fb" value="on">あり（練習向け）</label>
+          <label class="chip on"><input type="radio" name="fb" value="off" checked>なし</label>
+        </div>
+
+        <h3>音量</h3>
+        <input type="range" id="nbVol" min="0" max="100" value="70">
+        <div class="row" style="margin-top:4px">
+          <button class="btn ghost" type="button" id="nbTestCry">🔊 鳴き声を試す</button>
+        </div>
+        <div id="audioInfo">鳴き声：未確認</div>
+
+        <p class="note">
+          外付けキーボード： <span class="kbd">A</span>＝位置、<span class="kbd">S</span>＝見た目、<span class="kbd">L</span>＝鳴き声。
+        </p>
+        <div class="hist" id="history"></div>
+      </div>
+    </div>
+    <div class="bar row grow">
+      <button class="btn" data-go="menu" style="flex:0 0 34%">もどる</button>
+      <button class="btn primary" id="nbGo">スタート</button>
+    </div>
+  </div>
+
+  <!-- ================= N-Back プレイ ================= -->
+  <div id="screenNback" class="screen hidden">
+    <div class="hud">
+      <button class="iconbtn" id="nbQuit" style="min-width:48px;padding:6px 10px">◀</button>
+      <span id="nbHudN">2-Back</span>
+      <span id="nbHudTrial">0 / 0</span>
+      <span id="nbHudScore">✔ 0</span>
+    </div>
+    <div id="gridWrap"><div id="grid"></div></div>
+    <div id="bigmsg" class="hidden">3</div>
+    <div class="bar"><div id="answerRow"></div></div>
+  </div>
+
+  <!-- ================= おとな：計算設定 ================= -->
+  <div id="screenMathSetup" class="screen hidden">
+    <div class="scroll">
+      <div class="panel">
+        <h2>計算トレーナー 設定</h2>
+        <h3>出題する種類（複数選択可）</h3>
+        <div class="row grow" id="mOps">
+          <label class="chip on"><input type="checkbox" value="add" checked>➕ たし算</label>
+          <label class="chip on"><input type="checkbox" value="sub" checked>➖ ひき算</label>
+          <label class="chip"><input type="checkbox" value="mul">✖️ かけ算</label>
+          <label class="chip"><input type="checkbox" value="div">➗ わり算</label>
+        </div>
+
+        <h3>むずかしさ</h3>
+        <div class="row grow" id="mLevel">
+          <label class="chip"><input type="radio" name="lv" value="1">★ 1桁</label>
+          <label class="chip"><input type="radio" name="lv" value="2">★★ 2桁</label>
+          <label class="chip on"><input type="radio" name="lv" value="3" checked>★★★ 3桁</label>
+          <label class="chip"><input type="radio" name="lv" value="4">🔥 エクストラ</label>
+        </div>
+        <table class="res" style="margin-top:6px">
+          <tr><th style="width:26%">　</th><td>たし算・ひき算</td><td>かけ算</td><td>わり算</td></tr>
+          <tr><th>★</th><td>1桁</td><td>1桁×1桁</td><td>九九</td></tr>
+          <tr><th>★★</th><td>2桁</td><td>2桁×1桁</td><td>2桁÷1桁</td></tr>
+          <tr><th>★★★</th><td>3桁</td><td>3桁×1桁</td><td>3桁÷1桁</td></tr>
+          <tr><th>🔥エクストラ</th><td>3桁</td><td>2桁×2桁</td><td>3桁÷2桁</td></tr>
+        </table>
+        <p class="note">ひき算の答えは負になりません。わり算は必ず割り切れます。</p>
+
+        <h3>おわりかた</h3>
+        <div class="row grow" id="mEnd">
+          <label class="chip on"><input type="radio" name="end" value="t60" checked>⏱ 60秒</label>
+          <label class="chip"><input type="radio" name="end" value="t120">⏱ 2分</label>
+          <label class="chip"><input type="radio" name="end" value="c20">📝 20問</label>
+          <label class="chip"><input type="radio" name="end" value="c50">📝 50問</label>
+        </div>
+
+        <h3>音</h3>
+        <div class="row grow" id="mSound">
+          <label class="chip on"><input type="radio" name="snd" value="on" checked>🔊 鳴き声あり</label>
+          <label class="chip"><input type="radio" name="snd" value="off">🔇 なし</label>
+        </div>
+        <div class="hist" id="mHistory"></div>
+      </div>
+    </div>
+    <div class="bar row grow">
+      <button class="btn" data-go="menu" style="flex:0 0 34%">もどる</button>
+      <button class="btn primary" id="mGo">スタート</button>
+    </div>
+  </div>
+
+  <!-- ================= 計算 プレイ ================= -->
+  <div id="screenMath" class="screen hidden">
+    <div class="hud">
+      <button class="iconbtn" id="mQuit" style="min-width:48px;padding:6px 10px">◀</button>
+      <span id="mHudTime">60.0</span>
+      <span id="mHudScore">✔ 0</span>
+      <span id="mHudStreak">れんぞく 0</span>
+    </div>
+    <div id="mathBody">
+      <div class="timerbar" id="mBar"><div style="width:100%"></div></div>
+      <div id="mathTop">
+        <div id="mathPoke"></div>
+        <div class="bubble"><div id="question">…</div></div>
+      </div>
+      <div id="answerBox">&nbsp;</div>
+      <div id="keypad">
+        <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
+        <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
+        <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
+        <button class="del" data-k="del">⌫</button>
+        <button data-k="0">0</button>
+        <button class="enter" data-k="enter">⏎</button>
+      </div>
+    </div>
+    <div class="bar" style="padding-top:0"></div>
+  </div>
+
+  <!-- ================= けっか ================= -->
+  <div id="screenResult" class="screen hidden">
+    <div class="scroll">
+      <div class="panel">
+        <h2 id="resTitle">けっか</h2>
+        <div id="resPoke" style="text-align:center;margin-bottom:8px"></div>
+        <div id="resBig"></div>
+        <div id="resBadges"></div>
+        <table class="res"><tbody id="resTable"></tbody></table>
+        <div id="resMsg" style="margin-top:12px;font-size:13px;line-height:1.8"></div>
+      </div>
+    </div>
+    <div class="bar row grow">
+      <button class="btn" id="resBack" style="flex:0 0 32%">◀ せんたく</button>
+      <button class="btn primary" id="resAgain">もういちど ▶</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* =========================================================
+   0. データ
+   ========================================================= */
+const SPRITE = id => `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
+/* 鳴き声は複数の配信元を順に試す。ogg 非対応の端末（iPhone / iPad の Safari）は
+   2番目の mp3 が再生でき、どれも読めなければ最後に電子音で代用する。 */
+const CRY_SOURCES = [
+  p => `https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/${p.id}.ogg`,
+  p => `https://play.pokemonshowdown.com/audio/cries/${p.en}.mp3`,
+  p => `https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/legacy/${p.id}.ogg`
+];
+
+const POKEMON = [
+  {id:1,  name:"フシギダネ", en:"bulbasaur", e:"🌱"}, {id:4,  name:"ヒトカゲ",   en:"charmander", e:"🔥"},
+  {id:7,  name:"ゼニガメ",   en:"squirtle",  e:"💧"}, {id:25, name:"ピカチュウ", en:"pikachu",    e:"⚡"},
+  {id:39, name:"プリン",     en:"jigglypuff",e:"🎈"}, {id:52, name:"ニャース",   en:"meowth",     e:"🐱"},
+  {id:54, name:"コダック",   en:"psyduck",   e:"🦆"}, {id:63, name:"ケーシィ",   en:"abra",       e:"🥄"},
+  {id:66, name:"ワンリキー", en:"machop",    e:"💪"}, {id:74, name:"イシツブテ", en:"geodude",    e:"🪨"},
+  {id:92, name:"ゴース",     en:"gastly",    e:"👻"}, {id:95, name:"イワーク",   en:"onix",       e:"🐍"},
+  {id:104,name:"カラカラ",   en:"cubone",    e:"🦴"}, {id:129,name:"コイキング", en:"magikarp",   e:"🐟"},
+  {id:131,name:"ラプラス",   en:"lapras",    e:"🌊"}, {id:133,name:"イーブイ",   en:"eevee",      e:"🦊"},
+  {id:143,name:"カビゴン",   en:"snorlax",   e:"😴"}, {id:147,name:"ミニリュウ", en:"dratini",    e:"🐉"},
+  {id:6,  name:"リザードン", en:"charizard", e:"🐲"}, {id:9,  name:"カメックス", en:"blastoise",  e:"🐢"},
+  {id:3,  name:"フシギバナ", en:"venusaur",  e:"🌺"}, {id:26, name:"ライチュウ", en:"raichu",     e:"⚡"},
+  {id:35, name:"ピッピ",     en:"clefairy",  e:"⭐"}, {id:37, name:"ロコン",     en:"vulpix",     e:"🦊"},
+  {id:58, name:"ガーディ",   en:"growlithe", e:"🐕"}, {id:77, name:"ポニータ",   en:"ponyta",     e:"🐴"},
+  {id:81, name:"コイル",     en:"magnemite", e:"🧲"}, {id:113,name:"ラッキー",   en:"chansey",    e:"🥚"},
+  {id:123,name:"ストライク", en:"scyther",   e:"🗡️"}, {id:125,name:"エレブー",   en:"electabuzz", e:"🔌"},
+  {id:126,name:"ブーバー",   en:"magmar",    e:"🌋"}, {id:137,name:"ポリゴン",   en:"porygon",    e:"🔷"},
+  {id:144,name:"フリーザー", en:"articuno",  e:"❄️"}, {id:145,name:"サンダー",   en:"zapdos",     e:"🌩️"},
+  {id:146,name:"ファイヤー", en:"moltres",   e:"🔥"}, {id:150,name:"ミュウツー", en:"mewtwo",     e:"🧬"},
+  {id:151,name:"ミュウ",     en:"mew",       e:"✨"}, {id:94, name:"ゲンガー",   en:"gengar",     e:"😈"}
+];
+const byId = id => POKEMON.find(p => p.id === id);
+
+const VIS_POOL = [25, 4, 7, 1, 129, 143, 94, 54].map(byId);
+const AUD_POOL = [25, 143, 129, 94, 4, 7, 39, 81].map(byId);
+
+const SYNTH = {
+  25 :{w:'square',   f:[880,1500,1100,760],  d:.38, vib:0},
+  4  :{w:'sawtooth', f:[300,520,430,250],    d:.48, vib:5},
+  7  :{w:'triangle', f:[620,420,780,500],    d:.42, vib:0},
+  1  :{w:'sine',     f:[440,470,455,330],    d:.55, vib:14},
+  129:{w:'square',   f:[1300,1150,1300,1150],d:.26, vib:0},
+  143:{w:'sawtooth', f:[110,86,140,70],      d:.75, vib:3},
+  94 :{w:'sawtooth', f:[760,520,300,180],    d:.60, vib:9},
+  54 :{w:'triangle', f:[520,900,560,860],    d:.44, vib:0},
+  39 :{w:'sine',     f:[700,880,1050,900],   d:.50, vib:2},
+  81 :{w:'square',   f:[200,205,200,205],    d:.35, vib:22}
+};
+
+/* =========================================================
+   1. 画像
+   ========================================================= */
+const imgOK = {};
+POKEMON.forEach(p => {
+  const im = new Image();
+  im.onload  = () => imgOK[p.id] = true;
+  im.onerror = () => imgOK[p.id] = false;
+  im.src = SPRITE(p.id);
+});
+function pokeNode(p){
+  if(imgOK[p.id] === false){
+    const s = document.createElement('span');
+    s.className = 'fallback'; s.textContent = p.e; s.title = p.name;
+    return s;
+  }
+  const im = document.createElement('img');
+  im.src = SPRITE(p.id); im.alt = p.name; im.title = p.name; im.draggable = false;
+  im.onerror = function(){
+    imgOK[p.id] = false;
+    const s = document.createElement('span');
+    s.className = 'fallback'; s.textContent = p.e; s.title = p.name;
+    if(this.parentNode) this.parentNode.replaceChild(s, this);
+  };
+  return im;
+}
+const BALL_SVG = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="50" cy="50" r="44" fill="#f0f0f0" stroke="#20303a" stroke-width="6"/>
+  <path d="M6 50a44 44 0 0 1 88 0z" fill="#e3350d" stroke="#20303a" stroke-width="6"/>
+  <line x1="6" y1="50" x2="94" y2="50" stroke="#20303a" stroke-width="7"/>
+  <circle cx="50" cy="50" r="14" fill="#fff" stroke="#20303a" stroke-width="6"/></svg>`;
+function ballNode(){
+  const d = document.createElement('div');
+  d.style.cssText = 'width:84%;height:84%;display:flex';
+  d.innerHTML = BALL_SVG;
+  return d.firstElementChild;
+}
+
+/* =========================================================
+   2. 音
+   ========================================================= */
+let ctx = null, master = null, cryBuf = {}, realCryAvailable = null, volume = 0.7;
+function audioInit(){
+  if(ctx) return ctx;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if(!AC) return null;
+  ctx = new AC();
+  master = ctx.createGain(); master.gain.value = volume; master.connect(ctx.destination);
+  return ctx;
+}
+function audioUnlock(){
+  const c = audioInit(); if(!c) return;
+  if(c.state === 'suspended') c.resume();
+  const b = c.createBuffer(1,1,22050), s = c.createBufferSource();
+  s.buffer = b; s.connect(c.destination); s.start(0);
+}
+function setVolume(v){ volume = v; if(master) master.gain.value = v; }
+
+const loading = {};
+async function loadCry(id){
+  if(cryBuf[id] !== undefined) return cryBuf[id];
+  if(loading[id]) return loading[id];
+  const c = audioInit();
+  if(!c){ cryBuf[id] = null; return null; }
+  const p = byId(id);
+  loading[id] = (async () => {
+    for(const src of CRY_SOURCES){
+      try{
+        const res = await fetch(src(p), {mode:'cors'});
+        if(!res.ok) continue;
+        const ab = await res.arrayBuffer();
+        const buf = await new Promise((ok,ng) => {
+          const r = c.decodeAudioData(ab, ok, ng);
+          if(r && r.then) r.then(ok, ng);
+        });
+        cryBuf[id] = buf;
+        if(realCryAvailable !== true){ realCryAvailable = true; updateAudioInfo(); }
+        return buf;
+      }catch(e){ /* 次の配信元へ */ }
+    }
+    cryBuf[id] = null;
+    if(realCryAvailable === null){ realCryAvailable = false; updateAudioInfo(); }
+    return null;
+  })();
+  const r = await loading[id];
+  delete loading[id];
+  return r;
+}
+function preloadCries(list){ list.forEach(p => loadCry(p.id)); }
+
+const synthCache = {};
+function synthFor(id){
+  if(SYNTH[id]) return SYNTH[id];
+  if(synthCache[id]) return synthCache[id];
+  const waves = ['square','sawtooth','triangle','sine'];
+  const h = (id * 2654435761) % 2147483647;
+  const r = k => ((h >> (k*3)) % 100) / 100;
+  const base = 150 + Math.round(r(1) * 750);
+  return synthCache[id] = {
+    w: waves[id % 4],
+    f: [base, base*(1+r(2)), base*(0.6+r(3)), base*(0.8+r(4)*0.6)],
+    d: 0.3 + r(5)*0.35,
+    vib: Math.round(r(6)*15)
+  };
+}
+function playSynth(id){
+  const c = audioInit(); if(!c) return;
+  if(c.state === 'suspended') c.resume();
+  const s = synthFor(id), t0 = c.currentTime;
+  const osc = c.createOscillator();
+  osc.type = s.w;
+  osc.frequency.setValueAtTime(s.f[0], t0);
+  s.f.forEach((f,i) => { if(i) osc.frequency.linearRampToValueAtTime(f, t0 + s.d*(i/(s.f.length-1))); });
+  const g = c.createGain();
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(0.5, t0 + 0.02);
+  g.gain.setValueAtTime(0.5, t0 + s.d*0.6);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + s.d);
+  osc.connect(g);
+  if(s.vib){
+    const lfo = c.createOscillator(), lg = c.createGain();
+    lfo.frequency.value = 11; lg.gain.value = s.f[0]*s.vib/100;
+    lfo.connect(lg); lg.connect(osc.frequency); lfo.start(t0); lfo.stop(t0 + s.d);
+  }
+  g.connect(master || c.destination);
+  osc.start(t0); osc.stop(t0 + s.d + 0.02);
+}
+function playCry(id){
+  const c = audioInit(); if(!c) return;
+  if(c.state === 'suspended') c.resume();
+  const buf = cryBuf[id];
+  if(buf){
+    const src = c.createBufferSource();
+    src.buffer = buf; src.connect(master); src.start(0);
+  }else{
+    playSynth(id);
+    if(cryBuf[id] === undefined) loadCry(id);
+  }
+}
+function updateAudioInfo(){
+  const el = document.getElementById('audioInfo'); if(!el) return;
+  el.textContent = realCryAvailable === true  ? '鳴き声：本物のデータを再生します（読み込み済み）'
+                 : realCryAvailable === false ? '鳴き声：この端末では読み込めないため電子音で代用します'
+                 : '鳴き声：未確認（「試す」を押すと確認できます）';
+}
+
+/* =========================================================
+   3. 共通（画面切替・保存・カード選択）
+   ========================================================= */
+const SCREENS = {
+  kidsMenu:'screenKidsMenu', kidsNb:'screenKidsNb', kidsMath:'screenKidsMath',
+  menu:'screenMenu', nbackSetup:'screenNbackSetup', nback:'screenNback',
+  mathSetup:'screenMathSetup', math:'screenMath', result:'screenResult'
+};
+const mem = {};
+const store = {
+  get(k){ try{ return localStorage.getItem(k); }catch(e){ return mem[k] ?? null; } },
+  set(k,v){ try{ localStorage.setItem(k,v); }catch(e){ mem[k] = v; } }
+};
+let kids = store.get('kids') !== '0';           // 既定はこどもモード
+let current = 'kidsMenu';
+
+function applyMode(){
+  document.body.classList.toggle('kids', kids);
+  store.set('kids', kids ? '1' : '0');
+}
+function go(name){
+  if(name === 'menu' && kids) name = 'kidsMenu';
+  Object.values(SCREENS).forEach(id => document.getElementById(id).classList.add('hidden'));
+  document.getElementById(SCREENS[name]).classList.remove('hidden');
+  current = name;
+  if(name === 'nbackSetup'){ renderHistory(); updateAudioInfo(); }
+  if(name === 'mathSetup')  renderMathHistory();
+  const sc = document.querySelector('#' + SCREENS[name] + ' .scroll');
+  if(sc) sc.scrollTop = 0;
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-go]');
+  if(t) go(t.dataset.go);
+});
+document.getElementById('toAdult').addEventListener('click', () => { kids=false; applyMode(); go('menu'); });
+document.getElementById('toKids').addEventListener('click',  () => { kids=true;  applyMode(); go('kidsMenu'); });
+
+/* おとな用チップ */
+document.querySelectorAll('.chip input').forEach(inp => {
+  inp.addEventListener('change', () => {
+    const grp = inp.closest('.row');
+    if(inp.type === 'radio'){
+      grp.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+      inp.closest('.chip').classList.add('on');
+    }else inp.closest('.chip').classList.toggle('on', inp.checked);
+  });
+});
+const pickedRadio  = id => document.querySelector('#'+id+' input:checked').value;
+const pickedChecks = id => [...document.querySelectorAll('#'+id+' input:checked')].map(i => i.value);
+
+/* こども用カード（single = 1つだけ選ぶ / multi = いくつでも） */
+function setupCards(id, multi){
+  const box = document.getElementById(id);
+  box.addEventListener('click', e => {
+    const c = e.target.closest('.card'); if(!c) return;
+    if(multi){
+      const on = box.querySelectorAll('.card.on');
+      if(c.classList.contains('on') && on.length === 1) return;   // 0個は禁止
+      c.classList.toggle('on');
+    }else{
+      box.querySelectorAll('.card').forEach(x => x.classList.remove('on'));
+      c.classList.add('on');
+    }
+  });
+}
+['kNbN','kNbMode','kNbSpeed','kLevel','kCount','kSound'].forEach(id => setupCards(id, false));
+setupCards('kOps', true);
+const cardOne  = id => document.querySelector('#'+id+' .card.on').dataset.v;
+const cardMany = id => [...document.querySelectorAll('#'+id+' .card.on')].map(c => c.dataset.v);
+
+const rnd = n => Math.floor(Math.random() * n);
+
+/* =========================================================
+   4. Dual N-Back
+   ========================================================= */
+const CH = {
+  pos:{label:'位置',   kid:'ばしょ',   key:'A', icon:'📍', pool:9},
+  vis:{label:'見た目', kid:'みため',   key:'S', icon:'👀', pool:8},
+  aud:{label:'鳴き声', kid:'なきごえ', key:'L', icon:'👂', pool:8}
+};
+const MODES = { pv:['pos','vis'], pa:['pos','aud'], pva:['pos','vis','aud'] };
+const chName = ch => kids ? CH[ch].kid : CH[ch].label;
+
+let nbN = parseInt(store.get('nbN') || '2', 10);
+function nbSetN(d){
+  nbN = Math.min(9, Math.max(1, nbN + d));
+  document.getElementById('nbNVal').textContent = nbN;
+  store.set('nbN', nbN);
+}
+document.querySelectorAll('#screenNbackSetup .stepper button')
+  .forEach(b => b.addEventListener('click', () => nbSetN(parseInt(b.dataset.n, 10))));
+nbSetN(0);
+
+const gridEl = document.getElementById('grid');
+for(let i=0;i<9;i++){ const c = document.createElement('div'); c.className='cell'; gridEl.appendChild(c); }
+const cells = [...gridEl.children];
+
+function buildSequence(n, trials, channels, rate){
+  rate = rate || 0.3;
+  const seq = [];
+  for(let i=0;i<trials;i++){
+    const t = {};
+    channels.forEach(ch => {
+      const pool = CH[ch].pool;
+      if(i >= n && Math.random() < rate) t[ch] = seq[i-n][ch];
+      else{ let v; do{ v = rnd(pool); }while(i >= n && v === seq[i-n][ch]); t[ch] = v; }
+    });
+    seq.push(t);
+  }
+  return seq;
+}
+
+let nb = null, nbTimers = [];
+const clearNbTimers = () => { nbTimers.forEach(clearTimeout); nbTimers = []; };
+const later = (fn, ms) => { nbTimers.push(setTimeout(fn, ms)); };
+
+document.getElementById('nbTestCry').addEventListener('click', async () => {
+  audioUnlock(); setVolume(document.getElementById('nbVol').value / 100);
+  const p = AUD_POOL[rnd(AUD_POOL.length)];
+  await loadCry(p.id); playCry(p.id); updateAudioInfo();
+});
+document.getElementById('nbVol').addEventListener('input', e => setVolume(e.target.value/100));
+document.getElementById('nbQuit').addEventListener('click', nbAbort);
+
+/* おとな設定から */
+document.getElementById('nbGo').addEventListener('click', () => nbStart({
+  mode  : pickedRadio('nbMode'),
+  n     : nbN,
+  speed : parseInt(pickedRadio('nbSpeed'), 10),
+  trials: parseInt(pickedRadio('nbTrials'), 10) + nbN,
+  fb    : pickedRadio('nbFb') === 'on',
+  back  : 'nbackSetup'
+}));
+/* こども設定から */
+document.getElementById('kNbGo').addEventListener('click', () => {
+  const n = parseInt(cardOne('kNbN'), 10);
+  nbStart({
+    mode : cardOne('kNbMode'), n,
+    speed: parseInt(cardOne('kNbSpeed'), 10),
+    trials: 12 + n,
+    fb   : true,                 // こどもは1問ごとに ○× を表示
+    back : 'kidsNb'
+  });
+});
+
+function nbStart(cfg){
+  audioUnlock(); setVolume(document.getElementById('nbVol').value / 100);
+  const channels = MODES[cfg.mode];
+  if(channels.includes('aud')) preloadCries(AUD_POOL);
+
+  nb = {...cfg, channels, i:-1, pressed:{}, stat:{}, running:true,
+        seq: buildSequence(cfg.n, cfg.trials, channels)};
+  channels.forEach(ch => nb.stat[ch] = {hit:0, miss:0, fa:0, cr:0});
+
+  buildAnswerRow(channels);
+  document.getElementById('nbHudN').textContent = kids ? cfg.n + 'こまえ' : cfg.n + '-Back';
+  document.getElementById('nbHudTrial').textContent = '0 / ' + cfg.trials;
+  document.getElementById('nbHudScore').textContent = '✔ 0';
+  cells.forEach(c => { c.className = 'cell'; c.innerHTML = ''; });
+  go('nback');
+  countdown(3, nbNext);
+}
+
+function buildAnswerRow(channels){
+  const row = document.getElementById('answerRow');
+  row.innerHTML = '';
+  channels.forEach(ch => {
+    const b = document.createElement('button');
+    b.className = 'btn blue'; b.id = 'btn_' + ch;
+    b.innerHTML = `<span style="font-size:26px">${CH[ch].icon}</span><br>おなじ${chName(ch)}` +
+                  (kids ? '' : `<small>${CH[ch].key}</small>`);
+    b.addEventListener('click', () => nbPress(ch));
+    row.appendChild(b);
+  });
+}
+
+function countdown(k, done){
+  const stage = document.getElementById('gridWrap'), big = document.getElementById('bigmsg');
+  stage.classList.add('hidden'); big.classList.remove('hidden'); big.classList.remove('small');
+  const tick = v => {
+    if(!nb || !nb.running) return;
+    if(v === 0){
+      big.textContent = kids ? 'よーい ドン！' : 'START!'; big.classList.add('small');
+      later(() => { big.classList.add('hidden'); stage.classList.remove('hidden'); done(); }, 700);
+      return;
+    }
+    big.textContent = v;
+    later(() => tick(v-1), 700);
+  };
+  tick(k);
+}
+
+function nbNext(){
+  if(!nb || !nb.running) return;
+  if(nb.i >= 0) nbScoreTrial();
+  nb.i++;
+  if(nb.i >= nb.trials){ nbFinish(); return; }
+
+  nb.pressed = {};
+  nb.channels.forEach(ch => document.getElementById('btn_' + ch).classList.remove('lit'));
+  document.getElementById('nbHudTrial').textContent = (nb.i+1) + ' / ' + nb.trials;
+
+  const t = nb.seq[nb.i];
+  cells.forEach(c => { c.className = 'cell'; c.innerHTML = ''; });
+  const cell = cells[t.pos];
+  cell.classList.add('active');
+  cell.appendChild(nb.channels.includes('vis') ? pokeNode(VIS_POOL[t.vis]) : ballNode());
+  if(nb.channels.includes('aud')) playCry(AUD_POOL[t.aud].id);
+
+  const showMs = Math.round(nb.speed * 0.6);
+  later(() => { cell.classList.remove('active'); cell.innerHTML = ''; }, showMs);
+  later(nbNext, nb.speed);
+}
+
+function nbPress(ch){
+  if(!nb || !nb.running || nb.i < 0) return;
+  if(!nb.channels.includes(ch) || nb.pressed[ch]) return;
+  nb.pressed[ch] = true;
+  document.getElementById('btn_' + ch).classList.add('lit');
+}
+
+function showFeedback(ch, good){
+  const b = document.getElementById('btn_' + ch);
+  b.classList.remove('good','bad');
+  b.classList.add(good ? 'good' : 'bad');
+  const m = document.createElement('span');
+  m.className = 'fbmark'; m.textContent = good ? '⭕' : '❌';
+  b.appendChild(m);
+  later(() => { b.classList.remove('good','bad'); if(m.parentNode) m.remove(); },
+        Math.min(900, nb.speed * 0.5));
+}
+
+function nbScoreTrial(){
+  const i = nb.i;
+  if(i < nb.n) return;
+  const cur = nb.seq[i], prev = nb.seq[i - nb.n];
+  nb.channels.forEach(ch => {
+    const isMatch = cur[ch] === prev[ch];
+    const p = !!nb.pressed[ch], s = nb.stat[ch];
+    if(isMatch && p) s.hit++;
+    else if(isMatch && !p) s.miss++;
+    else if(!isMatch && p) s.fa++;
+    else s.cr++;
+    if(nb.fb) showFeedback(ch, isMatch === p);
+  });
+  const hits = nb.channels.reduce((a,ch) => a + nb.stat[ch].hit, 0);
+  document.getElementById('nbHudScore').textContent = '✔ ' + hits;
+}
+
+const accOf = s => { const t = s.hit+s.miss+s.fa+s.cr; return t ? (s.hit+s.cr)/t : 0; };
+
+function nbAbort(){
+  if(nb) nb.running = false;
+  clearNbTimers();
+  document.getElementById('gridWrap').classList.remove('hidden');
+  document.getElementById('bigmsg').classList.add('hidden');
+  go(nb && nb.back ? nb.back : (kids ? 'kidsNb' : 'nbackSetup'));
+}
+
+function nbFinish(){
+  nb.running = false; clearNbTimers();
+  const accs = nb.channels.map(ch => accOf(nb.stat[ch]));
+  const overall = accs.reduce((a,b) => a+b, 0) / accs.length;
+  const scored = nb.trials - nb.n;
+  const misses = nb.channels.reduce((a,ch) => a + nb.stat[ch].miss, 0);
+  const pct = Math.round(overall * 100);
+
+  let verdict, cls = '';
+  if(overall >= 0.85 && misses <= Math.max(1, scored*0.15)){
+    cls = 'lvup';
+    verdict = kids ? `かんぺき！ つぎは ${Math.min(9, nb.n+1)}こまえ に ちょうせん してみよう。`
+                   : `よくできました！ 次は ${nb.n+1}-Back に挑戦しましょう。`;
+    nbN = Math.min(9, nb.n + 1);
+  }else if(overall < 0.65){
+    cls = 'lvdown';
+    verdict = kids ? (nb.n > 1 ? `すこし むずかしかったね。${nb.n-1}こまえ から やってみよう。`
+                              : 'ゆっくりで だいじょうぶ。もういちど やってみよう。')
+                   : (nb.n > 1 ? `少し難しかったようです。${nb.n-1}-Back に下げて練習しましょう。`
+                              : 'まずは 1-Back に慣れることから始めましょう。');
+    nbN = Math.max(1, nb.n - 1);
+  }else{
+    verdict = kids ? `いい ちょうし！ もういちど やってみよう。`
+                   : `いい調子です。もう少し ${nb.n}-Back を続けましょう。`;
+  }
+  document.getElementById('nbNVal').textContent = nbN;
+  store.set('nbN', nbN);
+
+  const MODENAME = {pv:'位置＋見た目', pa:'位置＋鳴き声', pva:'トリプル'};
+  const hist = JSON.parse(store.get('nbHist') || '[]');
+  hist.unshift({n:nb.n, m:MODENAME[nb.mode], acc:pct, t:new Date().toLocaleString('ja-JP')});
+  store.set('nbHist', JSON.stringify(hist.slice(0,20)));
+
+  const star = POKEMON[rnd(POKEMON.length)];
+  showStar(star, kids ? star.name + 'が みに きたよ！' : star.name + 'が見にきた！');
+
+  document.getElementById('resTitle').textContent = kids ? 'おなじさがし の けっか'
+                                                         : `${nb.n}-Back けっか（${MODENAME[nb.mode]}）`;
+  document.getElementById('resBig').textContent = kids ? `せいかいりつ ${pct}%` : '';
+  document.getElementById('resBadges').innerHTML = kids ? '' :
+    `<span class="badge">総合正答率 ${pct}%</span>`;
+  document.getElementById('resTable').innerHTML =
+    nb.channels.map(ch => {
+      const s = nb.stat[ch];
+      return kids
+        ? `<tr><th>${chName(ch)}</th><td>あってた ${s.hit+s.cr} こ ／ まちがえた ${s.miss+s.fa} こ</td></tr>`
+        : `<tr><th>${CH[ch].label}：正答率</th><td>${Math.round(accOf(s)*100)}%</td></tr>
+           <tr><th>${CH[ch].label}：正解／見逃し／誤反応</th><td>${s.hit} / ${s.miss} / ${s.fa}</td></tr>`;
+    }).join('') + (kids ? '' : `<tr><th>採点した試行数</th><td>${scored}</td></tr>`);
+  document.getElementById('resMsg').innerHTML = `<span class="${cls}">${verdict}</span>`;
+
+  const cfg = {...nb};
+  document.getElementById('resAgain').onclick = () => nbStart({...cfg, n:nbN, trials:cfg.trials - cfg.n + nbN});
+  document.getElementById('resBack').onclick  = () => go(cfg.back);
+  go('result');
+}
+
+function showStar(p, caption){
+  const box = document.getElementById('resPoke');
+  box.innerHTML = '';
+  const nd = pokeNode(p);
+  nd.style.width = '120px'; nd.style.height = '120px';
+  if(nd.tagName === 'SPAN') nd.style.fontSize = '72px';
+  box.appendChild(nd);
+  const cap = document.createElement('div');
+  cap.style.cssText = 'font-size:13px;color:#5b6e7a';
+  cap.textContent = caption || '';
+  box.appendChild(cap);
+}
+function renderHistory(){
+  const hist = JSON.parse(store.get('nbHist') || '[]');
+  const el = document.getElementById('history');
+  el.innerHTML = hist.length ? '<b>これまでの記録</b><br>' +
+    hist.map(h => `${h.t}／${h.n}-Back ${h.m||''} ${h.acc}%`).join('<br>') : '';
+}
+
+/* =========================================================
+   5. 計算トレーナー
+   ========================================================= */
+let mg = null, mRaf = null;
+
+function randDigits(d){
+  const lo = d === 1 ? 1 : Math.pow(10, d-1);
+  return lo + rnd(Math.pow(10,d) - 1 - lo + 1);
+}
+/* level 1=やさしい 2=ふつう 3=むずかしい 4=エクストラ
+   ┌───────┬────────────┬──────────┬──────────┐
+   │ level │ たし算・ひき算 │  かけ算   │  わり算   │
+   │   1   │    1桁      │  1桁×1桁 │   九九    │
+   │   2   │    2桁      │  2桁×1桁 │ 2桁÷1桁  │
+   │   3   │    3桁      │  3桁×1桁 │ 3桁÷1桁  │
+   │   4   │    3桁      │  2桁×2桁 │ 3桁÷2桁  │
+   └───────┴────────────┴──────────┴──────────┘ */
+function makeQuestion(ops, level){
+  const op = ops[rnd(ops.length)];
+  const dig = Math.min(level, 3);                    // たし算・ひき算の桁数
+
+  if(op === 'add'){
+    const a = randDigits(dig), b = randDigits(dig);
+    return {text:`${a} ＋ ${b}`, ans:a+b};
+  }
+  if(op === 'sub'){
+    let a = randDigits(dig), b = randDigits(dig);
+    if(b > a){ const t=a; a=b; b=t; }
+    return {text:`${a} － ${b}`, ans:a-b};
+  }
+  if(op === 'mul'){
+    let a, b;
+    if(level === 1){ a = 1 + rnd(9);   b = 1 + rnd(9); }        // 九九
+    else if(level === 2){ a = 10 + rnd(90);  b = 2 + rnd(8); }  // 2桁 × 1桁
+    else if(level === 3){ a = 100 + rnd(900); b = 2 + rnd(8); } // 3桁 × 1桁
+    else { a = 10 + rnd(90); b = 10 + rnd(90); }                // エクストラ：2桁 × 2桁
+    return {text:`${a} × ${b}`, ans:a*b};
+  }
+  /* わり算：必ず割り切れる */
+  if(level === 1){                                              // 九九のはんい
+    const b = 2 + rnd(8), q = 1 + rnd(9);
+    return {text:`${b*q} ÷ ${b}`, ans:q};
+  }
+  const maxD = level === 2 ? 99 : 999;
+  const minD = level === 2 ? 10 : 100;
+  const bLo  = level === 4 ? 11 : 2;                            // エクストラは2桁で割る
+  const bHi  = level === 4 ? 29 : 9;
+  for(let k=0;k<300;k++){
+    const b = bLo + rnd(bHi - bLo + 1);
+    const qmax = Math.floor(maxD / b);
+    if(qmax < 2) continue;
+    const q = 2 + rnd(qmax - 1);
+    const a = b * q;
+    if(a >= minD && a <= maxD) return {text:`${a} ÷ ${b}`, ans:q};
+  }
+  return {text:'12 ÷ 4', ans:3};
+}
+
+document.getElementById('mQuit').addEventListener('click', mAbort);
+document.querySelectorAll('#keypad button')
+  .forEach(b => b.addEventListener('click', () => mKey(b.dataset.k)));
+
+/* おとな設定から */
+document.getElementById('mGo').addEventListener('click', () => {
+  const ops = pickedChecks('mOps');
+  if(!ops.length){ alert('出題する種類を1つ以上選んでください。'); return; }
+  const end = pickedRadio('mEnd');
+  mStart({
+    ops, level: parseInt(pickedRadio('mLevel'), 10),
+    sound: pickedRadio('mSound') === 'on',
+    limit: end[0] === 't' ? parseInt(end.slice(1),10) : null,
+    count: end[0] === 'c' ? parseInt(end.slice(1),10) : null,
+    back : 'mathSetup'
+  });
+});
+/* こども設定から */
+document.getElementById('kMathGo').addEventListener('click', () => mStart({
+  ops  : cardMany('kOps'),
+  level: parseInt(cardOne('kLevel'), 10),
+  sound: cardOne('kSound') === 'on',
+  limit: null,
+  count: parseInt(cardOne('kCount'), 10),
+  back : 'kidsMath'
+}));
+
+function mStart(cfg){
+  if(cfg.sound){ audioUnlock(); setVolume(document.getElementById('nbVol').value / 100); }
+  mg = {...cfg, correct:0, wrong:0, streak:0, best:0, input:'', locked:false, log:[], running:true,
+        asked:0, startAt: performance.now()};
+  mg.endAt = cfg.limit ? performance.now() + cfg.limit*1000 : null;
+
+  document.getElementById('mHudScore').textContent  = '✔ 0';
+  document.getElementById('mHudStreak').textContent = (kids ? 'れんぞく ' : '連続 ') + '0';
+  document.getElementById('mBar').classList.remove('warn');
+  go('math');
+  mNewQuestion();
+  mTick();
+}
+
+function mTick(){
+  if(!mg || !mg.running) return;
+  const bar = document.getElementById('mBar');
+  if(mg.limit){
+    const left = Math.max(0, mg.endAt - performance.now());
+    document.getElementById('mHudTime').textContent = (left/1000).toFixed(1) + '秒';
+    bar.firstElementChild.style.width = (left/(mg.limit*1000)*100) + '%';
+    bar.classList.toggle('warn', left < 10000);
+    if(left <= 0){ mFinish(); return; }
+  }else{
+    /* 問題数モード：残りではなく「どこまで進んだか」を見せる（急かさない） */
+    document.getElementById('mHudTime').textContent = mg.asked + ' / ' + mg.count + (kids ? 'もん' : '問');
+    bar.firstElementChild.style.width = (mg.asked/mg.count*100) + '%';
+  }
+  mRaf = requestAnimationFrame(mTick);
+}
+
+function mNewQuestion(){
+  if(mg.count && mg.asked >= mg.count){ mFinish(); return; }
+  mg.asked++;
+  mg.q = makeQuestion(mg.ops, mg.level);
+  mg.poke = POKEMON[rnd(POKEMON.length)];
+  const box = document.getElementById('mathPoke');
+  box.innerHTML = ''; box.appendChild(pokeNode(mg.poke));
+  if(mg.sound) loadCry(mg.poke.id);
+  mg.input = ''; mg.locked = false;
+  document.getElementById('question').textContent = mg.q.text + ' ＝ ?';
+  const ans = document.getElementById('answerBox');
+  ans.className = ''; ans.innerHTML = '&nbsp;';
+}
+
+function mKey(k){
+  if(!mg || !mg.running || mg.locked) return;
+  if(k === 'enter'){ mSubmit(); return; }
+  if(k === 'del') mg.input = mg.input.slice(0,-1);
+  else if(mg.input.length < 7) mg.input += k;
+  document.getElementById('answerBox').textContent = mg.input || ' ';
+}
+
+function mSubmit(){
+  if(!mg.input.length) return;
+  const val = parseInt(mg.input, 10), box = document.getElementById('answerBox');
+  mg.locked = true;
+  const ok = val === mg.q.ans;
+  mg.log.push({q:mg.q.text, ans:mg.q.ans, your:val, ok});
+  if(ok){
+    mg.correct++; mg.streak++; mg.best = Math.max(mg.best, mg.streak);
+    box.className = 'ok'; box.textContent = mg.input + ' ⭕';
+    if(mg.sound) playCry(mg.poke.id);
+  }else{
+    mg.wrong++; mg.streak = 0;
+    box.className = 'ng';
+    box.textContent = kids ? `${mg.input} ❌　こたえは ${mg.q.ans}` : `${mg.input} ❌ → ${mg.q.ans}`;
+  }
+  document.getElementById('mHudScore').textContent  = '✔ ' + mg.correct;
+  document.getElementById('mHudStreak').textContent = (kids ? 'れんぞく ' : '連続 ') + mg.streak;
+  setTimeout(() => { if(mg && mg.running) mNewQuestion(); }, ok ? 450 : (kids ? 1600 : 1000));
+}
+
+function mAbort(){
+  if(mg) mg.running = false;
+  cancelAnimationFrame(mRaf);
+  go(mg && mg.back ? mg.back : (kids ? 'kidsMath' : 'mathSetup'));
+}
+
+function mFinish(){
+  mg.running = false; cancelAnimationFrame(mRaf);
+  const total = mg.correct + mg.wrong;
+  const acc = total ? Math.round(mg.correct/total*100) : 0;
+  const secs = mg.limit ? mg.limit : (performance.now() - mg.startAt)/1000;
+  const perMin = (mg.correct / secs * 60).toFixed(1);
+
+  const hist = JSON.parse(store.get('mHist') || '[]');
+  hist.unshift({c:mg.correct, acc, lim:mg.limit, cnt:mg.count, t:new Date().toLocaleString('ja-JP')});
+  store.set('mHist', JSON.stringify(hist.slice(0,20)));
+
+  const star = POKEMON[rnd(POKEMON.length)];
+  showStar(star, kids ? star.name + 'が みて いたよ！' : star.name + 'が応援していた！');
+  if(mg.sound) playCry(star.id);
+
+  const OPNAME = kids ? {add:'たしざん',sub:'ひきざん',mul:'かけざん',div:'わりざん'}
+                      : {add:'たし算', sub:'ひき算', mul:'かけ算', div:'わり算'};
+  const LVNAME = kids ? {1:'やさしい',2:'ふつう',3:'むずかしい',4:'エクストラ'}
+                      : {1:'★',2:'★★',3:'★★★',4:'🔥エクストラ'};
+
+  document.getElementById('resTitle').textContent = kids ? 'けいさん の けっか' : '計算トレーナー けっか';
+  document.getElementById('resBig').textContent   = kids ? `${total}もん ちゅう ${mg.correct}もん せいかい！` : '';
+  document.getElementById('resBadges').innerHTML  = kids ? '' :
+    `<span class="badge">${mg.correct}問正解</span><span class="badge">正答率 ${acc}%</span>`;
+  document.getElementById('resTable').innerHTML = kids ? `
+    <tr><th>まちがえた かず</th><td>${mg.wrong} もん</td></tr>
+    <tr><th>れんぞく せいかい</th><td>${mg.best} もん</td></tr>
+    <tr><th>やった けいさん</th><td>${mg.ops.map(o=>OPNAME[o]).join('・')}（${LVNAME[mg.level]}）</td></tr>` : `
+    <tr><th>正解／不正解</th><td>${mg.correct} / ${mg.wrong}</td></tr>
+    <tr><th>正答率</th><td>${acc}%</td></tr>
+    <tr><th>1分あたり</th><td>${perMin}問</td></tr>
+    <tr><th>最高連続正解</th><td>${mg.best}</td></tr>
+    <tr><th>出題</th><td>${mg.ops.map(o=>OPNAME[o]).join('・')}（${LVNAME[mg.level]}）</td></tr>`;
+
+  const misses = mg.log.filter(l => !l.ok);
+  document.getElementById('resMsg').innerHTML = misses.length
+    ? (kids ? '<b>まちがえた もんだい</b><br>' : '<b>まちがえた問題</b><br>') +
+      misses.map(l => `${l.q} ＝ <b>${l.ans}</b>`).join('<br>')
+    : `<b style="color:#3ba55d">${kids ? 'ぜんぶ せいかい！ すごい！' : '全問正解！おみごと！'}</b>`;
+
+  const cfg = {...mg};
+  document.getElementById('resAgain').onclick = () => mStart(cfg);
+  document.getElementById('resBack').onclick  = () => go(cfg.back);
+  go('result');
+}
+
+function renderMathHistory(){
+  const hist = JSON.parse(store.get('mHist') || '[]');
+  const el = document.getElementById('mHistory');
+  el.innerHTML = hist.length ? '<b>これまでの記録</b><br>' +
+    hist.map(h => `${h.t}／${h.lim ? h.lim+'秒' : h.cnt+'問'}で ${h.c}問正解（${h.acc}%）`).join('<br>') : '';
+}
+
+/* =========================================================
+   6. キーボード（外付けキーボード用・任意）
+   ========================================================= */
+document.addEventListener('keydown', e => {
+  if(current === 'nback'){
+    const k = e.key.toLowerCase();
+    if(k === 'a'){ e.preventDefault(); nbPress('pos'); }
+    if(k === 's'){ e.preventDefault(); nbPress('vis'); }
+    if(k === 'l'){ e.preventDefault(); nbPress('aud'); }
+    if(k === 'escape') nbAbort();
+  }else if(current === 'math'){
+    if(e.key >= '0' && e.key <= '9'){ e.preventDefault(); mKey(e.key); }
+    else if(e.key === 'Enter'){ e.preventDefault(); mKey('enter'); }
+    else if(e.key === 'Backspace'){ e.preventDefault(); mKey('del'); }
+    else if(e.key === 'Escape') mAbort();
+  }
+});
+
+/* ダブルタップ拡大の抑止（iOS Safari） */
+let lastTouch = 0;
+document.addEventListener('touchend', e => {
+  const now = Date.now();
+  if(now - lastTouch < 350) e.preventDefault();
+  lastTouch = now;
+}, {passive:false});
+
+applyMode();
+go(kids ? 'kidsMenu' : 'menu');
+updateAudioInfo();
+</script>
+</body>
+</html>
