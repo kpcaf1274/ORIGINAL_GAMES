@@ -1335,6 +1335,11 @@ details[open] summary::after{content:"−"}
 .pair svg{width:22px;height:22px}
 .pair span{color:var(--hair);font-size:11px}
 
+/* ポケモン画像（読みこめたときだけ図形のかわりに使う） */
+.mini img.pmk{width:100%;height:100%;display:block;object-fit:contain;image-rendering:pixelated}
+.face .mark img.pmk{width:76%;height:76%;object-fit:contain;image-rendering:pixelated}
+.face .ghost img.pmk{width:82%;height:82%;object-fit:contain;image-rendering:pixelated}
+.pair img.pmk{width:24px;height:24px;object-fit:contain;image-rendering:pixelated}
 @media (prefers-reduced-motion: reduce){
   .inner{transition-duration:.001s}
   .cell.pop .inner,.cell.pop.flipped .inner,.board.solved .cell .inner,.board.solved .cell.flipped .inner{animation:none}
@@ -1389,9 +1394,21 @@ details[open] summary::after{content:"−"}
 
 <script>
 "use strict";
+/* PokeAPI が使えるあいだはマークをポケモンにする。だめなら元の図形のまま */
+const POKE_IDS=[25,4,7,1,39,94];
+const POKE_NAMES=["ピカチュウ","ヒトカゲ","ゼニガメ","フシギダネ","プリン","ゲンガー"];
+const pokeURL=id=>"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/"+id+".png";
+const pokeReady=[false,false,false,false,false,false];
+POKE_IDS.forEach((id,i)=>{
+  const im=new Image();
+  im.onload=()=>{pokeReady[i]=true;try{paintAll(false);paintTarget();renderSet();}catch(e){}};
+  im.src=pokeURL(id);
+});
 const COLORS=["var(--m0)","var(--m1)","var(--m2)","var(--m3)","var(--m4)","var(--m5)"];
 const NAMES=["まる","しかく","さんかく","ほし","ひし","ばつ"];
 function svg(m,size){
+  if(pokeReady[m])
+    return `<img class="pmk" src="${pokeURL(POKE_IDS[m])}" alt="${POKE_NAMES[m]}" draggable="false"${size?` width="${size}" height="${size}"`:""}>`;
   const c=COLORS[m];
   const body=[
     `<circle cx="50" cy="50" r="33" fill="${c}"/>`,
@@ -1821,6 +1838,12 @@ h1 small{
 .car.h .roof{margin:0 auto;width:52%}
 .car.v .roof{margin:auto 0;height:52%}
 .car.hero{box-shadow:0 0 0 1px rgba(255,255,255,.25), 0 4px 10px rgba(0,0,0,.35)}
+.car.hero .rider{
+  position:absolute;left:8%;right:8%;top:-20%;bottom:6%;
+  width:auto;height:auto;max-width:84%;max-height:114%;margin:auto;
+  object-fit:contain;image-rendering:pixelated;pointer-events:none;
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));z-index:2;
+}
 .car.hint{animation:pulse .7s ease-in-out 3}
 @keyframes pulse{50%{filter:brightness(1.55)}}
 
@@ -1944,6 +1967,7 @@ const N=6, EXIT=4;              // 赤い車が pos=4 に来たら脱出
 const CAP=140000;               // 連結成分の探索上限
 const H=0,V=1;
 
+const RIDERS=[25,4,7,133,39,54];   // 赤い車にのるポケモン
 const PAL=["#5C7A8A","#7D8A5B","#A8845C","#6E5C7A","#4F6B5E","#8A6A5C","#6C7482","#87764C","#4E7182","#7A5F5F"];
 
 /* ================= エンジン ================= */
@@ -2104,6 +2128,13 @@ function build(){
     if(c.o===H){d.style.width=pct(c.len);d.style.height=pct(1);d.style.top=pct(c.f);d.style.left="0"}
     else{d.style.height=pct(c.len);d.style.width=pct(1);d.style.left=pct(c.f);d.style.top="0"}
     d.innerHTML='<div class="roof"></div>';
+    if(i===0){
+      const rider=document.createElement("img");
+      rider.className="rider";rider.alt="";rider.draggable=false;
+      rider.src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/"+RIDERS[(Math.random()*RIDERS.length)|0]+".png";
+      rider.onerror=function(){this.remove()};
+      d.appendChild(rider);
+    }
     d.dataset.i=i;
     boardEl.appendChild(d);
     return d;
@@ -2465,7 +2496,10 @@ header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
   <header>
     <div class="brand">
       <div class="eyebrow">MASU KEISAN</div>
-      <div class="title">マス計算パズル</div>
+      <div class="title">マス計算パズル
+    <img id="mascot" alt="" draggable="false"
+      style="width:34px;height:34px;vertical-align:-10px;object-fit:contain;image-rendering:pixelated"
+      onerror="this.style.display='none'" onload="this.style.display='inline'"></div>
     </div>
     <div class="clock">
       <div class="time" id="time">0:00</div>
@@ -2478,6 +2512,9 @@ header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
     <div class="veil" id="veilGen"><div class="spin">問題をつくっています…</div></div>
     <div class="veil" id="veilWin">
       <div class="stamp">完</div>
+      <img id="winPoke" alt="" draggable="false"
+        style="width:92px;height:92px;object-fit:contain;image-rendering:pixelated;margin:-6px 0"
+        onerror="this.style.display='none'" onload="this.style.display='block'">
       <div class="rec" id="winTime">0:00</div>
       <div class="note" id="winNote"></div>
       <div class="acts">
@@ -2844,6 +2881,11 @@ function newGame(){
     let p=generate(S.n,S.ops);
     if(!p)p=generate(S.n,{'+':true,'-':false,'*':false,'/':false});
     S.puzzle=p;
+    /* 応援ポケモン：問題ごとにランダム */
+    const pk=[25,4,7,1,39,94,133,52][Math.floor(Math.random()*8)];
+    const pu="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/"+pk+".png";
+    const mc=document.getElementById("mascot");if(mc)mc.src=pu;
+    const wp=document.getElementById("winPoke");if(wp)wp.src=pu;
     buildPad(S.n);
     document.getElementById('veilGen').classList.remove('show');
     reset();
