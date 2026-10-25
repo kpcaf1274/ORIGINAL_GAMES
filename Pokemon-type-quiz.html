@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ポケモン タイプあてクイズ</title>
+    <style>
+        body { font-family: 'Hiragino Sans', 'Meiryo', sans-serif; text-align: center; background-color: #eef2f3; margin: 0; padding: 15px; }
+        #game-container { max-width: 550px; margin: 0 auto; background: white; padding: 25px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 8px solid #3c5aa6; }
+        
+        #img-box { width: 250px; height: 250px; margin: 15px auto; background: radial-gradient(#fff, #f0f0f0); border-radius: 20px; display: flex; align-items: center; justify-content: center; }
+        #pokemon-img { width: 90%; height: 90%; object-fit: contain; }
+
+        .pokemon-name { font-size: 2rem; font-weight: bold; color: #333; margin: 10px 0 5px 0; }
+        /* 分類のスタイル */
+        #pokemon-genus-display { font-size: 1.1rem; color: #666; margin-bottom: 10px; min-height: 1.2em; }
+
+        #type-choices { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 20px 0; }
+        .type-btn { 
+            width: 110px; padding: 15px 5px; font-size: 1.1rem; font-weight: bold; 
+            border: 3px solid #ddd; border-radius: 15px; background: white; cursor: pointer; transition: 0.2s;
+        }
+        .type-btn.selected { border-color: #333; transform: translateY(-5px); box-shadow: 0 5px 10px rgba(0,0,0,0.2); }
+        .type-btn.reveal-correct { border-color: #ff4757; border-width: 5px; box-shadow: 0 0 15px #ff4757; animation: blink 0.5s step-end infinite alternate; }
+
+        @keyframes blink { 50% { opacity: 0.7; } }
+
+        .action-area { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 10px; }
+        #check-btn { width: 85%; padding: 15px; font-size: 1.2rem; background: #ffcb05; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: #3c5aa6; box-shadow: 0 4px 0 #c7a008; }
+        #giveup-btn { width: 85%; padding: 10px; font-size: 1rem; background: #dfe6e9; border: 1px solid #b2bec3; border-radius: 50px; color: #636e72; cursor: pointer; }
+        #next-btn { display: none; width: 85%; padding: 15px; font-size: 1.2rem; background: #2ecc71; color: white; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #27ae60; }
+
+        #cry-btn { background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 50px; cursor: pointer; margin-bottom: 10px; }
+
+        /* タイプ別カラー */
+        .normal { background: #A8A878; color: white; } .fire { background: #F08030; color: white; }
+        .water { background: #6890F0; color: white; } .grass { background: #78C850; color: white; }
+        .electric { background: #F8D030; color: #333; } .ice { background: #98D8D8; color: #333; }
+        .fighting { background: #C03028; color: white; } .poison { background: #A040A0; color: white; }
+        .ground { background: #E0C068; color: #333; } .flying { background: #A890F0; color: white; }
+        .psychic { background: #F85888; color: white; } .bug { background: #A8B820; color: white; }
+        .rock { background: #B8A038; color: white; } .ghost { background: #705898; color: white; }
+        .dragon { background: #7038F8; color: white; } .steel { background: #B8B8D0; color: #333; }
+        .fairy { background: #EE99AC; color: white; } .dark { background: #705848; color: white; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <h2 id="status-text">タイプを えらんでね！</h2>
+    <p id="sub-status" style="font-size: 0.9rem; color: #666;">（2つあるときは、2つえらんでね）</p>
+    
+    <div id="img-box">
+        <div id="loading-msg">さがしています...</div>
+        <img id="pokemon-img" src="" style="display:none;">
+    </div>
+
+    <button id="cry-btn" style="display:none;">🔊 なきごえを きく</button>
+    
+    <div id="pokemon-name-display" class="pokemon-name"></div>
+    <div id="pokemon-genus-display"></div> <div id="type-choices"></div>
+    
+    <div class="action-area">
+        <button id="check-btn" onclick="checkAnswer()">これだ！</button>
+        <button id="giveup-btn" onclick="showAnswer()">わからない（こたえをみる）</button>
+        <button id="next-btn" onclick="initGame()">つぎの ポケモン！</button>
+    </div>
+</div>
+
+<script>
+    const typeList = [
+        { en: "normal", ja: "ノーマル" }, { en: "fire", ja: "ほのお" }, { en: "water", ja: "みず" },
+        { en: "grass", ja: "くさ" }, { en: "electric", ja: "でんき" }, { en: "ice", ja: "こおり" },
+        { en: "fighting", ja: "かくとう" }, { en: "poison", ja: "どく" }, { en: "ground", ja: "じめん" },
+        { en: "flying", ja: "ひこう" }, { en: "psychic", ja: "エスパー" }, { en: "bug", ja: "むし" },
+        { en: "rock", ja: "いわ" }, { en: "ghost", ja: "ゴースト" }, { en: "dragon", ja: "ドラゴン" },
+        { en: "steel", ja: "はがね" }, { en: "fairy", ja: "フェアリー" }, { en: "dark", ja: "あく" }
+    ];
+
+    let correctTypes = [];
+    let selectedTypes = [];
+    let pokemonAudio = null;
+    let pokemonName = "";
+    let pokemonGenus = ""; // 分類（〇〇ポケモン）
+
+    async function initGame() {
+        document.getElementById('loading-msg').style.display = "block";
+        document.getElementById('pokemon-img').style.display = "none";
+        document.getElementById('type-choices').innerHTML = "";
+        document.getElementById('pokemon-name-display').innerText = "";
+        document.getElementById('pokemon-genus-display').innerText = "";
+        document.getElementById('status-text').innerText = "タイプを えらんでね！";
+        document.getElementById('sub-status').style.visibility = "visible";
+        document.getElementById('check-btn').style.display = "inline-block";
+        document.getElementById('giveup-btn').style.display = "inline-block";
+        document.getElementById('next-btn').style.display = "none";
+        document.getElementById('cry-btn').style.display = "none";
+        selectedTypes = [];
+
+        const id = Math.floor(Math.random() * 1025) + 1;
+
+        try {
+            const [pokeRes, speciesRes] = await Promise.all([
+                fetch(`https://pokeapi.co/api/v2/pokemon/${id}/`),
+                fetch(`https://pokeapi.co/api/v2/pokemon-species/${id}/`)
+            ]);
+            const pokeData = await pokeRes.json();
+            const speciesData = await speciesRes.json();
+
+            // 正解タイプ
+            correctTypes = pokeData.types.map(t => t.type.name);
+            
+            // 名前
+            const nameEntry = speciesData.names.find(n => n.language.name === "ja") || speciesData.names.find(n => n.language.name === "ja-Hrkt");
+            pokemonName = nameEntry.name;
+            document.getElementById('pokemon-name-display').innerText = pokemonName;
+
+            // 【追加】分類
+            const genusEntry = speciesData.genera.find(g => g.language.name === "ja") || speciesData.genera.find(g => g.language.name === "ja-Hrkt");
+            pokemonGenus = genusEntry ? genusEntry.genus : "";
+
+            document.getElementById('pokemon-img').src = pokeData.sprites.other['official-artwork'].front_default;
+            document.getElementById('pokemon-img').style.display = "block";
+            document.getElementById('loading-msg').style.display = "none";
+            
+            pokemonAudio = new Audio(pokeData.cries.latest);
+            document.getElementById('cry-btn').style.display = "inline-block";
+            document.getElementById('cry-btn').onclick = () => pokemonAudio.play();
+
+            setupChoices();
+
+        } catch (e) {
+            initGame();
+        }
+    }
+
+    function setupChoices() {
+        let choices = typeList.filter(t => correctTypes.includes(t.en));
+        let otherTypes = typeList.filter(t => !correctTypes.includes(t.en));
+        otherTypes.sort(() => Math.random() - 0.5);
+        
+        while (choices.length < 4) {
+            choices.push(otherTypes.pop());
+        }
+        choices.sort(() => Math.random() - 0.5);
+        
+        const container = document.getElementById('type-choices');
+        choices.forEach(type => {
+            const btn = document.createElement('button');
+            btn.className = `type-btn ${type.en}`;
+            btn.dataset.en = type.en;
+            btn.innerText = type.ja;
+            btn.onclick = () => toggleType(btn, type.en);
+            container.appendChild(btn);
+        });
+    }
+
+    function toggleType(btn, typeEn) {
+        if (selectedTypes.includes(typeEn)) {
+            selectedTypes = selectedTypes.filter(t => t !== typeEn);
+            btn.classList.remove('selected');
+        } else {
+            if (selectedTypes.length < 2) {
+                selectedTypes.push(typeEn);
+                btn.classList.add('selected');
+            }
+        }
+    }
+
+    function checkAnswer() {
+        if (selectedTypes.length === 0) return;
+        const isCorrect = correctTypes.length === selectedTypes.length && 
+                          correctTypes.every(t => selectedTypes.includes(t));
+        if (isCorrect) {
+            endRound("せいかい！ すごいぞ！");
+        } else {
+            document.getElementById('status-text').innerText = "ざんねん！ もういちど！";
+            selectedTypes = [];
+            document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('selected'));
+        }
+    }
+
+    function showAnswer() {
+        const buttons = document.querySelectorAll('.type-btn');
+        buttons.forEach(btn => {
+            if (correctTypes.includes(btn.dataset.en)) {
+                btn.classList.add('reveal-correct');
+            }
+        });
+        endRound("こたえは これだよ！");
+    }
+
+    function endRound(message) {
+        document.getElementById('status-text').innerText = message;
+        // 分類を表示
+        document.getElementById('pokemon-genus-display').innerText = `ぶんるい：${pokemonGenus}`;
+        
+        document.getElementById('sub-status').style.visibility = "hidden";
+        document.getElementById('check-btn').style.display = "none";
+        document.getElementById('giveup-btn').style.display = "none";
+        document.getElementById('next-btn').style.display = "inline-block";
+        document.querySelectorAll('.type-btn').forEach(b => b.disabled = true);
+        
+        if (pokemonAudio) {
+            pokemonAudio.play();
+            pokemonAudio.onended = () => setTimeout(() => speakResult(), 300);
+        } else {
+            speakResult();
+        }
+    }
+
+    function speakResult() {
+        if ('speechSynthesis' in window) {
+            const jaTypes = correctTypes.map(en => typeList.find(t => t.en === en).ja).join("と");
+            // 読み上げに分類も追加
+            const text = `${pokemonName}。${pokemonGenus}。${jaTypes}タイプです！`;
+            const uttr = new SpeechSynthesisUtterance(text);
+            uttr.lang = 'ja-JP';
+            uttr.rate = 0.9;
+            window.speechSynthesis.speak(uttr);
+        }
+    }
+
+    initGame();
+</script>
+
+</body>
+</html>

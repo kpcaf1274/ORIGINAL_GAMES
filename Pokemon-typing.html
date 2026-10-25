@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ポケモン タイピング！</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Hiragino Sans', 'Meiryo', sans-serif; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 15px; color: #333; }
+
+        #game-container { max-width: 800px; margin: 0 auto; background: white; padding: 25px; border-radius: 24px; box-shadow: 0 15px 40px rgba(0,0,0,0.25); }
+
+        /* ヘッダー */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
+        .header h1 { font-size: 1.4rem; color: #764ba2; }
+        .score-display { font-size: 1rem; color: #555; background: #f0f0f0; padding: 6px 14px; border-radius: 20px; }
+
+        /* 設定トグル */
+        .settings { display: flex; justify-content: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+        .toggle-btn {
+            padding: 6px 16px; font-size: 0.85rem; border: 2px solid #ddd; border-radius: 20px;
+            background: white; cursor: pointer; transition: 0.2s; font-weight: bold;
+        }
+        .toggle-btn.active { background: #764ba2; color: white; border-color: #764ba2; }
+
+        /* ポケモン表示エリア */
+        .pokemon-area { display: flex; align-items: center; justify-content: center; gap: 20px; margin: 10px 0; flex-wrap: wrap; }
+        #img-box { width: 200px; height: 200px; background: radial-gradient(#fff, #f0f0f0); border-radius: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        #pokemon-img { width: 90%; height: 90%; object-fit: contain; }
+        #loading-msg { color: #999; font-size: 1.1rem; }
+
+        /* 名前表示 */
+        .name-area { flex: 1; min-width: 250px; }
+        .pokemon-name-display {
+            font-size: 2.4rem; font-weight: bold; color: #333; letter-spacing: 0.15em;
+            margin-bottom: 8px; min-height: 3.2rem;
+        }
+        .pokemon-name-display .typed { color: #aaa; }
+        .pokemon-name-display .current { color: #764ba2; text-decoration: underline; text-underline-offset: 6px; }
+        .pokemon-name-display .remaining { color: #333; }
+
+        /* ローマ字表示 */
+        .romaji-display {
+            font-size: 1.6rem; color: #888; letter-spacing: 0.12em; min-height: 2.2rem;
+            margin-bottom: 6px; font-family: 'Courier New', monospace;
+        }
+        .romaji-display .typed { color: #ccc; }
+        .romaji-display .current { color: #e74c3c; font-weight: bold; }
+        .romaji-display .remaining { color: #888; }
+        .romaji-hidden { visibility: hidden; }
+
+        /* 入力エリア */
+        .input-area { margin: 8px 0; }
+        #typed-display {
+            font-size: 1.4rem; font-family: 'Courier New', monospace; color: #764ba2;
+            background: #f8f6ff; border: 2px solid #e0d8f0; border-radius: 12px;
+            padding: 10px 16px; min-height: 2.5rem; letter-spacing: 0.1em;
+            display: inline-block; min-width: 200px;
+        }
+
+        /* 結果メッセージ */
+        #result-msg {
+            font-size: 1.3rem; font-weight: bold; min-height: 2rem;
+            margin: 6px 0; transition: 0.3s;
+        }
+        .correct-msg { color: #27ae60; }
+        .miss-msg { color: #e74c3c; }
+
+        /* 詳細情報 */
+        .pokemon-info {
+            font-size: 0.95rem; color: #666; background: #f9f9f9; padding: 8px 14px;
+            border-radius: 10px; display: none; margin: 8px 0;
+        }
+
+        /* キーボード */
+        .keyboard-container { margin-top: 12px; display: inline-block; margin-left: auto; margin-right: auto; }
+        .keyboard-row { display: flex; gap: 4px; margin: 4px 0; }
+        .key {
+            width: 48px; height: 48px; border: 2px solid #ddd; border-radius: 8px;
+            background: #fafafa; display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; font-weight: bold; color: #555; transition: 0.15s;
+            font-family: 'Courier New', monospace;
+        }
+        .key.highlight {
+            background: #764ba2; color: white; border-color: #5a3580;
+            box-shadow: 0 3px 10px rgba(118, 75, 162, 0.4);
+            transform: scale(1.12);
+        }
+        .key.pressed {
+            background: #27ae60; color: white; border-color: #1e8449;
+            transform: scale(0.95);
+        }
+        .key.miss {
+            background: #e74c3c; color: white; border-color: #c0392b;
+        }
+        .key-space { width: 220px; }
+
+        /* 次へボタン */
+        #next-btn {
+            margin-top: 12px; padding: 12px 36px; font-size: 1.1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2); border: none;
+            border-radius: 50px; font-weight: bold; cursor: pointer; display: none;
+            color: white; box-shadow: 0 4px 12px rgba(118, 75, 162, 0.3);
+            transition: 0.2s;
+        }
+        #next-btn:hover { transform: scale(1.05); }
+
+        /* 鳴き声ボタン */
+        #cry-btn {
+            background: #3498db; color: white; border: none; padding: 8px 18px;
+            border-radius: 50px; cursor: pointer; font-size: 0.9rem; display: none;
+        }
+
+        /* タイマー・統計 */
+        .stats {
+            display: flex; justify-content: center; gap: 20px; margin: 8px 0;
+            font-size: 0.9rem; color: #777;
+        }
+
+        @media (max-width: 600px) {
+            .pokemon-area { flex-direction: column; }
+            #img-box { width: 160px; height: 160px; }
+            .pokemon-name-display { font-size: 1.8rem; }
+            .romaji-display { font-size: 1.2rem; }
+            .key { width: 32px; height: 38px; font-size: 0.85rem; }
+            .key-space { width: 140px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div class="header">
+        <h1>ポケモン タイピング！</h1>
+        <div class="score-display">
+            スコア: <span id="score">0</span> / <span id="total">0</span>
+            　ミス: <span id="miss-count">0</span>
+        </div>
+    </div>
+
+    <div class="settings">
+        <button class="toggle-btn active" id="btn-katakana" onclick="setScript('katakana')">カタカナ</button>
+        <button class="toggle-btn" id="btn-hiragana" onclick="setScript('hiragana')">ひらがな</button>
+        <button class="toggle-btn active" id="btn-romaji" onclick="toggleRomaji()">ローマ字表示</button>
+        <button class="toggle-btn active" id="btn-keyboard" onclick="toggleKeyboard()">キーボード</button>
+        <button class="toggle-btn active" id="btn-hint" onclick="toggleHint()">ヒント</button>
+    </div>
+
+    <div class="pokemon-area">
+        <div id="img-box">
+            <div id="loading-msg">ポケモンを さがしています...</div>
+            <img id="pokemon-img" src="" style="display:none;">
+        </div>
+        <div class="name-area">
+            <div class="pokemon-name-display" id="name-display"></div>
+            <div class="romaji-display" id="romaji-display"></div>
+            <div class="input-area">
+                <div id="typed-display">&nbsp;</div>
+            </div>
+            <div id="result-msg"></div>
+            <button id="cry-btn">🔊 なきごえ</button>
+        </div>
+    </div>
+
+    <div class="stats">
+        <span>タイム: <span id="timer">0.0</span>秒</span>
+    </div>
+
+    <div class="pokemon-info" id="pokemon-info"></div>
+
+    <div class="keyboard-container" id="keyboard-container"></div>
+
+    <button id="next-btn" onclick="initGame()">つぎの ポケモン！</button>
+</div>
+
+<!-- 非表示の入力欄（モバイル・タブレット対応） -->
+<input type="text" id="hidden-input" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"
+    style="position:fixed; top:-100px; left:0; opacity:0; width:1px; height:1px;">
+
+<script>
+// ============================================================
+// 設定
+// ============================================================
+let scriptMode = 'katakana'; // 'katakana' | 'hiragana'
+let showRomaji = true;
+let showKeyboard = true;
+let showHint = true;
+
+// ゲーム状態
+let correctNameKatakana = '';
+let correctNameHiragana = '';
+let displayName = '';
+let romajiSequence = [];   // [{kana, romaji, alternatives}, ...]
+let flatRomaji = '';        // 全ローマ字フラット文字列
+let currentKanaIndex = 0;
+let currentRomajiPos = 0;  // flatRomaji 上の位置
+let typedRomaji = '';
+let pokemonAudio = null;
+let score = 0;
+let total = 0;
+let missCount = 0;
+let missThisRound = 0;
+let timerStart = 0;
+let timerInterval = null;
+let gameActive = false;
+
+// 現在のかなブロック内で入力済みのローマ字
+let kanaBlockTyped = '';
+
+// ============================================================
+// カタカナ→ひらがな変換
+// ============================================================
+function toHiragana(str) {
+    return str.replace(/[\u30A1-\u30F6]/g, m => String.fromCharCode(m.charCodeAt(0) - 0x60))
+              .replace(/\u30FC/g, 'ー');
+}
+
+// ============================================================
+// かな→ローマ字変換テーブル
+// ============================================================
+// 代替入力テーブル（各かなに対して受理するローマ字の一覧、先頭がデフォルト表示用）
+const ROMAJI_TABLE = {
+    // 基本母音
+    'ア':['a'],'イ':['i'],'ウ':['u'],'エ':['e'],'オ':['o'],
+    // カ行
+    'カ':['ka'],'キ':['ki'],'ク':['ku'],'ケ':['ke'],'コ':['ko'],
+    // サ行
+    'サ':['sa'],'シ':['si','shi'],'ス':['su'],'セ':['se'],'ソ':['so'],
+    // タ行
+    'タ':['ta'],'チ':['ti','chi'],'ツ':['tu','tsu'],'テ':['te'],'ト':['to'],
+    // ナ行
+    'ナ':['na'],'ニ':['ni'],'ヌ':['nu'],'ネ':['ne'],'ノ':['no'],
+    // ハ行
+    'ハ':['ha'],'ヒ':['hi'],'フ':['hu','fu'],'ヘ':['he'],'ホ':['ho'],
+    // マ行
+    'マ':['ma'],'ミ':['mi'],'ム':['mu'],'メ':['me'],'モ':['mo'],
+    // ヤ行
+    'ヤ':['ya'],'ユ':['yu'],'ヨ':['yo'],
+    // ラ行
+    'ラ':['ra'],'リ':['ri'],'ル':['ru'],'レ':['re'],'ロ':['ro'],
+    // ワ行・ン
+    'ワ':['wa'],'ヲ':['wo'],'ン':['nn','n\''],
+    // 濁音
+    'ガ':['ga'],'ギ':['gi'],'グ':['gu'],'ゲ':['ge'],'ゴ':['go'],
+    'ザ':['za'],'ジ':['zi','ji'],'ズ':['zu'],'ゼ':['ze'],'ゾ':['zo'],
+    'ダ':['da'],'ヂ':['di'],'ヅ':['du'],'デ':['de'],'ド':['do'],
+    'バ':['ba'],'ビ':['bi'],'ブ':['bu'],'ベ':['be'],'ボ':['bo'],
+    // 半濁音
+    'パ':['pa'],'ピ':['pi'],'プ':['pu'],'ペ':['pe'],'ポ':['po'],
+    // 拗音
+    'キャ':['kya'],'キュ':['kyu'],'キョ':['kyo'],
+    'シャ':['sya','sha'],'シュ':['syu','shu'],'ショ':['syo','sho'],
+    'チャ':['tya','cha'],'チュ':['tyu','chu'],'チョ':['tyo','cho'],
+    'ニャ':['nya'],'ニュ':['nyu'],'ニョ':['nyo'],
+    'ヒャ':['hya'],'ヒュ':['hyu'],'ヒョ':['hyo'],
+    'ミャ':['mya'],'ミュ':['myu'],'ミョ':['myo'],
+    'リャ':['rya'],'リュ':['ryu'],'リョ':['ryo'],
+    'ギャ':['gya'],'ギュ':['gyu'],'ギョ':['gyo'],
+    'ジャ':['zya','ja'],'ジュ':['zyu','ju'],'ジョ':['zyo','jo'],
+    'ビャ':['bya'],'ビュ':['byu'],'ビョ':['byo'],
+    'ピャ':['pya'],'ピュ':['pyu'],'ピョ':['pyo'],
+    // 特殊拗音（外来語）
+    'ファ':['fa'],'フィ':['fi'],'フェ':['fe'],'フォ':['fo'],
+    'ティ':['thi','texi'],'ディ':['dhi','dexi'],
+    'デュ':['dhu','dexyu'],'テュ':['thu','texyu'],
+    'ウィ':['wi','uxi'],'ウェ':['we','uxe'],'ウォ':['who','uxo'],
+    // ヴ行
+    'ヴ':['vu'],'ヴァ':['va'],'ヴィ':['vi'],'ヴェ':['ve'],'ヴォ':['vo'],
+    // 小文字カナ（単独出現時）
+    'ァ':['xa','la'],'ィ':['xi','li'],'ゥ':['xu','lu'],'ェ':['xe','le'],'ォ':['xo','lo'],
+    'ャ':['xya','lya'],'ュ':['xyu','lyu'],'ョ':['xyo','lyo'],
+    'ッ':['xtu','ltu','ltsu'],
+    // 長音
+    'ー':['-'],
+};
+
+// 小文字カナの一覧（拗音の2文字目候補）
+const SMALL_KANA = 'ァィゥェォャュョ';
+
+// かなのローマ字を取得（テーブルにない場合は空配列）
+function getAlternatives(kana) {
+    return ROMAJI_TABLE[kana] || [];
+}
+
+// カタカナ名からローマ字シーケンスを生成
+function buildRomajiSequence(katakanaName) {
+    const seq = [];
+    let i = 0;
+    const chars = [...katakanaName]; // サロゲートペア対応
+
+    while (i < chars.length) {
+        // 促音（ッ）の処理: 次の子音を重ねる
+        if (chars[i] === 'ッ' && i + 1 < chars.length) {
+            // 次のかなを特定（拗音なら2文字）
+            let nextKana = chars[i + 1];
+            if (i + 2 < chars.length && SMALL_KANA.includes(chars[i + 2])) {
+                const combo = chars[i + 1] + chars[i + 2];
+                if (ROMAJI_TABLE[combo]) nextKana = combo;
+            }
+            const nextAlts = getAlternatives(nextKana);
+            // 次のかなの全代替入力の先頭子音を集める
+            const consonants = new Set();
+            for (const alt of nextAlts) {
+                if (alt.length > 0) consonants.add(alt[0]);
+            }
+            const consArray = [...consonants];
+            seq.push({ kana: 'ッ', romaji: consArray[0] || 'x', alternatives: consArray.length > 0 ? consArray : ['x'] });
+            i++;
+            continue;
+        }
+
+        // 拗音チェック（2文字組み合わせ）
+        if (i + 1 < chars.length && SMALL_KANA.includes(chars[i + 1])) {
+            const combo = chars[i] + chars[i + 1];
+            const alts = getAlternatives(combo);
+            if (alts.length > 0) {
+                seq.push({ kana: combo, romaji: alts[0], alternatives: alts });
+                i += 2;
+                continue;
+            }
+        }
+
+        // 通常文字
+        const ch = chars[i];
+        const alts = getAlternatives(ch);
+        if (alts.length > 0) {
+            seq.push({ kana: ch, romaji: alts[0], alternatives: alts });
+        }
+        i++;
+    }
+
+    // ン の代替入力を文脈に応じて調整
+    for (let si = 0; si < seq.length; si++) {
+        if (seq[si].kana === 'ン') {
+            const isLast = (si === seq.length - 1);
+            const nextBlock = isLast ? null : seq[si + 1];
+            // 次の文字が母音・ヤ行・ナ行で始まる場合は nn 必須
+            const needsDouble = isLast || (nextBlock && 'aiueony'.includes(nextBlock.alternatives[0][0]));
+            if (needsDouble) {
+                seq[si].alternatives = ['nn'];
+                seq[si].romaji = 'nn';
+            } else {
+                // n 1回でOK（nn も許容）
+                seq[si].alternatives = ['n', 'nn'];
+                seq[si].romaji = 'n';
+            }
+        }
+    }
+
+    return seq;
+}
+
+// ============================================================
+// タイプ判定ロジック
+// ============================================================
+
+// 現在のかなブロックで、入力済み文字列から受理可能な代替を返す
+function getAcceptableAlternatives() {
+    if (currentKanaIndex >= romajiSequence.length) return [];
+    const block = romajiSequence[currentKanaIndex];
+    return block.alternatives.filter(alt => alt.startsWith(kanaBlockTyped));
+}
+
+// 次に受理可能な文字セット
+function getNextAcceptableChars() {
+    const alts = getAcceptableAlternatives();
+    const chars = new Set();
+    for (const alt of alts) {
+        if (kanaBlockTyped.length < alt.length) {
+            chars.add(alt[kanaBlockTyped.length]);
+        }
+    }
+    return chars;
+}
+
+function handleKeyPress(key) {
+    if (!gameActive) return;
+    if (currentKanaIndex >= romajiSequence.length) return;
+
+    const acceptable = getNextAcceptableChars();
+
+    if (acceptable.has(key)) {
+        kanaBlockTyped += key;
+        typedRomaji += key;
+        currentRomajiPos++;
+
+        // ブロック完了チェック: 入力済み文字列と完全一致する代替があるか
+        const completed = getAcceptableAlternatives().find(alt => alt === kanaBlockTyped);
+        if (completed) {
+            // 完了だが、より長い代替もまだマッチするか確認
+            const longerExists = getAcceptableAlternatives().some(alt => alt.length > kanaBlockTyped.length);
+            if (!longerExists) {
+                // 完全確定
+                currentKanaIndex++;
+                kanaBlockTyped = '';
+            } else {
+                // 例: ン で 'n' 入力済み、'n' は完了だが 'nn' もある
+                // → 次の入力が次のブロックの先頭として有効なら確定、そうでなければ待つ
+                // ここでは一旦確定して次へ進む（次の文字で判断）
+                currentKanaIndex++;
+                kanaBlockTyped = '';
+            }
+        }
+
+        updateDisplay();
+        flashKey(key, 'pressed');
+        checkCompletion();
+    } else {
+        // ン の 'n' 入力後、次のブロックの先頭文字が来た場合の救済
+        if (currentKanaIndex > 0) {
+            const prevBlock = romajiSequence[currentKanaIndex - 1];
+            // 前のブロックが既に確定済みなので、ここでは通常ミス
+        }
+        // ミス
+        missCount++;
+        missThisRound++;
+        document.getElementById('miss-count').textContent = missCount;
+        flashKey(key, 'miss');
+        showResultMsg('ミス！', 'miss-msg');
+    }
+}
+
+function checkCompletion() {
+    if (currentKanaIndex >= romajiSequence.length) {
+        // 完了！
+        gameActive = false;
+        clearInterval(timerInterval);
+        score++;
+        total++;
+        document.getElementById('score').textContent = score;
+        document.getElementById('total').textContent = total;
+
+        const elapsed = ((Date.now() - timerStart) / 1000).toFixed(1);
+        const msg = missThisRound === 0 ? `パーフェクト！ ${elapsed}秒` : `クリア！ ${elapsed}秒（ミス${missThisRound}回）`;
+        showResultMsg(msg, 'correct-msg');
+
+        // 情報表示
+        document.getElementById('pokemon-info').style.display = 'block';
+        document.getElementById('next-btn').style.display = 'inline-block';
+
+        if (pokemonAudio) {
+            pokemonAudio.play();
+        }
+    }
+}
+
+// ============================================================
+// 表示更新
+// ============================================================
+function updateDisplay() {
+    // かな表示
+    const nameEl = document.getElementById('name-display');
+    let html = '';
+    const nameChars = scriptMode === 'katakana' ? correctNameKatakana : correctNameHiragana;
+
+    // かなブロック → 表示文字のマッピングを構築
+    let charPos = 0;
+    for (let si = 0; si < romajiSequence.length; si++) {
+        const block = romajiSequence[si];
+        const kanaLen = block.kana.length;
+        const displayKana = scriptMode === 'katakana' ? block.kana : toHiragana(block.kana);
+
+        if (si < currentKanaIndex) {
+            html += `<span class="typed">${displayKana}</span>`;
+        } else if (si === currentKanaIndex) {
+            html += `<span class="current">${displayKana}</span>`;
+        } else {
+            html += `<span class="remaining">${displayKana}</span>`;
+        }
+        charPos += kanaLen;
+    }
+    nameEl.innerHTML = html;
+
+    // ローマ字表示
+    const romajiEl = document.getElementById('romaji-display');
+    if (!showRomaji) {
+        romajiEl.className = 'romaji-display romaji-hidden';
+    } else {
+        romajiEl.className = 'romaji-display';
+        // 完了済みブロックのローマ字 + 現在ブロック + 残りブロック
+        let rhtml = '';
+        for (let si = 0; si < romajiSequence.length; si++) {
+            const block = romajiSequence[si];
+            if (si < currentKanaIndex) {
+                // typedとして表示（実際に入力されたローマ字を使いたいが、簡略化のため表示用ローマ字）
+                rhtml += `<span class="typed">${block.romaji}</span>`;
+            } else if (si === currentKanaIndex) {
+                // 現在入力中
+                const displayRomaji = block.romaji; // デフォルト表示
+                const typedPart = kanaBlockTyped;
+                const remainPart = displayRomaji.slice(typedPart.length);
+                rhtml += `<span class="typed">${typedPart}</span><span class="current">${remainPart[0] || ''}</span><span class="remaining">${remainPart.slice(1)}</span>`;
+            } else {
+                rhtml += `<span class="remaining">${block.romaji}</span>`;
+            }
+        }
+        romajiEl.innerHTML = rhtml;
+    }
+
+    // 入力済み表示
+    document.getElementById('typed-display').textContent = typedRomaji || '\u00A0';
+
+    // キーボードハイライト
+    updateKeyboardHighlight();
+}
+
+function updateKeyboardHighlight() {
+    document.querySelectorAll('.key').forEach(k => k.classList.remove('highlight'));
+    if (!gameActive || !showKeyboard || !showHint) return;
+    const nextChars = getNextAcceptableChars();
+    nextChars.forEach(ch => {
+        const keyEl = document.querySelector(`.key[data-key="${ch.toUpperCase()}"]`);
+        if (keyEl) keyEl.classList.add('highlight');
+    });
+}
+
+function flashKey(key, className) {
+    const keyEl = document.querySelector(`.key[data-key="${key.toUpperCase()}"]`);
+    if (!keyEl) return;
+    keyEl.classList.add(className);
+    setTimeout(() => keyEl.classList.remove(className), 200);
+}
+
+function showResultMsg(text, cls) {
+    const el = document.getElementById('result-msg');
+    el.textContent = text;
+    el.className = cls;
+    if (cls === 'miss-msg') {
+        setTimeout(() => { if (el.className === 'miss-msg') el.textContent = ''; }, 800);
+    }
+}
+
+// ============================================================
+// キーボード描画
+// ============================================================
+const KEYBOARD_ROWS = [
+    ['Q','W','E','R','T','Y','U','I','O','P','-'],
+    ['A','S','D','F','G','H','J','K','L'],
+    ['Z','X','C','V','B','N','M']
+];
+
+function renderKeyboard() {
+    const container = document.getElementById('keyboard-container');
+    container.innerHTML = '';
+    if (!showKeyboard) return;
+
+    const ROW_OFFSETS = [0, 26, 46]; // px: 実キーボード準拠
+    KEYBOARD_ROWS.forEach((row, ri) => {
+        const rowEl = document.createElement('div');
+        rowEl.className = 'keyboard-row';
+        if (ROW_OFFSETS[ri]) rowEl.style.paddingLeft = ROW_OFFSETS[ri] + 'px';
+        row.forEach(key => {
+            const keyEl = document.createElement('div');
+            keyEl.className = 'key';
+            if (key === '-') keyEl.textContent = 'ー';
+            else keyEl.textContent = key;
+            keyEl.dataset.key = key;
+            keyEl.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                handleKeyPress(key.toLowerCase());
+                focusInput();
+            });
+            rowEl.appendChild(keyEl);
+        });
+        container.appendChild(rowEl);
+    });
+}
+
+// ============================================================
+// 設定トグル
+// ============================================================
+function setScript(mode) {
+    scriptMode = mode;
+    document.getElementById('btn-katakana').classList.toggle('active', mode === 'katakana');
+    document.getElementById('btn-hiragana').classList.toggle('active', mode === 'hiragana');
+    if (gameActive) updateDisplay();
+}
+
+function toggleRomaji() {
+    showRomaji = !showRomaji;
+    document.getElementById('btn-romaji').classList.toggle('active', showRomaji);
+    updateDisplay();
+}
+
+function toggleKeyboard() {
+    showKeyboard = !showKeyboard;
+    document.getElementById('btn-keyboard').classList.toggle('active', showKeyboard);
+    renderKeyboard();
+    if (gameActive) updateKeyboardHighlight();
+}
+
+function toggleHint() {
+    showHint = !showHint;
+    document.getElementById('btn-hint').classList.toggle('active', showHint);
+    updateKeyboardHighlight();
+}
+
+// ============================================================
+// タイプ翻訳
+// ============================================================
+const typeTranslations = {
+    normal:"ノーマル", fire:"ほのお", water:"みず", grass:"くさ", electric:"でんき",
+    ice:"こおり", fighting:"かくとう", poison:"どく", ground:"じめん", flying:"ひこう",
+    psychic:"エスパー", bug:"むし", rock:"いわ", ghost:"ゴースト", dragon:"ドラゴン",
+    steel:"はがね", fairy:"フェアリー", dark:"あく"
+};
+
+// ============================================================
+// ゲーム初期化
+// ============================================================
+async function initGame() {
+    // UIリセット
+    document.getElementById('loading-msg').style.display = 'block';
+    document.getElementById('pokemon-img').style.display = 'none';
+    document.getElementById('name-display').innerHTML = '';
+    document.getElementById('romaji-display').innerHTML = '';
+    document.getElementById('typed-display').textContent = '\u00A0';
+    document.getElementById('result-msg').textContent = '';
+    document.getElementById('result-msg').className = '';
+    document.getElementById('pokemon-info').style.display = 'none';
+    document.getElementById('next-btn').style.display = 'none';
+    document.getElementById('cry-btn').style.display = 'none';
+    document.getElementById('timer').textContent = '0.0';
+    clearInterval(timerInterval);
+    gameActive = false;
+    missThisRound = 0;
+
+    const id = Math.floor(Math.random() * 1025) + 1;
+
+    try {
+        const [pokeRes, speciesRes] = await Promise.all([
+            fetch(`https://pokeapi.co/api/v2/pokemon/${id}/`),
+            fetch(`https://pokeapi.co/api/v2/pokemon-species/${id}/`)
+        ]);
+        if (!pokeRes.ok || !speciesRes.ok) throw new Error('取得失敗');
+
+        const pokeData = await pokeRes.json();
+        const speciesData = await speciesRes.json();
+
+        const nameEntry = speciesData.names.find(n => n.language.name === 'ja-Hrkt') || speciesData.names.find(n => n.language.name === 'ja');
+        if (!nameEntry) throw new Error('名前なし');
+
+        correctNameKatakana = nameEntry.name;
+        correctNameHiragana = toHiragana(correctNameKatakana);
+
+        // 分類・タイプ
+        const genusEntry = speciesData.genera.find(g => g.language.name === 'ja-Hrkt') || speciesData.genera.find(g => g.language.name === 'ja');
+        const genus = genusEntry ? genusEntry.genus : '';
+        const types = pokeData.types.map(t => typeTranslations[t.type.name] || t.type.name).join('・');
+
+        document.getElementById('pokemon-info').innerHTML =
+            `<strong>${correctNameKatakana}</strong>（${correctNameHiragana}）　ぶんるい：${genus}　タイプ：${types}`;
+
+        // 画像
+        const imgUrl = pokeData.sprites.other['official-artwork'].front_default;
+        if (!imgUrl) throw new Error('画像なし');
+
+        // 鳴き声
+        if (pokeData.cries && pokeData.cries.latest) {
+            pokemonAudio = new Audio(pokeData.cries.latest);
+            document.getElementById('cry-btn').style.display = 'inline-block';
+            document.getElementById('cry-btn').onclick = () => pokemonAudio.play();
+        } else {
+            pokemonAudio = null;
+        }
+
+        // ローマ字シーケンス構築
+        romajiSequence = buildRomajiSequence(correctNameKatakana);
+        flatRomaji = romajiSequence.map(b => b.romaji).join('');
+        currentKanaIndex = 0;
+        currentRomajiPos = 0;
+        typedRomaji = '';
+        kanaBlockTyped = '';
+
+        // 画像読み込み完了を待ってからゲーム開始
+        const img = document.getElementById('pokemon-img');
+        img.onload = () => {
+            img.style.display = 'block';
+            document.getElementById('loading-msg').style.display = 'none';
+
+            // ポケモン表示時に名前を読み上げ
+            speakName(correctNameKatakana);
+
+            // タイマー開始
+            gameActive = true;
+
+            updateDisplay();
+            renderKeyboard();
+            updateKeyboardHighlight();
+            timerStart = Date.now();
+            timerInterval = setInterval(() => {
+                if (gameActive) {
+                    document.getElementById('timer').textContent = ((Date.now() - timerStart) / 1000).toFixed(1);
+                }
+            }, 100);
+
+            focusInput();
+        };
+        img.onerror = () => {
+            console.error('画像読み込み失敗、再試行');
+            initGame();
+        };
+        img.src = imgUrl;
+
+    } catch (e) {
+        console.error('エラー、再試行:', e);
+        initGame();
+    }
+}
+
+// ============================================================
+// キーボードイベント
+// ============================================================
+// keydown で処理したら input イベントでの二重処理を防ぐフラグ
+let handledByKeydown = false;
+
+document.addEventListener('keydown', (e) => {
+    if (e.isComposing) return; // IME入力中は無視
+    if (e.key === 'Enter' && !gameActive && document.getElementById('next-btn').style.display !== 'none') {
+        initGame();
+        return;
+    }
+    // a-z, ハイフン
+    const key = e.key.toLowerCase();
+    if (/^[a-z\-]$/.test(key)) {
+        e.preventDefault();
+        handledByKeydown = true;
+        handleKeyPress(key);
+        // hidden input に文字が入った場合に備えてクリア
+        const inp = document.getElementById('hidden-input');
+        inp.value = '';
+    }
+});
+
+// タブレット対応: hidden input にフォーカス
+function focusInput() {
+    const inp = document.getElementById('hidden-input');
+    inp.focus();
+}
+
+// タブレット・ソフトキーボード用（物理キーボードの keydown で処理済みならスキップ）
+document.getElementById('hidden-input').addEventListener('input', (e) => {
+    if (handledByKeydown) {
+        handledByKeydown = false;
+        e.target.value = '';
+        return;
+    }
+    const val = e.target.value.toLowerCase();
+    e.target.value = '';
+    for (const ch of val) {
+        if (/^[a-z\-]$/.test(ch)) {
+            handleKeyPress(ch);
+        }
+    }
+});
+
+// ゲームコンテナクリックでフォーカス
+document.getElementById('game-container').addEventListener('click', focusInput);
+
+function speakName(name) {
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const uttr = new SpeechSynthesisUtterance(name);
+        uttr.lang = 'ja-JP';
+        uttr.rate = 0.8;
+        uttr.pitch = 1.1;
+        window.speechSynthesis.speak(uttr);
+    }
+}
+
+// 開始
+initGame();
+</script>
+
+</body>
+</html>

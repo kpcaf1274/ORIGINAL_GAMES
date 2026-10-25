@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ポケモン だーれだ？ DX</title>
+    <style>
+        body { font-family: 'Hiragino Sans', 'Meiryo', sans-serif; text-align: center; background-color: #f0f4f8; margin: 0; padding: 15px; color: #333; }
+        #game-container { max-width: 550px; margin: 0 auto; background: white; padding: 25px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 8px solid #ffcb05; }
+        
+        /* 画像エリア */
+        #img-box { position: relative; width: 280px; height: 280px; margin: 15px auto; background: radial-gradient(#fff, #e0e0e0); border-radius: 20px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        #pokemon-img { width: 90%; height: 90%; object-fit: contain; }
+        .silhouette { filter: brightness(0); }
+        .reveal { filter: brightness(1); transition: filter 0.8s ease; }
+
+        /* 情報表示エリア */
+        #info-display { margin-top: 10px; min-height: 60px; }
+        .pokemon-name-katakana { font-size: 2rem; font-weight: bold; color: #3c5aa6; margin: 5px 0; }
+        .pokemon-details { font-size: 1rem; color: #666; background: #f9f9f9; padding: 10px; border-radius: 10px; display: inline-block; }
+
+        /* 選択肢 */
+        .choice-btn { 
+            display: block; width: 90%; margin: 10px auto; padding: 15px; 
+            font-size: 1.4rem; font-weight: bold; border: 3px solid #ccc; border-radius: 50px; 
+            background: white; cursor: pointer; transition: 0.2s;
+        }
+        .correct { background-color: #2ecc71 !important; color: white; border-color: #27ae60; }
+        .wrong { background-color: #e74c3c !important; color: white; border-color: #c0392b; opacity: 0.5; }
+
+        #next-btn { margin-top: 20px; padding: 15px 40px; font-size: 1.2rem; background: #ffcb05; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; display: none; box-shadow: 0 4px 0 #c7a008; color: #3c5aa6; }
+        #cry-btn { background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 50px; cursor: pointer; margin-bottom: 10px; font-size: 1rem; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <h2 id="status-text">この ポケモン だーれだ？</h2>
+    <button id="cry-btn" style="display:none;">🔊 なきごえを きく</button>
+    
+    <div id="img-box">
+        <div id="loading-msg">さがしています...</div>
+        <img id="pokemon-img" class="silhouette" src="" style="display:none;">
+    </div>
+
+    <div id="info-display"></div>
+
+    <div id="choices"></div>
+    <button id="next-btn" onclick="initGame()">つぎの ポケモン！</button>
+</div>
+
+<script>
+    let correctNameHiragana = "";
+    let correctNameKatakana = "";
+    let pokemonAudio = null;
+    let pokemonDetails = "";
+
+    // 英語のタイプ名を日本語に変換する辞書
+    const typeTranslations = {
+        normal: "ノーマル", fire: "ほのお", water: "みず", grass: "くさ", electric: "でんき",
+        ice: "こおり", fighting: "かくとう", poison: "どく", ground: "じめん", flying: "ひこう",
+        psychic: "エスパー", bug: "むし", rock: "いわ", ghost: "ゴースト", dragon: "ドラゴン",
+        steel: "はがね", fairy: "フェアリー", dark: "あく"
+    };
+
+    function toHiragana(str) {
+        return str.replace(/[\u30a1-\u30f6]/g, m => String.fromCharCode(m.charCodeAt(0) - 0x60));
+    }
+
+    function generateWrongName(name) {
+        const hiragana = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん";
+        let arr = name.split('');
+        let idx = Math.floor(Math.random() * arr.length);
+        let newChar = hiragana[Math.floor(Math.random() * hiragana.length)];
+        while(newChar === arr[idx]) newChar = hiragana[Math.floor(Math.random() * hiragana.length)];
+        arr[idx] = newChar;
+        return arr.join('');
+    }
+
+    async function initGame() {
+        // UIリセット
+        document.getElementById('loading-msg').style.display = "block";
+        document.getElementById('pokemon-img').style.display = "none";
+        document.getElementById('pokemon-img').className = "silhouette";
+        document.getElementById('choices').innerHTML = "";
+        document.getElementById('info-display').innerHTML = "";
+        document.getElementById('next-btn').style.display = "none";
+        document.getElementById('cry-btn').style.display = "none";
+        document.getElementById('status-text').innerText = "この ポケモン だーれだ？";
+
+        // 1〜1025番からランダム（全世代）
+        const id = Math.floor(Math.random() * 1025) + 1;
+
+        try {
+            const [pokeRes, speciesRes] = await Promise.all([
+                fetch(`https://pokeapi.co/api/v2/pokemon/${id}/`),
+                fetch(`https://pokeapi.co/api/v2/pokemon-species/${id}/`)
+            ]);
+            if (!pokeRes.ok || !speciesRes.ok) throw new Error("取得失敗");
+
+            const pokeData = await pokeRes.json();
+            const speciesData = await speciesRes.json();
+
+            // 名前取得
+            const nameEntry = speciesData.names.find(n => n.language.name === "ja-Hrkt") || speciesData.names.find(n => n.language.name === "ja");
+            correctNameKatakana = nameEntry.name;
+            correctNameHiragana = toHiragana(correctNameKatakana);
+
+            // ぶんるい（分類）取得
+            const genusEntry = speciesData.genera.find(g => g.language.name === "ja-Hrkt") || speciesData.genera.find(g => g.language.name === "ja");
+            const genus = genusEntry ? genusEntry.genus : "";
+
+            // タイプ取得
+            const types = pokeData.types.map(t => typeTranslations[t.type.name] || t.type.name).join("・");
+
+            pokemonDetails = `ぶんるい：${genus}<br>タイプ：${types}`;
+
+            // 画像と鳴き声
+            document.getElementById('pokemon-img').src = pokeData.sprites.other['official-artwork'].front_default;
+            document.getElementById('pokemon-img').style.display = "block";
+            document.getElementById('loading-msg').style.display = "none";
+            pokemonAudio = new Audio(pokeData.cries.latest);
+            document.getElementById('cry-btn').style.display = "inline-block";
+            document.getElementById('cry-btn').onclick = () => pokemonAudio.play();
+
+            // 選択肢
+            let choices = [correctNameHiragana, generateWrongName(correctNameHiragana), generateWrongName(correctNameHiragana)];
+            choices.sort(() => Math.random() - 0.5);
+
+            choices.forEach(name => {
+                const btn = document.createElement('button');
+                btn.className = "choice-btn";
+                btn.innerText = name;
+                btn.onclick = () => checkAnswer(btn, name);
+                document.getElementById('choices').appendChild(btn);
+            });
+
+        } catch (e) {
+            console.error("エラーが発生しました。次のポケモンを読み込みます:", e);
+            initGame(); // 自動リトライ
+        }
+    }
+
+    function checkAnswer(btn, selectedName) {
+        if (selectedName === correctNameHiragana) {
+            btn.classList.add('correct');
+            document.getElementById('pokemon-img').className = "reveal";
+            document.getElementById('status-text').innerText = "せいかい！";
+            
+            // カタカナ名・分類・タイプの表示
+            document.getElementById('info-display').innerHTML = `
+                <div class="pokemon-name-katakana">${correctNameKatakana}</div>
+                <div class="pokemon-details">${pokemonDetails}</div>
+            `;
+
+            // 【ここを修正】順番に再生するロジック
+            if (pokemonAudio) {
+                // 1. まず鳴き声を再生
+                pokemonAudio.play();
+                
+                // 2. 鳴き声が終わったら読み上げを開始
+                pokemonAudio.onended = () => {
+                    // 少し間を置いてから読み上げるとより自然（0.3秒）
+                    setTimeout(() => {
+                        speakName(correctNameKatakana);
+                    }, 300);
+                };
+            } else {
+                // 鳴き声データがない場合はすぐ読み上げ
+                speakName(correctNameKatakana);
+            }
+
+            document.getElementById('next-btn').style.display = "inline-block";
+            document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+        } else {
+            btn.classList.add('wrong');
+            btn.disabled = true;
+            document.getElementById('status-text').innerText = "ちがうみたい…";
+        }
+    }
+
+    function speakName(name) {
+        if ('speechSynthesis' in window) {
+            // 以前の読み上げが残っていたらキャンセル
+            window.speechSynthesis.cancel();
+
+            const uttr = new SpeechSynthesisUtterance(name);
+            uttr.lang = 'ja-JP';
+            uttr.rate = 0.8; // お子さんが聞き取りやすいよう、さらに少しゆっくり
+            uttr.pitch = 1.2; // 少し高めの声にすると子供向けっぽくなります
+            window.speechSynthesis.speak(uttr);
+        }
+    }
+      
+
+
+    initGame();
+</script>
+
+</body>
+</html>
