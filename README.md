@@ -53,7 +53,7 @@ python3 -m http.server 8000 --bind 127.0.0.1
 
 1. ゲームのHTMLと必要なファイルを追加します。
 2. `assets/games.js` の `games` に項目を追加します。
-3. ホームの件数表示とJavaScript無効時のリンクを更新します。
+3. ホームの件数表示とJavaScript無効時のリンクを更新します。公開更新時は `index.html` のアセットURLの `v` を更新し、イラストを追加したときは `assets/home.js` のイラストURLの `v` も合わせます。
 4. ホームのリンクから、そのゲームのHTMLへ直接移動することを確認します。
 
 ## 統合元

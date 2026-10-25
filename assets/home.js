@@ -30,7 +30,7 @@
     svg.setAttribute('viewBox', '0 0 400 230');
     svg.setAttribute('aria-hidden', 'true');
     const use = document.createElementNS(svg.namespaceURI, 'use');
-    use.setAttribute('href', 'assets/illustrations.svg#' + game.art);
+    use.setAttribute('href', 'assets/illustrations.svg?v=20261025-2#' + game.art);
     svg.append(use);
     return svg;
   }
