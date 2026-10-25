@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#173f36">
+<meta name="description" content="21種類のブロックを角でつなぐ陣取りゲーム。1〜4人、CPU対戦対応。HTML一つでオフラインでも遊べます。">
+<title>CORNER BLOCKS — 角から、広がる。</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='5' y='5' width='25' height='25' rx='5' fill='%23488cce'/%3E%3Crect x='34' y='34' width='25' height='25' rx='5' fill='%23e2b752'/%3E%3C/svg%3E">
+<style>
+:root{--paper:#f4f5ec;--ink:#203f36;--muted:#778277;--line:#dce2d3;--blue:#4388c7;--yellow:#ddb34d;--red:#d57566;--green:#66a084;--active:var(--blue);font-family:"Hiragino Maru Gothic ProN","Hiragino Sans","Yu Gothic",Meiryo,sans-serif;color-scheme:light}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased}button,select{font:inherit}button{cursor:pointer}button:disabled{cursor:default}button:focus-visible,summary:focus-visible,canvas:focus-visible{outline:3px solid #c18449;outline-offset:4px}[hidden]{display:none!important}button{-webkit-tap-highlight-color:transparent}svg{display:block}header{max-width:1250px;margin:auto;padding:24px 30px 21px;display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:13px}.brand-icon{position:relative;width:37px;height:37px;flex:none}.brand-icon:before,.brand-icon:after{content:"";position:absolute;width:17px;height:17px;border-radius:4px;background:var(--blue);top:0;left:0;box-shadow:inset 0 -3px 0 #0001}.brand-icon:after{top:20px;left:20px;background:var(--yellow)}h1{font:800 21px/1.1 Arial,sans-serif;letter-spacing:.055em;margin:0}.tagline{font-size:10px;color:var(--muted);letter-spacing:.15em;margin:6px 0 0}.header-actions{display:flex;gap:8px}.small-button{background:#fff8;border:1px solid var(--line);color:var(--ink);border-radius:8px;min-height:37px;padding:8px 13px;font-size:11px;display:inline-flex;align-items:center;justify-content:center;gap:6px}.small-button:hover:not(:disabled){background:#fff;border-color:#9eaf9b}.small-button:disabled{opacity:.35}.small-button .icon{font-size:16px;line-height:1}.scores{max-width:1250px;margin:23px auto 20px;padding:0 30px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.score-card{--color:var(--blue);min-width:0;background:#ffffff85;border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;transition:background .2s,border-color .2s;position:relative}.score-card.active{border-color:var(--color);background:#fff;box-shadow:0 0 0 2px color-mix(in srgb,var(--color) 14%,transparent)}.score-card.blocked{opacity:.55}.color-dot{background:var(--color);height:12px;width:12px;flex:none;border-radius:4px;box-shadow:inset 0 -2px 0 #0001}.score-info{min-width:0;flex:1}.score-name{font-size:11px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.score-role{font-size:9px;color:var(--muted);margin-top:5px}.score-number{font:700 24px/1 Arial,sans-serif;color:var(--color);white-space:nowrap}.score-number small{font:9px sans-serif;color:var(--muted);margin-left:4px}.score-card.active:after{content:"";width:5px;height:5px;position:absolute;top:8px;right:8px;background:var(--color);border-radius:50%}.layout{max-width:1250px;padding:0 30px;margin:auto;display:grid;grid-template-columns:minmax(0,1fr) 315px;gap:24px;align-items:start}.board-panel{background:#fff9;border:1px solid var(--line);border-radius:15px;padding:20px;min-width:0}.turn-line{display:flex;align-items:center;gap:10px;margin-bottom:15px}.turn-dot{background:var(--active);height:13px;width:13px;border-radius:4px;flex:none}.turn-title{font-size:15px;font-weight:800;flex:1;min-width:0}.move-count{font:10px Arial,sans-serif;color:var(--muted);letter-spacing:.05em}.board-wrap{overflow:auto;overscroll-behavior:contain;background:#e9eddf;border-radius:8px;padding:7px;max-height:76vh}.board-sizing{width:100%;margin:auto;max-width:min(760px,max(340px,calc(100dvh - 390px)))}.board-sizing.zoomed{width:180%;max-width:none}canvas{display:block;width:100%;aspect-ratio:1;touch-action:none;cursor:crosshair;border-radius:3px}canvas:focus-visible{outline-offset:1px}.board-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0 0;font-size:9px;color:var(--muted)}.zoom-controls{display:flex;align-items:center;gap:4px}.zoom-controls button{background:transparent;border:1px solid var(--line);border-radius:5px;color:var(--ink);font-size:13px;min-width:28px;height:26px}.zoom-controls button:disabled{opacity:.3}.zoom-label{width:40px;text-align:center;font:9px Arial,sans-serif}.placement-bar{margin-top:15px;padding-top:14px;border-top:1px solid var(--line);display:flex;align-items:center;gap:12px}.placement-message{flex:1;min-width:0;font-size:11px;line-height:1.7;color:var(--muted)}.placement-message.good{color:#2e7d54}.placement-message.bad{color:#b35b4e}.confirm{border:0;background:var(--active);color:#fff;min-height:43px;border-radius:8px;padding:11px 22px;font-weight:700;font-size:12px;box-shadow:inset 0 -3px 0 #0002;white-space:nowrap}.confirm:hover:not(:disabled){filter:brightness(.95)}.confirm:disabled{background:#d8dfd1;color:#8e9988;box-shadow:none}.tray-panel{background:#fff9;border:1px solid var(--line);border-radius:15px;padding:19px 17px}.tray-heading{display:flex;align-items:center;gap:8px;margin-bottom:4px}.tray-heading h2{font-size:14px;margin:0;flex:1}.remaining{font-size:10px;font-weight:500;color:var(--muted)}.tray-description{font-size:10px;color:var(--muted);line-height:1.8;margin:7px 0 15px}.piece-filters{display:flex;gap:5px;margin-bottom:12px}.piece-filters button{flex:1;border:1px solid var(--line);background:transparent;font-size:9px;color:var(--muted);padding:7px 2px;border-radius:5px}.piece-filters button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:white}.piece-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;align-content:start;min-height:90px}.piece-button{position:relative;min-width:0;height:66px;padding:9px 6px 16px;border:1px solid #e0e5d8;border-radius:7px;background:#fff;display:flex;justify-content:center;align-items:center;color:var(--active);transition:border-color .15s,background .15s}.piece-button svg{width:100%;height:100%;max-width:52px;max-height:42px;overflow:visible}.piece-button:hover:not(:disabled){border-color:var(--active);background:#f4f7ee}.piece-button[aria-pressed=true]{border:2px solid var(--active);background:color-mix(in srgb,var(--active) 8%,white);padding:8px 5px 15px}.piece-button.used{opacity:.17;background:#f0f2e9}.piece-button small{position:absolute;bottom:5px;left:0;right:0;font:8px Arial,sans-serif;color:#7b8b78}.piece-button.used:after{content:"✓";position:absolute;right:5px;top:2px;font-size:9px;color:var(--ink)}.piece-controls{margin-top:16px;border-top:1px solid var(--line);padding-top:15px}.selected-line{display:flex;justify-content:space-between;font-size:10px;min-height:16px;margin-bottom:10px}.selected-name{font-weight:700}.selected-size{color:var(--muted)}.transform-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.transform-buttons button{background:#edf1e5;border:1px solid #d9e1ce;border-radius:7px;min-height:40px;color:var(--ink);font-size:11px;display:flex;align-items:center;justify-content:center;gap:5px}.transform-buttons button:disabled{opacity:.4}.transform-buttons span{font-size:20px}.secondary-controls{display:flex;gap:7px;margin-top:8px}.secondary-controls button{flex:1;min-height:36px;border:1px solid var(--line);border-radius:6px;font-size:10px;background:transparent;color:var(--ink)}.secondary-controls button:disabled{opacity:.35}.keyboard-note{font-size:8px;color:#99a18f;line-height:1.9;margin:12px 0 0;text-align:center}.history-panel{padding:20px 4px}.history-heading{display:flex;align-items:center;justify-content:space-between}.history-heading h2{font-size:10px;color:var(--muted);font-weight:500;margin:0}.save-state{font-size:8px;letter-spacing:.03em;color:#8c9a82}.game-log{list-style:none;padding:0;margin:10px 0 0;display:grid;gap:7px}.game-log li{font-size:9px;color:#88917f;line-height:1.6}.game-log li:first-child{color:#557057}.bottom-note{max-width:1250px;margin:20px auto 28px;padding:0 30px;font-size:9px;line-height:1.9;color:#96a08e;display:flex;justify-content:space-between;gap:20px}.bottom-note span:last-child{font:9px Arial,sans-serif;letter-spacing:.12em;white-space:nowrap}dialog{border:1px solid #d3dcc6;border-radius:18px;padding:29px;background:#f9faf3;color:var(--ink);box-shadow:0 25px 100px #102d3640;width:min(480px,calc(100% - 32px));max-height:90dvh;overflow:auto}dialog::backdrop{background:#173f36a6;backdrop-filter:blur(4px)}.dialog-eyebrow{font:9px Arial,sans-serif;letter-spacing:.2em;color:#7d9275;margin:0 0 12px}.dialog-title{font-size:24px;line-height:1.5;margin:0 0 13px;letter-spacing:.03em}.dialog-description{font-size:11px;color:var(--muted);line-height:2;margin:0 0 23px}.setup-illustration{display:flex;justify-content:center;gap:9px;align-items:center;margin:7px 0 22px;height:76px}.setup-illustration svg{width:60px;height:60px;filter:drop-shadow(0 4px 0 #173f3612)}.setup-label{display:block;font-size:11px;font-weight:700;margin-bottom:10px}.player-choices,.difficulty-choices{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.player-choices button{border:1px solid #d3dcc7;background:#fff8;color:var(--ink);padding:12px 5px;border-radius:9px;font-weight:700;font-size:16px}.player-choices small{display:block;font-size:8px;font-weight:400;color:#849279;margin-top:5px}.player-choices button[aria-pressed=true],.difficulty-choices button[aria-pressed=true]{border-color:var(--ink);background:var(--ink);color:white}.player-choices button[aria-pressed=true] small{color:#bed2b9}.setup-note{font-size:10px;color:var(--muted);margin:11px 0 23px;line-height:1.8}.difficulty-choices{grid-template-columns:repeat(3,1fr);margin-bottom:25px}.difficulty-choices button{border:1px solid #d3dcc7;border-radius:7px;background:#fff8;color:#6d7f64;padding:10px 5px;font-size:11px}.dialog-main-button{width:100%;background:var(--ink);border:0;color:#fff;border-radius:9px;min-height:48px;font-size:13px;font-weight:700;box-shadow:inset 0 -3px 0 #0002}.dialog-link-button{display:block;border:0;background:transparent;font-size:11px;padding:12px;color:var(--ink);margin:10px auto 0}.resume-button{width:100%;border:1px solid #bcccb0;border-radius:8px;background:#edf3e4;color:var(--ink);font-size:12px;min-height:43px;margin-bottom:12px}.dialog-close{position:absolute;top:17px;right:17px;min-width:30px;height:30px;background:transparent;border:0;color:#7c8b71;font-size:23px}.rules-list{padding-left:22px;font-size:12px;line-height:2.1}.rules-list li{margin-bottom:11px}.rules-list strong{color:#235a42}.rule-tip{font-size:10px;line-height:1.9;background:#ecf0e2;padding:13px;border-radius:8px;color:#6c7b60}.piece-guide{margin-top:24px;border-top:1px solid var(--line);padding-top:19px}.piece-guide h3{font-size:13px;margin:0 0 6px}.piece-guide p{font-size:10px;color:var(--muted);line-height:1.8}.guide-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin:13px 0 20px}.guide-piece{background:white;border:1px solid var(--line);border-radius:6px;padding:7px 4px;color:var(--blue);min-width:0;height:63px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px}.guide-piece svg{height:35px;max-width:42px;width:100%;overflow:visible}.guide-piece small{font:8px Arial,sans-serif;color:var(--muted)}.result-trophy{font-size:42px;margin:3px 0 15px}.results-list{padding:0;list-style:none;margin:23px 0;display:grid;gap:9px}.result-row{display:flex;align-items:center;gap:12px;background:white;border:1px solid var(--line);border-radius:9px;padding:12px}.result-rank{font:700 16px Arial,sans-serif;color:#8da07a;width:24px}.result-name{flex:1;min-width:0;font-size:12px;font-weight:700}.result-name small{display:block;font-size:9px;font-weight:400;color:var(--muted);margin-top:4px}.result-score{font:700 23px Arial,sans-serif}.result-score small{font:9px sans-serif;margin-left:4px;color:var(--muted)}.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#203f36ed;color:#fff;padding:12px 22px;border-radius:9px;font-size:11px;line-height:1.8;max-width:90vw;z-index:20;box-shadow:0 6px 25px #203f3630}.visually-hidden{position:absolute;width:1px;height:1px;margin:-1px;clip:rect(0,0,0,0);overflow:hidden;white-space:nowrap}.thinking .turn-dot{animation:breathe 1s ease-in-out infinite}@keyframes breathe{50%{opacity:.35}}
+@media(min-width:1500px){.layout{grid-template-columns:minmax(0,1fr) 335px}.board-panel{padding:24px}.piece-button{height:73px}}
+@media(max-width:1000px){.layout{grid-template-columns:minmax(0,1fr) 270px;gap:17px;padding:0 20px}header{padding:20px}.scores{padding:0 20px;gap:9px}.score-card{padding:11px 10px;gap:7px}.score-number{font-size:20px}.board-panel{padding:15px}.tray-panel{padding:16px 12px}.piece-button{height:59px}.piece-grid{gap:5px}.keyboard-note{font-size:7px}.bottom-note{padding:0 20px}}
+@media(max-width:760px){header{padding:18px 18px 16px;gap:12px}h1{font-size:17px}.tagline{font-size:8px}.brand{gap:9px}.brand-icon{transform:scale(.82);transform-origin:left center;width:31px}.header-actions{gap:5px}.header-actions .small-button{padding:7px 9px;font-size:10px;min-height:33px}.sound-label{display:none}.scores{padding:0 16px;margin:16px auto;gap:6px}.score-card{padding:10px 7px;display:block}.score-card .color-dot{width:7px;height:7px;float:left;margin:2px 5px 0 0}.score-name{font-size:9px}.score-role{font-size:8px;margin-top:5px}.score-number{font-size:20px;margin-top:7px}.score-number small{font-size:8px}.layout{grid-template-columns:1fr;padding:0 16px;gap:16px}.board-panel{padding:13px;border-radius:12px}.turn-line{margin-bottom:12px}.turn-title{font-size:12px}.move-count{font-size:8px}.board-wrap{padding:5px;max-height:77dvh}.board-sizing{max-width:none}.board-meta{font-size:8px;gap:7px}.placement-bar{gap:10px;margin-top:12px;padding-top:12px}.placement-message{font-size:10px}.confirm{font-size:11px;padding:10px 17px;min-height:42px}.tray-panel{padding:17px 14px}.tray-description{font-size:10px;margin-bottom:12px}.piece-grid{grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}.piece-button{height:56px;padding:6px 4px 15px}.piece-button[aria-pressed=true]{padding:5px 3px 14px}.piece-button small{font-size:7px;bottom:4px}.piece-button svg{max-height:32px}.piece-controls{position:static;background:#f9faf4f5;padding:12px;border:1px solid var(--line);border-radius:9px;margin:14px 0 0;box-shadow:0 3px 20px #173f3610}.selected-line{margin-bottom:8px}.transform-buttons button{min-height:38px}.secondary-controls button{min-height:33px}.keyboard-note{display:none}.history-panel{padding:19px 5px 0}.game-log{display:grid;grid-template-columns:1fr 1fr;gap:8px}.game-log li{font-size:8px}.bottom-note{padding:0 18px;margin:20px 0;display:block;font-size:8px}.bottom-note span:last-child{display:block;margin-top:8px;font-size:8px}.piece-filters button{font-size:10px}.guide-grid{grid-template-columns:repeat(5,1fr)}}
+@media(max-width:390px){h1{font-size:15px}.tagline{font-size:7px;letter-spacing:.07em}.header-actions .small-button{font-size:9px;padding:7px}.header-actions .sound-button{display:none}.scores{padding:0 12px;gap:5px}.layout{padding:0 12px}.score-card{padding:9px 6px}.score-name{font-size:8px}.score-role{font-size:7px}.score-number{font-size:18px}.piece-grid{grid-template-columns:repeat(6,minmax(0,1fr))}.board-panel{padding:10px}.placement-message{font-size:9px}.confirm{padding:10px 13px}.board-meta>span{font-size:7px}.dialog-title{font-size:22px}dialog{padding:24px}.guide-grid{grid-template-columns:repeat(5,1fr)}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><span class="brand-icon" aria-hidden="true"></span><div><h1>CORNER BLOCKS</h1><p class="tagline">角から、広がる。ブロック陣取りゲーム</p></div></div>
+  <div class="header-actions"><button type="button" class="small-button sound-button" id="sound" aria-pressed="false" aria-label="効果音をオンにする"><span class="icon" aria-hidden="true">♪</span><span class="sound-label">音 OFF</span></button><button type="button" class="small-button" id="rules-open">あそびかた</button><button type="button" class="small-button" id="setup-open">対戦設定</button></div>
+</header>
+<section class="scores" id="scores" aria-label="4色の残りマス数"></section>
+<main class="layout">
+  <section class="board-panel" aria-label="ゲーム盤">
+    <div class="turn-line" id="turn-line"><span class="turn-dot" aria-hidden="true"></span><div class="turn-title" id="turn-title">角をつないで、ひろげよう。</div><span class="move-count" id="move-count">20 × 20 BOARD</span></div>
+    <div class="board-wrap" id="board-wrap"><div class="board-sizing" id="board-sizing"><canvas id="board" width="800" height="800" tabindex="0" aria-label="20行20列のゲーム盤。ピースを選び、盤面をタップして場所を確認してから、ここに置くボタンで確定します。"></canvas></div></div>
+    <div class="board-meta"><span id="board-hint">ピースをえらぶ → 盤面で場所をきめる → 置く</span><div class="zoom-controls"><button type="button" id="zoom-out" aria-label="盤面を縮小する" disabled>−</button><span class="zoom-label" id="zoom-label">100%</span><button type="button" id="zoom-in" aria-label="盤面を拡大する">＋</button></div></div>
+    <div class="placement-bar"><div class="placement-message" id="placement-message" role="status" aria-live="polite">はじめに、対戦する人数をえらんでね。</div><button type="button" class="confirm" id="place" disabled>ここに置く ↗</button></div>
+  </section>
+  <aside>
+    <section class="tray-panel" aria-labelledby="tray-title">
+      <div class="tray-heading"><span class="turn-dot" aria-hidden="true"></span><h2 id="tray-title">あなたのピース</h2><span class="remaining" id="remaining">21 / 21</span></div>
+      <p class="tray-description" id="tray-description">1マスから5マスまで、かたちは全部で21種類。</p>
+      <div class="piece-filters" role="group" aria-label="ピースを大きさで絞り込む"><button type="button" data-size="all" aria-pressed="true">すべて</button><button type="button" data-size="5" aria-pressed="false">5マス</button><button type="button" data-size="4" aria-pressed="false">4マス</button><button type="button" data-size="small" aria-pressed="false">1〜3マス</button></div>
+      <div class="piece-grid" id="pieces" role="group" aria-label="ピース一覧"></div>
+      <div class="piece-controls"><div class="selected-line"><span class="selected-name" id="selected-name">ピースをえらんでね</span><span class="selected-size" id="selected-size"></span></div><div class="transform-buttons"><button type="button" id="rotate-left" disabled><span aria-hidden="true">↶</span>左回転</button><button type="button" id="rotate-right" disabled><span aria-hidden="true">↷</span>右回転</button><button type="button" id="flip" disabled><span aria-hidden="true">⇋</span>裏返す</button></div><div class="secondary-controls"><button type="button" id="hint" disabled>✧ 置ける場所</button><button type="button" id="undo" disabled>↩ 一手戻す</button></div><p class="keyboard-note">Q / E：回転　F：裏返し　矢印：位置　Enter：置く</p></div>
+    </section>
+    <section class="history-panel" aria-label="対戦の記録"><div class="history-heading"><h2>あそびの記録</h2><span class="save-state" id="save-state">OFFLINE READY</span></div><ol class="game-log" id="game-log"><li>21種類のピース、4色の作戦。</li></ol></section>
+  </aside>
+</main>
+<footer class="bottom-note"><span>同じ色は角でつなぐ。辺どうしはつなげない。<br>同じ画面で交代してあそべます。ゲームのデータはこのブラウザに保存します。</span><span>21 SHAPES · 4 COLORS · ENDLESS POSSIBILITIES</span></footer>
+<dialog id="setup-dialog" aria-labelledby="setup-title"><p class="dialog-eyebrow">LET'S FIND YOUR CORNER</p><h2 class="dialog-title" id="setup-title">角から、あそぼう。</h2><p class="dialog-description">ぴったり置けたら、きもちいい。<br>色とりどりのピースで、盤面をひろげよう。</p><div class="setup-illustration" id="setup-art" aria-hidden="true"></div><button type="button" class="resume-button" id="resume" hidden>保存した対戦のつづきから ↗</button><span class="setup-label">人間のプレイヤーは何人？</span><div class="player-choices" role="group" aria-label="人間のプレイヤー数"><button type="button" data-humans="1" aria-pressed="true">1人<small>CPU 3人</small></button><button type="button" data-humans="2" aria-pressed="false">2人<small>CPU 2人</small></button><button type="button" data-humans="3" aria-pressed="false">3人<small>CPU 1人</small></button><button type="button" data-humans="4" aria-pressed="false">4人<small>みんなで対戦</small></button></div><p class="setup-note" id="setup-note">あなたは青。ほかの3色はCPUが担当します。</p><div id="difficulty-section"><span class="setup-label">CPUの強さ</span><div class="difficulty-choices" role="group" aria-label="CPUの強さ"><button type="button" data-difficulty="easy" aria-pressed="false">やさしい</button><button type="button" data-difficulty="normal" aria-pressed="true">ふつう</button><button type="button" data-difficulty="hard" aria-pressed="false">つよい</button></div></div><button type="button" class="dialog-main-button" id="start">この人数ではじめる →</button><button type="button" class="dialog-link-button" id="setup-cancel" hidden>いまの対戦にもどる</button></dialog>
+<dialog id="rules-dialog" aria-labelledby="rules-title"><button type="button" class="dialog-close" id="rules-close" aria-label="あそびかたを閉じる">×</button><p class="dialog-eyebrow">SMALL RULES, BIG IDEAS</p><h2 class="dialog-title" id="rules-title">角だけ、つなごう。</h2><ol class="rules-list"><li>最初のピースは、<strong>自分の色の隅</strong>をかならず覆うように置きます。</li><li>2個目からは、盤面にある<strong>同じ色のピースの角</strong>につなぎます。同じ色の辺どうしは接してはいけません。</li><li>ほかの色とは、辺で接してもOK。重ねたり、盤面からはみ出したりするのはNGです。</li><li>ピースをえらんで、回転・裏返し。盤面をタップして、<strong>「ここに置く」</strong>で確定します。</li><li>置けるピースがなくなった色は自動でパス。全色が置けなくなると終了です。</li></ol><p class="rule-tip">残った1マスにつき −1点。全部置けたら ＋15点、最後が1マスのピースならさらに ＋5点。点数がいちばん高い人の勝ち！<br><br>このゲームは4色対戦です。人間は1〜4人で、空いている席をCPUが担当します。2人用の「1人2色」ルールは使いません。</p><section class="piece-guide"><h3>21種類、ぜんぶちがうかたち。</h3><p>1マス×1種 / 2マス×1種 / 3マス×2種 / 4マス×5種 / 5マス×12種。1色あたり合計89マスです。</p><div class="guide-grid" id="guide-grid"></div></section><button type="button" class="dialog-main-button" id="rules-done">わかった、あそぼう →</button></dialog>
+<dialog id="result-dialog" aria-labelledby="result-title"><p class="dialog-eyebrow">THAT WAS A GOOD GAME</p><div class="result-trophy" aria-hidden="true">✦</div><h2 class="dialog-title" id="result-title">対戦終了！</h2><p class="dialog-description" id="result-description"></p><ol class="results-list" id="results-list"></ol><button type="button" class="dialog-main-button" id="play-again">もう一度あそぶ →</button><button type="button" class="dialog-link-button" id="result-close">盤面を見る</button></dialog>
+<div class="toast" id="toast" role="status" hidden></div>
+<p class="visually-hidden" id="announcer" aria-live="polite"></p>
+<script id="rules-engine">
+/* Pure game engine. No network, DOM, or external dependencies. */
+const BlockEngine = (() => {
+  'use strict';
+  const N = 20;
+  const definitions = [
+    ['O1',[[0,0]]], ['I2',[[0,0],[1,0]]],
+    ['I3',[[0,0],[1,0],[2,0]]], ['V3',[[0,0],[0,1],[1,1]]],
+    ['I4',[[0,0],[1,0],[2,0],[3,0]]], ['O4',[[0,0],[1,0],[0,1],[1,1]]],
+    ['T4',[[0,0],[1,0],[2,0],[1,1]]], ['L4',[[0,0],[0,1],[0,2],[1,2]]],
+    ['Z4',[[0,0],[1,0],[1,1],[2,1]]],
+    ['F5',[[1,0],[2,0],[0,1],[1,1],[1,2]]], ['I5',[[0,0],[1,0],[2,0],[3,0],[4,0]]],
+    ['L5',[[0,0],[0,1],[0,2],[0,3],[1,3]]], ['P5',[[0,0],[1,0],[0,1],[1,1],[0,2]]],
+    ['N5',[[0,0],[0,1],[1,1],[1,2],[1,3]]], ['T5',[[0,0],[1,0],[2,0],[1,1],[1,2]]],
+    ['U5',[[0,0],[2,0],[0,1],[1,1],[2,1]]], ['V5',[[0,0],[0,1],[0,2],[1,2],[2,2]]],
+    ['W5',[[0,0],[0,1],[1,1],[1,2],[2,2]]], ['X5',[[1,0],[0,1],[1,1],[2,1],[1,2]]],
+    ['Y5',[[0,0],[0,1],[0,2],[0,3],[1,1]]], ['Z5',[[0,0],[1,0],[1,1],[1,2],[2,2]]]
+  ];
+  const EDGES = [[1,0],[-1,0],[0,1],[0,-1]];
+  const DIAGONALS = [[1,1],[-1,1],[1,-1],[-1,-1]];
+  const CORNERS = [[0,0],[19,0],[19,19],[0,19]];
+  const COLORS = ['#4388c7','#ddb34d','#d57566','#66a084'];
+  const COLOR_NAMES = ['青','黄','赤','緑'];
+  const normalize = cells => {
+    const minX = Math.min(...cells.map(cell=>cell[0])), minY = Math.min(...cells.map(cell=>cell[1]));
+    return cells.map(([x,y])=>[x-minX,y-minY]).sort((a,b)=>a[1]-b[1]||a[0]-b[0]);
+  };
+  const key = cells => normalize(cells).map(cell=>cell.join(',')).join(';');
+  function transform(cells, rotation=0, flipped=false) {
+    let next = cells.map(([x,y])=>[flipped ? -x : x,y]);
+    for(let turn=0;turn<((rotation%4)+4)%4;turn++) next=next.map(([x,y])=>[-y,x]);
+    return normalize(next);
+  }
+  const PIECES = definitions.map(([name,cells],id)=>({id,name,cells:normalize(cells),size:cells.length}));
+  const ORIENTATIONS = PIECES.map(piece=>{
+    const seen = new Set(), variants=[];
+    for(const flip of [false,true]) for(let rotation=0;rotation<4;rotation++) {
+      const cells=transform(piece.cells,rotation,flip), signature=key(cells);
+      if(!seen.has(signature)){seen.add(signature);variants.push(cells);}
+    }
+    return variants;
+  });
+  const inside=(x,y)=>x>=0&&x<N&&y>=0&&y<N;
+  const clone=state=>JSON.parse(JSON.stringify(state));
+  function create(humanCount=1,difficulty='normal') {
+    const humanSeats = humanCount===2 ? [0,2] : Array.from({length:humanCount},(_,i)=>i);
+    let human=0,cpu=0;
+    return {version:1,humanCount,difficulty,board:Array(N*N).fill(0),turn:0,moveCount:0,ended:false,lastMove:null,log:[],players:COLORS.map((color,id)=>({color,name:humanSeats.includes(id)?`プレイヤー${++human}`:`CPU ${++cpu}`,kind:humanSeats.includes(id)?'human':'cpu',remaining:Array(21).fill(true),placed:0,lastPiece:null,blocked:false}))};
+  }
+  function legal(state,player,cells,x,y) {
+    if(!Number.isInteger(x)||!Number.isInteger(y)) return '盤面で置く場所をえらんでね。';
+    let cornerTouch=false, coversStart=false;
+    for(const [dx,dy] of cells){
+      const bx=x+dx,by=y+dy;
+      if(!inside(bx,by)) return 'ピースが盤面からはみ出しています。';
+      if(state.board[by*N+bx]) return 'ほかのピースと重なっています。';
+      if(bx===CORNERS[player][0]&&by===CORNERS[player][1]) coversStart=true;
+      for(const [ex,ey] of EDGES) if(inside(bx+ex,by+ey)&&state.board[(by+ey)*N+bx+ex]===player+1) return '同じ色の辺どうしは、くっつけられません。';
+      for(const [cx,cy] of DIAGONALS) if(inside(bx+cx,by+cy)&&state.board[(by+cy)*N+bx+cx]===player+1) cornerTouch=true;
+    }
+    if(state.players[player].placed===0) return coversStart ? '' : `最初は${COLOR_NAMES[player]}の隅を覆うように置いてね。`;
+    return cornerTouch ? '' : '同じ色のピースの角につないでね。';
+  }
+  function frontier(state,player) {
+    if(!state.players[player].placed) return [CORNERS[player]];
+    const found=new Set();
+    for(let index=0;index<N*N;index++) if(state.board[index]===player+1){
+      const x=index%N,y=Math.floor(index/N);
+      for(const [dx,dy] of DIAGONALS){
+        const nx=x+dx,ny=y+dy;
+        if(!inside(nx,ny)||state.board[ny*N+nx]) continue;
+        if(EDGES.some(([ex,ey])=>inside(nx+ex,ny+ey)&&state.board[(ny+ey)*N+nx+ex]===player+1)) continue;
+        found.add(ny*N+nx);
+      }
+    }
+    return [...found].map(index=>[index%N,Math.floor(index/N)]);
+  }
+  function eachMove(state,player,visit,onlyPiece=null) {
+    const anchors=frontier(state,player);
+    const pieces=PIECES.filter(piece=>state.players[player].remaining[piece.id]&&(onlyPiece===null||onlyPiece===piece.id)).sort((a,b)=>b.size-a.size);
+    for(const piece of pieces){
+      const seen=new Set();
+      for(let orientation=0;orientation<ORIENTATIONS[piece.id].length;orientation++){
+        const cells=ORIENTATIONS[piece.id][orientation];
+        for(const [fx,fy] of anchors) for(const [cx,cy] of cells){
+          const x=fx-cx,y=fy-cy,signature=`${orientation}/${x}/${y}`;
+          if(seen.has(signature)) continue;
+          seen.add(signature);
+          if(!legal(state,player,cells,x,y)&&visit({piece:piece.id,orientation,x,y})===false) return;
+        }
+      }
+    }
+  }
+  function findMove(state,player,onlyPiece=null) {
+    let found=null;
+    eachMove(state,player,move=>{found=move;return false;},onlyPiece);
+    return found;
+  }
+  function remainingSquares(player) { return PIECES.reduce((sum,piece)=>sum+(player.remaining[piece.id]?piece.size:0),0); }
+  function score(player) { return remainingSquares(player) ? -remainingSquares(player) : 15+(player.lastPiece===0?5:0); }
+  function apply(state,move) {
+    const player=state.players[state.turn];
+    if(state.ended||!Number.isInteger(move.piece)||!player.remaining[move.piece]) return 'そのピースは使えません。';
+    const cells=ORIENTATIONS[move.piece]?.[move.orientation];
+    if(!cells) return 'ピースの向きを確認してね。';
+    const error=legal(state,state.turn,cells,move.x,move.y);
+    if(error) return error;
+    for(const [dx,dy] of cells) state.board[(move.y+dy)*N+move.x+dx]=state.turn+1;
+    player.remaining[move.piece]=false;player.placed++;player.lastPiece=move.piece;
+    state.lastMove={...move,player:state.turn};state.moveCount++;
+    state.log.unshift(`${COLOR_NAMES[state.turn]} · ${player.name} が ${PIECES[move.piece].name} を置きました`);
+    state.log=state.log.slice(0,8);
+    state.turn=(state.turn+1)%4;
+    return '';
+  }
+  function advance(state) {
+    for(let checked=0;checked<4;checked++){
+      const player=state.players[state.turn];
+      if(!player.blocked && findMove(state,state.turn)) return;
+      if(!player.blocked){player.blocked=true;state.log.unshift(`${COLOR_NAMES[state.turn]} · ${player.name} は置けるピースがなくなりました`);state.log=state.log.slice(0,8);}
+      state.turn=(state.turn+1)%4;
+    }
+    state.ended=true;
+  }
+  function moveValue(state,player,move) {
+    const cells=ORIENTATIONS[move.piece][move.orientation];
+    const placed=new Set(cells.map(([x,y])=>(y+move.y)*N+x+move.x));
+    const newCorners=new Set();
+    let central=0, contact=0;
+    for(const [x,y] of cells){
+      const bx=x+move.x,by=y+move.y;
+      central+=19-Math.abs(bx-9.5)-Math.abs(by-9.5);
+      for(const [dx,dy] of DIAGONALS){
+        const nx=bx+dx,ny=by+dy,index=ny*N+nx;
+        if(!inside(nx,ny)||state.board[index]||placed.has(index)) continue;
+        if(!EDGES.some(([ex,ey])=>inside(nx+ex,ny+ey)&&(state.board[(ny+ey)*N+nx+ex]===player+1||placed.has((ny+ey)*N+nx+ex)))) newCorners.add(index);
+      }
+      for(const [dx,dy] of EDGES){const nx=bx+dx,ny=by+dy;if(inside(nx,ny)&&state.board[ny*N+nx]&&state.board[ny*N+nx]!==player+1)contact++;}
+    }
+    return cells.length*16+central/cells.length*.55+newCorners.size*2.2+contact*.2;
+  }
+  function chooseAI(state,player,difficulty='normal',random=Math.random) {
+    let count=0,randomMove=null;
+    const best=[];
+    eachMove(state,player,move=>{
+      if(difficulty==='easy'){if(random()<1/++count)randomMove=move;return;}
+      const value=moveValue(state,player,move)+random()*.3;
+      if(best.length<10||value>best[best.length-1].value){best.push({move,value});best.sort((a,b)=>b.value-a.value);best.length=Math.min(best.length,10);}
+    });
+    if(difficulty==='easy')return randomMove;
+    if(!best.length)return null;
+    if(difficulty==='hard'){
+      const before=Array.from({length:4},(_,p)=>frontier(state,p).length);
+      for(const candidate of best){
+        const next=clone(state);next.turn=player;apply(next,candidate.move);
+        candidate.value+=(frontier(next,player).length-before[player])*1.4;
+        for(let other=0;other<4;other++)if(other!==player)candidate.value+=(before[other]-frontier(next,other).length)*1.2;
+      }
+      best.sort((a,b)=>b.value-a.value);
+      return best[0].move;
+    }
+    const near=best.filter(item=>item.value>=best[0].value-3);
+    return near[Math.floor(random()*near.length)].move;
+  }
+  function validState(state) {
+    if(!state||state.version!==1||!Number.isInteger(state.humanCount)||state.humanCount<1||state.humanCount>4||!['easy','normal','hard'].includes(state.difficulty)||!Array.isArray(state.board)||state.board.length!==400||!state.board.every(n=>Number.isInteger(n)&&n>=0&&n<=4)||!Number.isInteger(state.turn)||state.turn<0||state.turn>3||!Array.isArray(state.players)||state.players.length!==4||!Array.isArray(state.log)||!state.log.every(item=>typeof item==='string')||typeof state.ended!=='boolean')return false;
+    if(!Number.isInteger(state.moveCount)||state.moveCount<0||state.moveCount>84)return false;
+    return state.players.every((player,p)=>Array.isArray(player.remaining)&&player.remaining.length===21&&player.remaining.every(item=>typeof item==='boolean')&&['human','cpu'].includes(player.kind)&&typeof player.name==='string'&&player.name.length<40&&typeof player.blocked==='boolean'&&player.placed===player.remaining.filter(item=>!item).length&&89-remainingSquares(player)===state.board.filter(item=>item===p+1).length);
+  }
+  return {N,PIECES,ORIENTATIONS,CORNERS,COLORS,COLOR_NAMES,normalize,key,transform,clone,create,legal,frontier,eachMove,findMove,remainingSquares,score,apply,advance,chooseAI,validState};
+})();
+</script>
+<script>
+(() => {
+  'use strict';
+  const E=BlockEngine, $=id=>document.getElementById(id), canvas=$('board'),ctx=canvas.getContext('2d');
+  const setup=$('setup-dialog'),rules=$('rules-dialog'),result=$('result-dialog');
+  const STORAGE_KEY='corner-blocks:game:v1';
+  let state=null,history=[],selected=null,rotation=0,flipped=false,ghost=null,pinned=false,dragging=false,filter='all';
+  let humans=1,difficulty='normal',busy=false,worker=null,workerUrl=null,job=0,paused=false,zoom=1,sound=false,audio=null,toastTimer=null,saved=null;
+  function el(tag,className,text){const node=document.createElement(tag);if(className)node.className=className;if(text!==undefined)node.textContent=text;return node;}
+  function svgPiece(cells,color='currentColor'){
+    const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');
+    const width=Math.max(...cells.map(c=>c[0]))+1,height=Math.max(...cells.map(c=>c[1]))+1;
+    svg.setAttribute('viewBox',`-1 -1 ${width*10+2} ${height*10+2}`);svg.setAttribute('aria-hidden','true');
+    for(const [x,y] of cells){const rect=document.createElementNS(ns,'rect');rect.setAttribute('x',x*10+.5);rect.setAttribute('y',y*10+.5);rect.setAttribute('width','9');rect.setAttribute('height','9');rect.setAttribute('rx','1.2');rect.setAttribute('fill',color);svg.append(rect);}
+    return svg;
+  }
+  function soundEffect(win=false){if(!sound)return;try{audio??=new(window.AudioContext||window.webkitAudioContext)();audio.resume();[0,...(win?[1,2]:[])].forEach((_,i)=>{const osc=audio.createOscillator(),gain=audio.createGain(),start=audio.currentTime+i*.1;osc.type='sine';osc.frequency.value=win?[440,554,659][i]:520;gain.gain.setValueAtTime(.07,start);gain.gain.exponentialRampToValueAtTime(.001,start+.16);osc.connect(gain);gain.connect(audio.destination);osc.start(start);osc.stop(start+.17);});}catch{}}
+  function toast(text){$('toast').textContent=text;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,2800);}
+  function announce(text){$('announcer').textContent=text;}
+  function save(){if(!state)return;try{localStorage.setItem(STORAGE_KEY,JSON.stringify({state,history:history.slice(-12)}));$('save-state').textContent='自動保存済み';}catch{$('save-state').textContent='この画面でプレイ中';}}
+  try{const data=JSON.parse(localStorage.getItem(STORAGE_KEY));if(E.validState(data?.state)&&!data.state.ended)saved=data;}catch{}
+  const activePlayer=()=>state?.players[state.turn];
+  const canPlay=()=>state&&!state.ended&&!busy&&!paused&&activePlayer().kind==='human';
+  const shape=()=>selected===null?null:E.transform(E.PIECES[selected].cells,rotation,flipped);
+  function moveFromGhost(){const cells=shape();return {piece:selected,orientation:E.ORIENTATIONS[selected].findIndex(item=>E.key(item)===E.key(cells)),x:ghost.x,y:ghost.y};}
+  function clearSelection(){selected=null;rotation=0;flipped=false;ghost=null;pinned=false;dragging=false;}
+  function cancelCPU(){job++;busy=false;if(worker){worker.terminate();worker=null;}}
+  function svgAll(){for(const [id,index] of [['setup-art',9],['setup-art',14],['setup-art',17],['setup-art',20]]){$(id).append(svgPiece(E.PIECES[index].cells,E.COLORS[[9,14,17,20].indexOf(index)]));}for(const piece of E.PIECES){const cell=el('div','guide-piece');cell.append(svgPiece(piece.cells),el('small','',piece.name));$('guide-grid').append(cell);}}
+  function renderScores(){const players=state?.players??E.create().players;$('scores').replaceChildren(...players.map((player,id)=>{const card=el('div','score-card'+(state&&!state.ended&&state.turn===id?' active':'')+(player.blocked?' blocked':''));card.style.setProperty('--color',E.COLORS[id]);const dot=el('span','color-dot');dot.setAttribute('aria-hidden','true');const info=el('div','score-info');info.append(el('div','score-name',player.name),el('div','score-role',`${E.COLOR_NAMES[id]} / ${player.blocked?'配置終了':player.kind==='human'?'人間':'CPU'}`));const number=el('div','score-number',String(E.remainingSquares(player)));number.append(el('small','','マス'));card.append(dot,info,number);return card;}));}
+  function renderPieces(){const player=activePlayer()??E.create().players[0];$('pieces').replaceChildren(...E.PIECES.filter(piece=>filter==='all'||(filter==='small'?piece.size<=3:piece.size===+filter)).map(piece=>{const used=!player.remaining[piece.id],button=el('button','piece-button'+(used?' used':''));button.type='button';button.dataset.piece=piece.id;button.disabled=used||!canPlay();button.setAttribute('aria-label',`${piece.name}、${piece.size}マス${used?'、配置済み':''}`);button.setAttribute('aria-pressed',String(selected===piece.id));button.append(svgPiece(piece.cells),el('small','',piece.name));return button;}));document.querySelectorAll('[data-size]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.size===filter)));$('remaining').textContent=`${player.remaining.filter(Boolean).length} / 21`;$('tray-title').textContent=state?`${player.name} のピース`:'あなたのピース';$('tray-description').textContent=busy?'CPUがピースをえらんでいます。':state?.ended?'対戦終了。残ったピースを確認できます。':'ピースをえらんで、盤面に置いてみよう。';}
+  function renderControls(){const playable=canPlay(),cells=shape();for(const id of ['rotate-left','rotate-right','flip'])$(id).disabled=!playable||selected===null;$('hint').disabled=!playable;$('undo').disabled=!state||history.length===0||paused;$('selected-name').textContent=selected===null?'ピースをえらんでね':`${E.PIECES[selected].name} を選択中`;$('selected-size').textContent=cells?`${cells.length}マス`:'';let message='ピースをえらんで、盤面をタップしてね。',status='';$('place').disabled=true;if(!state)message='はじめに、対戦する人数をえらんでね。';else if(state.ended)message='対戦終了！ 対戦設定から新しくあそべます。';else if(busy)message='CPUが考えています。少し待ってね。';else if(paused)message='対戦を一時停止しています。';else if(cells&&ghost){const error=E.legal(state,state.turn,cells,ghost.x,ghost.y);message=error||'ここに置けます。「ここに置く」で確定。';status=error?'bad':'good';$('place').disabled=!!error||!playable;}else if(cells)message='盤面をタップして、置く場所をえらんでね。';$('placement-message').textContent=message;$('placement-message').className='placement-message '+status;}
+  function render(){const color=state?E.COLORS[state.turn]:E.COLORS[0];document.documentElement.style.setProperty('--active',color);renderScores();renderPieces();renderControls();$('board-hint').textContent=selected===null?'ピースをえらぶ → 盤面で場所をきめる → 置く':`${E.PIECES[selected].name} 選択中 · 盤面をタップして配置`;const player=activePlayer();$('turn-title').textContent=!state?'角をつないで、ひろげよう。':state.ended?'すべての色が配置終了':busy?`${player.name} が考えています…`:`${player.name} の番です`;$('turn-line').classList.toggle('thinking',busy);$('move-count').textContent=state?`${state.moveCount} PIECES PLACED`:'20 × 20 BOARD';if(state)$('game-log').replaceChildren(...state.log.slice(0,6).map(text=>el('li','',text)));draw();}
+  function draw(){const size=800,pad=20,cell=38;ctx.clearRect(0,0,size,size);ctx.fillStyle='#f2f4e9';ctx.fillRect(0,0,size,size);ctx.fillStyle='#fafbf5';ctx.fillRect(pad,pad,760,760);ctx.strokeStyle='#dbe2d0';ctx.lineWidth=1;ctx.beginPath();for(let i=0;i<=20;i++){ctx.moveTo(pad+i*cell+.5,pad);ctx.lineTo(pad+i*cell+.5,780);ctx.moveTo(pad,pad+i*cell+.5);ctx.lineTo(780,pad+i*cell+.5);}ctx.stroke();ctx.fillStyle='#a1ae96';ctx.font='9px Arial';ctx.textAlign='center';ctx.textBaseline='middle';for(let i=0;i<20;i++){ctx.fillText(String.fromCharCode(65+i),pad+i*cell+cell/2,9);ctx.fillText(String(i+1),9,pad+i*cell+cell/2);}const board=state?.board??Array(400).fill(0);for(let i=0;i<400;i++)if(board[i])drawTile(i%20,Math.floor(i/20),E.COLORS[board[i]-1],1);for(let p=0;p<4;p++)if(!state||state.players[p].placed===0){const[x,y]=E.CORNERS[p];ctx.fillStyle=E.COLORS[p];ctx.globalAlpha=.22;ctx.fillRect(pad+x*cell+2,pad+y*cell+2,cell-4,cell-4);ctx.globalAlpha=1;ctx.font='bold 19px Arial';ctx.fillText('●',pad+x*cell+cell/2,pad+y*cell+cell/2);}if(state?.lastMove){const move=state.lastMove,cells=E.ORIENTATIONS[move.piece][move.orientation];ctx.strokeStyle='#183f36';ctx.lineWidth=2;ctx.setLineDash([4,3]);for(const[dx,dy]of cells)ctx.strokeRect(pad+(move.x+dx)*cell+4,pad+(move.y+dy)*cell+4,cell-8,cell-8);ctx.setLineDash([]);}const cells=shape();if(state&&cells&&ghost){const error=E.legal(state,state.turn,cells,ghost.x,ghost.y);for(const[dx,dy]of cells){const x=ghost.x+dx,y=ghost.y+dy;if(x<0||x>=20||y<0||y>=20)continue;drawTile(x,y,error?'#b86459':E.COLORS[state.turn],error?.35:.58);ctx.strokeStyle=error?'#a94f43':E.COLORS[state.turn];ctx.lineWidth=3;ctx.strokeRect(pad+x*cell+2,pad+y*cell+2,cell-4,cell-4);}ctx.globalAlpha=1;}function drawTile(x,y,color,alpha){ctx.globalAlpha=alpha;ctx.fillStyle=color;ctx.fillRect(pad+x*cell+1.5,pad+y*cell+1.5,cell-3,cell-3);ctx.fillStyle='#ffffff22';ctx.fillRect(pad+x*cell+4,pad+y*cell+4,cell-8,4);ctx.fillStyle='#0000000c';ctx.fillRect(pad+x*cell+3,pad+y*cell+cell-6,cell-6,3);ctx.globalAlpha=1;}}
+  function selectPiece(id){if(!canPlay()||!activePlayer().remaining[id])return;selected=id;rotation=0;flipped=false;ghost=null;pinned=false;renderPieces();renderControls();draw();if(window.innerWidth<761){$('board-hint').textContent=`${E.PIECES[id].name} 選択中 · 盤面をタップして配置`;}canvas.focus({preventScroll:true});if(window.innerWidth<761)$('board-wrap').scrollIntoView({behavior:'smooth',block:'start'});announce(`${E.PIECES[id].name}、${E.PIECES[id].size}マスをえらびました。`);}
+  function rotate(amount){if(!canPlay()||selected===null)return;rotation=(rotation+amount+4)%4;renderControls();draw();}
+  function flip(){if(!canPlay()||selected===null)return;flipped=!flipped;renderControls();draw();}
+  function setGhost(event){if(!canPlay()||selected===null)return;const rect=canvas.getBoundingClientRect(),px=(event.clientX-rect.left)*800/rect.width,py=(event.clientY-rect.top)*800/rect.height;const cells=shape(),width=Math.max(...cells.map(c=>c[0]))+1,height=Math.max(...cells.map(c=>c[1]))+1;ghost={x:Math.max(0,Math.min(20-width,Math.floor((px-20)/38)-Math.floor(width/2))),y:Math.max(0,Math.min(20-height,Math.floor((py-20)/38)-Math.floor(height/2)))};renderControls();draw();}
+  canvas.addEventListener('pointerdown',event=>{if(!canPlay())return;if(selected===null){toast('先にピースをえらんでね。');return;}event.preventDefault();dragging=true;pinned=false;canvas.setPointerCapture(event.pointerId);setGhost(event);});
+  canvas.addEventListener('pointermove',event=>{if(dragging||(!pinned&&event.pointerType==='mouse'))setGhost(event);});
+  canvas.addEventListener('pointerup',event=>{if(!dragging)return;setGhost(event);dragging=false;pinned=true;if(canvas.hasPointerCapture(event.pointerId))canvas.releasePointerCapture(event.pointerId);});
+  canvas.addEventListener('pointercancel',()=>{dragging=false;});
+  canvas.addEventListener('pointerleave',()=>{if(!pinned&&!dragging){ghost=null;renderControls();draw();}});
+  function commit(){if(!canPlay()||selected===null||!ghost)return;const move=moveFromGhost(),error=E.legal(state,state.turn,shape(),ghost.x,ghost.y);if(error){toast(error);return;}history.push(E.clone(state));history=history.slice(-40);const applied=E.apply(state,move);if(applied){history.pop();toast(applied);return;}clearSelection();soundEffect();drive();}
+  function requestAI(){const token=++job;busy=true;render();const applyMove=move=>{if(token!==job||paused||!state||state.ended)return;busy=false;if(move){const error=E.apply(state,move);if(error){const fallback=E.findMove(state,state.turn);if(fallback)E.apply(state,fallback);}}else state.players[state.turn].blocked=true;clearSelection();soundEffect();drive();};
+    if(typeof Worker!=='undefined')try{if(!workerUrl){const source=$('rules-engine').textContent+'\nself.onmessage = event => { const data=event.data; self.postMessage(BlockEngine.chooseAI(data.state,data.player,data.difficulty)); };';workerUrl=URL.createObjectURL(new Blob([source],{type:'text/javascript'}));}const currentWorker=new Worker(workerUrl);worker=currentWorker;currentWorker.onmessage=event=>{currentWorker.terminate();if(worker===currentWorker)worker=null;if(token===job)setTimeout(()=>applyMove(event.data),180);};currentWorker.onerror=()=>{currentWorker.terminate();if(worker===currentWorker)worker=null;if(token===job)setTimeout(()=>{if(token===job&&!paused)applyMove(E.chooseAI(state,state.turn,state.difficulty));},50);};currentWorker.postMessage({state:E.clone(state),player:state.turn,difficulty:state.difficulty});return;}catch{}
+    setTimeout(()=>{if(token===job&&!paused)applyMove(E.chooseAI(state,state.turn,state.difficulty));},160);
+  }
+  function drive(){if(!state||paused)return;E.advance(state);save();render();if(state.ended){finish();return;}announce(`${E.COLOR_NAMES[state.turn]}、${activePlayer().name} の番です。`);if(activePlayer().kind==='cpu')requestAI();}
+  function finish(){const ranked=state.players.map((player,id)=>({player,id,score:E.score(player)})).sort((a,b)=>b.score-a.score),best=ranked[0].score,winners=ranked.filter(item=>item.score===best);$('result-title').textContent=winners.length===1?`${winners[0].player.name} の勝ち！`:'引き分け！';$('result-description').textContent=winners.length===1?`${E.COLOR_NAMES[winners[0].id]}のピースが、いちばん上手に広がりました。`:`${winners.map(item=>item.player.name).join(' と ')} が同点です。`;$('results-list').replaceChildren(...ranked.map((item,index)=>{const row=el('li','result-row'),rank=ranked.findIndex(other=>other.score===item.score)+1,dot=el('span','color-dot');dot.style.setProperty('--color',E.COLORS[item.id]);const name=el('div','result-name',item.player.name);name.append(el('small','',`${E.COLOR_NAMES[item.id]} · 残り${E.remainingSquares(item.player)}マス`));const points=el('span','result-score',(item.score>0?'+':'')+item.score);points.append(el('small','','点'));row.append(el('span','result-rank',String(rank)),dot,name,points);return row;}));soundEffect(true);announce($('result-title').textContent);if(!result.open)result.showModal();}
+  function chooseHumans(count){humans=count;document.querySelectorAll('[data-humans]').forEach(button=>button.setAttribute('aria-pressed',String(+button.dataset.humans===count)));$('difficulty-section').hidden=count===4;$('setup-note').textContent=['','あなたは青。ほかの3色はCPUが担当します。','青と赤が人間、黄と緑はCPUです。同じ画面で交代します。','青・黄・赤が人間、緑はCPUです。同じ画面で交代します。','4色とも人間。同じ画面で交代して対戦します。'][count];}
+  function openSetup(){cancelCPU();paused=true;renderControls();$('setup-cancel').hidden=!state;$('resume').hidden=!!state||!saved;if(state){chooseHumans(state.humanCount);difficulty=state.difficulty;document.querySelectorAll('[data-difficulty]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.difficulty===difficulty)));}if(!setup.open)setup.showModal();}
+  function start(){cancelCPU();state=E.create(humans,difficulty);history=[];clearSelection();filter='all';paused=false;setup.close();if(result.open)result.close();drive();}
+  function undo(){if(!history.length||paused)return;cancelCPU();state=history.pop();clearSelection();save();render();announce('ひとつ前の人間の手番まで戻しました。');if(!state.ended&&activePlayer().kind==='cpu')drive();}
+  function hint(){if(!canPlay())return;let move=E.findMove(state,state.turn,selected);if(!move){if(selected!==null){toast('このピースを置ける場所はありません。別のピースをえらんでね。');return;}drive();return;}selected=move.piece;const desired=E.key(E.ORIENTATIONS[selected][move.orientation]);outer:for(const f of [false,true])for(let r=0;r<4;r++)if(E.key(E.transform(E.PIECES[selected].cells,r,f))===desired){rotation=r;flipped=f;break outer;}ghost={x:move.x,y:move.y};pinned=true;renderPieces();renderControls();draw();$('board').focus({preventScroll:true});if(window.innerWidth<761)$('board-wrap').scrollIntoView({behavior:'smooth',block:'start'});announce(`${E.PIECES[selected].name} を置ける場所を表示しました。ここに置くボタンで確定できます。`);}
+  $('pieces').addEventListener('click',event=>{const button=event.target.closest('[data-piece]');if(button)selectPiece(+button.dataset.piece);});
+  document.querySelectorAll('[data-size]').forEach(button=>button.addEventListener('click',()=>{filter=button.dataset.size;renderPieces();}));
+  document.querySelectorAll('[data-humans]').forEach(button=>button.addEventListener('click',()=>chooseHumans(+button.dataset.humans)));
+  document.querySelectorAll('[data-difficulty]').forEach(button=>button.addEventListener('click',()=>{difficulty=button.dataset.difficulty;document.querySelectorAll('[data-difficulty]').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));}));
+  $('place').addEventListener('click',commit);$('rotate-left').addEventListener('click',()=>rotate(-1));$('rotate-right').addEventListener('click',()=>rotate(1));$('flip').addEventListener('click',flip);$('hint').addEventListener('click',hint);$('undo').addEventListener('click',undo);$('start').addEventListener('click',start);$('setup-open').addEventListener('click',openSetup);$('play-again').addEventListener('click',()=>{result.close();openSetup();});$('result-close').addEventListener('click',()=>result.close());
+  function resumePaused(){paused=false;setup.close();render();if(state&&!state.ended)drive();}
+  $('setup-cancel').addEventListener('click',resumePaused);setup.addEventListener('cancel',event=>{event.preventDefault();if(state)resumePaused();});
+  $('resume').addEventListener('click',()=>{state=E.clone(saved.state);history=Array.isArray(saved.history)?saved.history.filter(E.validState).map(E.clone):[];clearSelection();paused=false;setup.close();drive();});
+  $('rules-open').addEventListener('click',()=>{cancelCPU();paused=true;renderControls();rules.showModal();});
+  function closeRules(){rules.close();paused=false;if(state&&!state.ended)drive();else render();}
+  $('rules-close').addEventListener('click',closeRules);$('rules-done').addEventListener('click',closeRules);rules.addEventListener('cancel',event=>{event.preventDefault();closeRules();});
+  $('sound').addEventListener('click',()=>{sound=!sound;$('sound').setAttribute('aria-pressed',String(sound));$('sound').setAttribute('aria-label',`効果音を${sound?'オフ':'オン'}にする`);$('sound').querySelector('.sound-label').textContent=sound?'音 ON':'音 OFF';if(sound)soundEffect();});
+  function setZoom(value){zoom=value;$('board-sizing').classList.toggle('zoomed',zoom!==1);$('zoom-label').textContent=zoom===1?'100%':'180%';$('zoom-in').disabled=zoom!==1;$('zoom-out').disabled=zoom===1;}
+  $('zoom-in').addEventListener('click',()=>setZoom(1.8));$('zoom-out').addEventListener('click',()=>setZoom(1));
+  document.addEventListener('keydown',event=>{if(setup.open||rules.open||result.open||!canPlay()||event.target.closest('input,select,textarea'))return;const key=event.key.toLowerCase();if(key==='q'){event.preventDefault();rotate(-1);}else if(key==='e'){event.preventDefault();rotate(1);}else if(key==='f'){event.preventDefault();flip();}else if(key==='escape'){clearSelection();render();}else if(key==='enter'&&event.target===canvas){event.preventDefault();commit();}else if(['arrowleft','arrowright','arrowup','arrowdown'].includes(key)&&selected!==null){event.preventDefault();ghost??={x:8,y:8};if(key==='arrowleft')ghost.x--;if(key==='arrowright')ghost.x++;if(key==='arrowup')ghost.y--;if(key==='arrowdown')ghost.y++;pinned=true;renderControls();draw();}});
+  window.addEventListener('pagehide',()=>{save();cancelCPU();if(workerUrl){URL.revokeObjectURL(workerUrl);workerUrl=null;}});
+  window.addEventListener('pageshow',event=>{if(event.persisted&&state&&!paused&&!state.ended)drive();});
+  const controlNode=document.querySelector('.piece-controls'),compactLayout=window.matchMedia('(max-width:760px)');
+  function syncControls(){if(compactLayout.matches)document.querySelector('.board-panel').insertBefore(controlNode,document.querySelector('.placement-bar'));else document.querySelector('.tray-panel').append(controlNode);}
+  compactLayout.addEventListener('change',syncControls);syncControls();
+  svgAll();render();chooseHumans(1);openSetup();
+})();
+</script>
+</body>
+</html>
